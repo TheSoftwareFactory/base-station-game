@@ -40,5 +40,4 @@ public class MainActivity extends AppCompatActivity {
         //tv1.setText("Hello1");
         //tv2.setText("Hello2");
     }
-
 }
