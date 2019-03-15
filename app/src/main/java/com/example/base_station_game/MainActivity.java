@@ -10,6 +10,9 @@ public class MainActivity extends AppCompatActivity {
     TextView tv1;
     TextView tv2;
     int counter=0;
+    Handler handler = new Handler();
+    int millisecondsOfDelay = 1000;
+    int timesToReapeat = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,26 +20,25 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         tv1 = (TextView)findViewById(R.id.textViewUP);
         tv2 = (TextView)findViewById(R.id.textViewDOWN);
-        Handler handler = new Handler();
+
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 counter++;
                 tv1.setText(""+counter);
                 tv2.setText(""+counter);
-
-                /*if(counter<10) {
-                    handler.postDelayed(this, 1000);
-                }*/
+                if(counter<timesToReapeat) {
+                    handler.postDelayed(this, millisecondsOfDelay);
+                }
             }
-        }, 1000);
+        }, millisecondsOfDelay);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        tv1.setText("Hello1");
-        tv2.setText("Hello2");
+        //tv1.setText("Hello1");
+        //tv2.setText("Hello2");
     }
 
 }
