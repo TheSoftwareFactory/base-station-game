@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">base-station-game</string>
+    <string name="pause">pause</string>
 </resources>
