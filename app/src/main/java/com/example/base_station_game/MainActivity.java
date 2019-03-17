@@ -1,12 +1,17 @@
 package com.example.base_station_game;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.widget.TextView;
+import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String LOG_TAG =
+        MainActivity.class.getSimpleName();
     TextView tv1;
     TextView tv2;
     int counter=0;
@@ -39,5 +44,12 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         //tv1.setText("Hello1");
         //tv2.setText("Hello2");
+    }
+
+
+    public void launchSecondActivity(View view) {
+        Log.d(LOG_TAG, "Button clicked!");
+        Intent intent = new Intent(this, SecondActivity.class);
+        startActivity(intent);
     }
 }
