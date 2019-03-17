@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -61,38 +62,39 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        configure_button();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
-            case 10:
-                configure_button();
-                break;
-            default:
-                break;
-        }
-    }
 
-    void configure_button(){
-        // first check for permissions
+    public void sendMessage(View view) {
+        //check weather gps is enabled
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.INTERNET}
                         ,10);
             }
+            t.setText("error");
             return;
         }
-        // this code won't execute IF permissions are not allowed, because in the line above there is return statement.
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //noinspection MissingPermission
-                locationManager.requestLocationUpdates("gps", 5000, 0, listener);
-            }
-        });
+
+        switch (view.getId())
+        {
+            case R.id.button: {t.setText("");  locationManager.requestLocationUpdates("gps", 5000, 0, listener); break;}
+            case R.id.reset: t.setText(""); break;
+            case R.id.stop_gps:  {t.append("GPS STOPPED");  onPause(); break;}
+        }
     }
+
+    //stop gps
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //check gps permissions
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        locationManager.removeUpdates(listener);
+    }
+
 }
 
 
