@@ -13,7 +13,17 @@
 android:orientation="vertical"
 android:layout_width="fill_parent"
 android:layout_height="fill_parent">
+
+    <Button
+        android:id="@+id/locate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="sendMessage"
+        android:text="locate me" />
+
 <org.osmdroid.views.MapView android:id="@+id/map"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" />
+
+
 </LinearLayout>
