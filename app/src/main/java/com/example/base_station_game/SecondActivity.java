@@ -55,7 +55,7 @@ public class SecondActivity extends AppCompatActivity {
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
-
+        map.getController().setZoom(3);
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
@@ -66,9 +66,10 @@ public class SecondActivity extends AppCompatActivity {
                 //GeoPointWrapper wrapper=new GeoPointWrapper();
                 Marker startMarker = new Marker(map);
                 map.getController().setCenter(new GeoPoint(location));
-                startMarker.setPosition(new GeoPoint(location.getLongitude(),location.getLatitude()));
+                startMarker.setPosition(new GeoPoint(location.getLatitude(),location.getLongitude()));
                 startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 map.getOverlays().add(startMarker);
+                map.getController().setZoom(18);
             }
 
             public void onStatusChanged(String s, int i, Bundle bundle) {
