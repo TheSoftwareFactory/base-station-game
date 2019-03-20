@@ -1,4 +1,4 @@
-package com.example.base_station_game.sampling;
+package com.example.base_station_game.sampling.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
