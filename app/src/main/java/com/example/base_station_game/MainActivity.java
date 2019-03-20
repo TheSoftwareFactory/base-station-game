@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch (view.getId())
         {
-            case R.id.button: {t.setText("asdfghjkl");  locationManager.requestLocationUpdates("gps", 5000, 0, listener); break;}
+            case R.id.button: {t.setText("");  locationManager.requestLocationUpdates("gps", 5000, 0, listener); break;}
             case R.id.reset: t.setText(""); break;
             case R.id.stop_gps:  {t.append("GPS STOPPED");  onPause(); break;}
         }

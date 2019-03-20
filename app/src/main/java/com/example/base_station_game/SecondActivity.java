@@ -5,7 +5,6 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.config.Configuration;
 
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -32,7 +31,8 @@ public class SecondActivity extends AppCompatActivity {
 
     private LocationManager locationManager;
     private LocationListener listener;
-    MapView map = null;
+    private MapView map = null;
+    private Marker marker = null;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,13 +62,15 @@ public class SecondActivity extends AppCompatActivity {
 
         listener = new LocationListener() {
             public void onLocationChanged(Location location) {
-                //t.append("\n " + location.getLongitude() + " " + location.getLatitude());
-                //GeoPointWrapper wrapper=new GeoPointWrapper();
-                Marker startMarker = new Marker(map);
-                map.getController().setCenter(new GeoPoint(location));
-                startMarker.setPosition(new GeoPoint(location.getLatitude(),location.getLongitude()));
-                startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                map.getOverlays().add(startMarker);
+                GeoPoint newlocation = new GeoPoint(location);
+                if (marker == null){
+                    marker = new Marker(map);
+                    map.getOverlays().add(marker);
+                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                } else{
+                    marker.setPosition(newlocation);
+                }
+                map.getController().setCenter(newlocation);
                 map.getController().setZoom(18);
             }
 
@@ -98,7 +100,7 @@ public class SecondActivity extends AppCompatActivity {
             return;
         }
 
-        locationManager.requestLocationUpdates("gps", 5000, 0, listener);
+        locationManager.requestLocationUpdates("gps", 3000, 0, listener);
     }
 
     public void onResume(){
