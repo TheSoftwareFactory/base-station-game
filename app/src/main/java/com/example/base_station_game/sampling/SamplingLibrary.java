@@ -1,4 +1,4 @@
-package com.example.base_station_game;
+package com.example.base_station_game.sampling;
 
 //package edu.berkeley.cs.amplab.carat.android.sampling;
 
@@ -21,7 +21,6 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -73,7 +72,6 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.provider.Settings.SettingNotFoundException;
-import android.telephony.CellIdentityGsm;
 import android.telephony.CellInfo;
 import android.telephony.CellInfoCdma;
 import android.telephony.CellInfoGsm;
@@ -88,6 +86,8 @@ import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.example.base_station_game.R;
 
 import edu.berkeley.cs.amplab.carat.android.BuildConfig;
 import edu.berkeley.cs.amplab.carat.android.CaratApplication;
@@ -2634,50 +2634,50 @@ public final class SamplingLibrary {
         return false;
     }
 
-    /**
-     * Helper method to collect all the extra information we wish to add to the sample into the Extra Feature list.
-     * @param context the Context
-     * @return a List<Feature> populated with extra items to collect outside of the protocol spec.
-     */
-    public static List<Feature> getExtras(Context context) {
-        LinkedList<Feature> res = new LinkedList<Feature>();
-        res.add(getVmVersion());
-        res.add(versionCode());
-        res.add(versionName());
-        return res;
-    }
-
-    private static Feature versionName(){
-        return feature("carat.version.name", BuildConfig.VERSION_NAME);
-    }
-
-    private static Feature versionCode(){
-        return feature("carat.version.code", BuildConfig.VERSION_CODE + "");
-    }
-
-    /**
-     * Helper to create Feature objects for e.g. Sample Extras.
-     * @param key Name of the field
-     * @param value value of the field
-     * @return
-     */
-    public static Feature feature(String key, String value){
-        Feature f = new Feature();
-        f.setKey(key);
-        f.setValue(value);
-        return f;
-    }
-
-    /**
-     * Get the java.vm.version system property as a Feature("vm", version).
-     * @return a Feature instance with the key "vm" and value of the "java.vm.version" system property.
-     */
-    private static Feature getVmVersion() {
-        String vm = System.getProperty("java.vm.version");
-        if (vm == null)
-            vm = "";
-        return feature("vm", vm);
-    }
+//    /**
+//     * Helper method to collect all the extra information we wish to add to the sample into the Extra Feature list.
+//     * @param context the Context
+//     * @return a List<Feature> populated with extra items to collect outside of the protocol spec.
+//     */
+//    public static List<Feature> getExtras(Context context) {
+//        LinkedList<Feature> res = new LinkedList<Feature>();
+//        res.add(getVmVersion());
+//        res.add(versionCode());
+//        res.add(versionName());
+//        return res;
+//    }
+//
+//    private static Feature versionName(){
+//        return feature("carat.version.name", BuildConfig.VERSION_NAME);
+//    }
+//
+//    private static Feature versionCode(){
+//        return feature("carat.version.code", BuildConfig.VERSION_CODE + "");
+//    }
+//
+//    /**
+//     * Helper to create Feature objects for e.g. Sample Extras.
+//     * @param key Name of the field
+//     * @param value value of the field
+//     * @return
+//     */
+//    public static Feature feature(String key, String value){
+//        Feature f = new Feature();
+//        f.setKey(key);
+//        f.setValue(value);
+//        return f;
+//    }
+//
+//    /**
+//     * Get the java.vm.version system property as a Feature("vm", version).
+//     * @return a Feature instance with the key "vm" and value of the "java.vm.version" system property.
+//     */
+//    private static Feature getVmVersion() {
+//        String vm = System.getProperty("java.vm.version");
+//        if (vm == null)
+//            vm = "";
+//        return feature("vm", vm);
+//    }
 
     public static List<String> getSignatures(PackageInfo pak) {
         List<String> sigList = new LinkedList<String>();
