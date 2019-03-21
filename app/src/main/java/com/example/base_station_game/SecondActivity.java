@@ -3,6 +3,7 @@ package com.example.base_station_game;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.MapController;
 import org.osmdroid.config.Configuration;
 
 
@@ -33,6 +34,7 @@ public class SecondActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private LocationListener listener;
     MapView map = null;
+    Marker marker =null;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,14 +64,19 @@ public class SecondActivity extends AppCompatActivity {
 
         listener = new LocationListener() {
             public void onLocationChanged(Location location) {
-                //t.append("\n " + location.getLongitude() + " " + location.getLatitude());
-                //GeoPointWrapper wrapper=new GeoPointWrapper();
-                Marker startMarker = new Marker(map);
-                map.getController().setCenter(new GeoPoint(location));
-                startMarker.setPosition(new GeoPoint(location.getLatitude(),location.getLongitude()));
-                startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                map.getOverlays().add(startMarker);
-                map.getController().setZoom(18);
+                GeoPoint newlocation = new GeoPoint(location);
+                if (marker == null) {
+                    marker = new Marker(map);
+                    map.getOverlays().add(marker);
+                    marker.setPosition(newlocation);
+                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                    marker.setTitle("test");
+                }
+                else {
+                    marker.setPosition(newlocation);
+                }
+                map.getController().animateTo(newlocation,(double)18,1500L);
+                map.invalidate();
             }
 
             public void onStatusChanged(String s, int i, Bundle bundle) {
