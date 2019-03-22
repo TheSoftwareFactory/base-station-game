@@ -75,18 +75,9 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 import com.example.base_station_game.R;
+import com.example.base_station_game.sampling.models.SystemLoadPoint;
+import com.example.base_station_game.sampling.utils.FsUtils;
 import com.example.base_station_game.sampling.utils.Util;
-
-import edu.berkeley.cs.amplab.carat.android.models.SystemLoadPoint;
-import edu.berkeley.cs.amplab.carat.android.utils.FsUtils;
-import edu.berkeley.cs.amplab.carat.android.utils.Logger;
-import edu.berkeley.cs.amplab.carat.android.utils.PowerUtils;
-import edu.berkeley.cs.amplab.carat.android.utils.ProcessUtil;
-import edu.berkeley.cs.amplab.carat.android.utils.Util;
-import edu.berkeley.cs.amplab.carat.thrift.Feature;
-import edu.berkeley.cs.amplab.carat.thrift.PackageProcess;
-import edu.berkeley.cs.amplab.carat.thrift.ProcessInfo;
-import edu.berkeley.cs.amplab.carat.thrift.StorageDetails;
 
 /**
  * Library class for methods that obtain information about the phone that is
@@ -208,13 +199,13 @@ public final class SamplingLibrary {
         return Secure.getString(c.getContentResolver(), Secure.ANDROID_ID);
     }
 
-    public static String getUuid(Context c) {
-        return getTimeBasedUuid(c, false);
-    }
+//    public static String getUuid(Context c) {
+//        return getTimeBasedUuid(c, false);
+//    }
 
-    public static String getTimeBasedUuid(Context c) {
-        return getTimeBasedUuid(c, true);
-    }
+//    public static String getTimeBasedUuid(Context c) {
+//        return getTimeBasedUuid(c, true);
+//    }
 
     public static double readLastBatteryLevel() {
         return lastSampledBatteryLevel;
@@ -261,61 +252,61 @@ public final class SamplingLibrary {
         }
     }
 
-    /**
-     * Generate a time-based, random identifier.
-     *
-     * @param c
-     *            the app's Context
-     * @return a time-based, random identifier.
-     */
-    public static String getTimeBasedUuid(Context c, boolean includeTimestamp) {
-        String aID = getAndroidId(c);
-        String wifiMac = getWifiMacAddress(c);
-        String devid = getDeviceId(c);
-        String concat = "";
-        if (aID != null)
-            concat = aID;
-        else
-            concat = "0000000000000000";
-        if (wifiMac != null)
-            concat += wifiMac;
-        else
-            concat += "00:00:00:00:00:00";
-
-        // IMEI is 15 characters, decimal, while MEID is 14 characters, hex. Add
-        // a space if length is less than 15:
-        if (devid != null) {
-            concat += devid;
-            if (devid.length() < 15)
-                concat += " ";
-        } else
-            concat += "000000000000000";
-        if (includeTimestamp) {
-            long timestamp = System.currentTimeMillis();
-            concat += timestamp;
-        }
-
-        // Logger.d(STAG,
-        // "AID="+aID+" wifiMac="+wifiMac+" devid="+devid+" rawUUID=" +concat );
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.update(concat.getBytes());
-            byte[] mdbytes = md.digest();
-            StringBuilder hexString = new StringBuilder();
-            for (int i = 0; i < mdbytes.length; i++) {
-                String hx = Integer.toHexString(0xFF & mdbytes[i]);
-                if (hx.equals("0"))
-                    hexString.append("00");
-                else
-                    hexString.append(hx);
-            }
-            String uuid = hexString.toString().substring(0, UUID_LENGTH);
-            return uuid;
-        } catch (NoSuchAlgorithmException e) {
-            Util.printStackTrace(TAG, e);
-            return aID;
-        }
-    }
+//    /**
+//     * Generate a time-based, random identifier.
+//     *
+//     * @param c
+//     *            the app's Context
+//     * @return a time-based, random identifier.
+//     */
+//    public static String getTimeBasedUuid(Context c, boolean includeTimestamp) {
+//        String aID = getAndroidId(c);
+//        String wifiMac = getWifiMacAddress(c);
+//        String devid = getDeviceId(c);
+//        String concat = "";
+//        if (aID != null)
+//            concat = aID;
+//        else
+//            concat = "0000000000000000";
+//        if (wifiMac != null)
+//            concat += wifiMac;
+//        else
+//            concat += "00:00:00:00:00:00";
+//
+//        // IMEI is 15 characters, decimal, while MEID is 14 characters, hex. Add
+//        // a space if length is less than 15:
+//        if (devid != null) {
+//            concat += devid;
+//            if (devid.length() < 15)
+//                concat += " ";
+//        } else
+//            concat += "000000000000000";
+//        if (includeTimestamp) {
+//            long timestamp = System.currentTimeMillis();
+//            concat += timestamp;
+//        }
+//
+//        // Logger.d(STAG,
+//        // "AID="+aID+" wifiMac="+wifiMac+" devid="+devid+" rawUUID=" +concat );
+//        try {
+//            MessageDigest md = MessageDigest.getInstance("SHA-512");
+//            md.update(concat.getBytes());
+//            byte[] mdbytes = md.digest();
+//            StringBuilder hexString = new StringBuilder();
+//            for (int i = 0; i < mdbytes.length; i++) {
+//                String hx = Integer.toHexString(0xFF & mdbytes[i]);
+//                if (hx.equals("0"))
+//                    hexString.append("00");
+//                else
+//                    hexString.append(hx);
+//            }
+//            String uuid = hexString.toString().substring(0, UUID_LENGTH);
+//            return uuid;
+//        } catch (NoSuchAlgorithmException e) {
+//            Util.printStackTrace(TAG, e);
+//            return aID;
+//        }
+//    }
 
     /**
      * Returns the model of the device running Carat, for example "sdk" for the
@@ -775,22 +766,22 @@ public final class SamplingLibrary {
 //        return true;
 //    }
 
-    /**
-     * package name to packageInfo map for quick querying.
-     */
-    static WeakReference<Map<String, PackageInfo>> packages = null;
-
-    /**
-     * Returns true if an application should be hidden in the UI. Uses the blacklist downloaded from Carat servers.
-     * @param c the Context
-     * @param processName the process name
-     * @return true if the process should be hidden from the user, usually because it is an unkillable application that belongs to the system.
-     */
-    public static boolean isHidden(Context c, String processName) {
-        boolean isSystem = isSystem(c, processName);
-        boolean blocked = isDisabled(c, processName) || (isSystem && !isWhiteListed(c, processName));
-        return blocked || isBlacklisted(c, processName);
-    }
+//    /**
+//     * package name to packageInfo map for quick querying.
+//     */
+//    static WeakReference<Map<String, PackageInfo>> packages = null;
+//
+//    /**
+//     * Returns true if an application should be hidden in the UI. Uses the blacklist downloaded from Carat servers.
+//     * @param c the Context
+//     * @param processName the process name
+//     * @return true if the process should be hidden from the user, usually because it is an unkillable application that belongs to the system.
+//     */
+//    public static boolean isHidden(Context c, String processName) {
+//        boolean isSystem = isSystem(c, processName);
+//        boolean blocked = isDisabled(c, processName) || (isSystem && !isWhiteListed(c, processName));
+//        return blocked || isBlacklisted(c, processName);
+//    }
 
 //    /**
 //     * We currently do not employ a whitelist, so this returns true iff isBlacklisted(c, processName) returns false and vice versa.
@@ -846,27 +837,27 @@ public final class SamplingLibrary {
 //
 //        return false;
 //    }
-
-    /**
-     * Returns true if the application is preinstalled on the device.
-     * This usually means it is a system application, e.g. Key chain, google partner set up, package installer, package access helper.
-     * We currently do not filter these out, because some of them are killable by the user, and not part of the core system, even if they are preinstalled on the device.
-     * @param context the Context.
-     * @param processName the process name.
-     * @return true if the application is preinstalled on the device.
-     */
-    private static boolean isSystem(Context context, String processName) {
-        PackageInfo pak = getPackageInfo(context, processName);
-        if (pak != null) {
-            ApplicationInfo i = pak.applicationInfo;
-            int flags = i.flags;
-            boolean isSystemApp = (flags & ApplicationInfo.FLAG_SYSTEM) > 0;
-            isSystemApp = isSystemApp || (flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) > 0;
-            // Log.v(STAG, processName + " is System app? " + isSystemApp);
-            return isSystemApp;
-        }
-        return false;
-    }
+//
+//    /**
+//     * Returns true if the application is preinstalled on the device.
+//     * This usually means it is a system application, e.g. Key chain, google partner set up, package installer, package access helper.
+//     * We currently do not filter these out, because some of them are killable by the user, and not part of the core system, even if they are preinstalled on the device.
+//     * @param context the Context.
+//     * @param processName the process name.
+//     * @return true if the application is preinstalled on the device.
+//     */
+//    private static boolean isSystem(Context context, String processName) {
+//        PackageInfo pak = getPackageInfo(context, processName);
+//        if (pak != null) {
+//            ApplicationInfo i = pak.applicationInfo;
+//            int flags = i.flags;
+//            boolean isSystemApp = (flags & ApplicationInfo.FLAG_SYSTEM) > 0;
+//            isSystemApp = isSystemApp || (flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) > 0;
+//            // Log.v(STAG, processName + " is System app? " + isSystemApp);
+//            return isSystemApp;
+//        }
+//        return false;
+//    }
 
 //    public static boolean isDisabled(Context c, String processName) {
 //        PackageManager pm = c.getPackageManager();
@@ -897,76 +888,76 @@ public final class SamplingLibrary {
 //        return false;
 //    }
 
-    /**
-     * Helper to ensure the WeakReferenced `packages` is populated.
-     *
-     * @param context
-     * @return The content of `packages` or null in case of failure.
-     */
-    private static Map<String, PackageInfo> getPackages(Context context) {
-        List<android.content.pm.PackageInfo> packagelist = null;
-        boolean cached = packages != null;
+//    /**
+//     * Helper to ensure the WeakReferenced `packages` is populated.
+//     *
+//     * @param context
+//     * @return The content of `packages` or null in case of failure.
+//     */
+//    private static Map<String, PackageInfo> getPackages(Context context) {
+//        List<android.content.pm.PackageInfo> packagelist = null;
+//        boolean cached = packages != null;
+//
+//        if(cached){
+//            Map<String, PackageInfo> mp = packages.get();
+//            if(mp == null || mp.size() == 0){
+//                cached = false;
+//            }
+//        }
+//
+//        if (!cached) {
+//            Map<String, PackageInfo> mp = new HashMap<String, PackageInfo>();
+//            PackageManager pm = context.getPackageManager();
+//            if (pm == null)
+//                return null;
+//
+//            try {
+//                if (collectSignatures)
+//                    packagelist = pm.getInstalledPackages(PackageManager.GET_SIGNATURES
+//                            | PackageManager.GET_PERMISSIONS);
+//                else
+//                    packagelist = pm.getInstalledPackages(0);
+//            } catch (Throwable th) {
+//                // Forget about it...
+//            }
+//            if (packagelist == null)
+//                return null;
+//            for (PackageInfo pak : packagelist) {
+//                if (pak == null || pak.applicationInfo == null || pak.applicationInfo.processName == null)
+//                    continue;
+//                mp.put(pak.applicationInfo.processName, pak);
+//            }
+//
+//            packages = new WeakReference<Map<String, PackageInfo>>(mp);
+//
+//            if (mp == null || mp.size() == 0)
+//                return null;
+//            return mp;
+//        } else {
+//            if (packages == null)
+//                return null;
+//            Map<String, PackageInfo> p = packages.get();
+//            if (p == null || p.size() == 0)
+//                return null;
+//            return p;
+//        }
+//    }
 
-        if(cached){
-            Map<String, PackageInfo> mp = packages.get();
-            if(mp == null || mp.size() == 0){
-                cached = false;
-            }
-        }
-
-        if (!cached) {
-            Map<String, PackageInfo> mp = new HashMap<String, PackageInfo>();
-            PackageManager pm = context.getPackageManager();
-            if (pm == null)
-                return null;
-
-            try {
-                if (collectSignatures)
-                    packagelist = pm.getInstalledPackages(PackageManager.GET_SIGNATURES
-                            | PackageManager.GET_PERMISSIONS);
-                else
-                    packagelist = pm.getInstalledPackages(0);
-            } catch (Throwable th) {
-                // Forget about it...
-            }
-            if (packagelist == null)
-                return null;
-            for (PackageInfo pak : packagelist) {
-                if (pak == null || pak.applicationInfo == null || pak.applicationInfo.processName == null)
-                    continue;
-                mp.put(pak.applicationInfo.processName, pak);
-            }
-
-            packages = new WeakReference<Map<String, PackageInfo>>(mp);
-
-            if (mp == null || mp.size() == 0)
-                return null;
-            return mp;
-        } else {
-            if (packages == null)
-                return null;
-            Map<String, PackageInfo> p = packages.get();
-            if (p == null || p.size() == 0)
-                return null;
-            return p;
-        }
-    }
-
-    /**
-     * Get info for a single package from the WeakReferenced packagelist.
-     *
-     * @param context
-     * @param processName
-     *            The package to get info for.
-     * @return info for a single package from the WeakReferenced packagelist.
-     */
-    public static PackageInfo getPackageInfo(Context context, String processName) {
-        Map<String, PackageInfo> mp = getPackages(context);
-        if (mp == null || !mp.containsKey(processName))
-            return null;
-        PackageInfo pak = mp.get(processName);
-        return pak;
-    }
+//    /**
+//     * Get info for a single package from the WeakReferenced packagelist.
+//     *
+//     * @param context
+//     * @param processName
+//     *            The package to get info for.
+//     * @return info for a single package from the WeakReferenced packagelist.
+//     */
+//    public static PackageInfo getPackageInfo(Context context, String processName) {
+//        Map<String, PackageInfo> mp = getPackages(context);
+//        if (mp == null || !mp.containsKey(processName))
+//            return null;
+//        PackageInfo pak = mp.get(processName);
+//        return pak;
+//    }
 
 //    /**
 //     * Returns a list of installed packages on the device. Will be called for
@@ -1589,34 +1580,38 @@ public final class SamplingLibrary {
         int strength = Integer.MIN_VALUE;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             String currentNetwork = getMobileWirelessTechnology(context);
-            Logger.d(TAG, "Current network: " + currentNetwork);
+//            Logger.d(TAG, "Current network: " + currentNetwork);
             TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             if(telephonyManager != null){
-                List<CellInfo> cellInfoList = telephonyManager.getAllCellInfo();
-                if(!Util.isNullOrEmpty(cellInfoList)){ // Not implemented by all manufacturers
-                    for(CellInfo info : cellInfoList){
-                        if(info != null && info.isRegistered()){ // Only registered networks
-                            if(info instanceof CellInfoGsm && currentNetwork.equals("GSM")){
-                                CellSignalStrengthGsm strengthGsm = ((CellInfoGsm) info).getCellSignalStrength();
-                                strength = Math.max(strength, strengthGsm.getDbm());
+                try {
+                    List<CellInfo> cellInfoList = telephonyManager.getAllCellInfo();
+                    if (!Util.isNullOrEmpty(cellInfoList)) { // Not implemented by all manufacturers
+                        for (CellInfo info : cellInfoList) {
+                            if (info != null && info.isRegistered()) { // Only registered networks
+                                if (info instanceof CellInfoGsm && currentNetwork.equals("GSM")) {
+                                    CellSignalStrengthGsm strengthGsm = ((CellInfoGsm) info).getCellSignalStrength();
+                                    strength = Math.max(strength, strengthGsm.getDbm());
 
-                            } else if(info instanceof CellInfoCdma && currentNetwork.equals("CDMA")){
-                                CellSignalStrengthCdma strengthCdma = ((CellInfoCdma) info).getCellSignalStrength();
-                                strength = Math.max(strength, strengthCdma.getDbm());
+                                } else if (info instanceof CellInfoCdma && currentNetwork.equals("CDMA")) {
+                                    CellSignalStrengthCdma strengthCdma = ((CellInfoCdma) info).getCellSignalStrength();
+                                    strength = Math.max(strength, strengthCdma.getDbm());
 
-                            } else if(info instanceof CellInfoLte && currentNetwork.equals("LTE")){
-                                CellSignalStrengthLte strengthLte = ((CellInfoLte) info).getCellSignalStrength();
-                                strength = Math.max(strength, strengthLte.getDbm());
+                                } else if (info instanceof CellInfoLte && currentNetwork.equals("LTE")) {
+                                    CellSignalStrengthLte strengthLte = ((CellInfoLte) info).getCellSignalStrength();
+                                    strength = Math.max(strength, strengthLte.getDbm());
 
-                            } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                                if(info instanceof CellInfoWcdma && currentNetwork.equals("WCDMA")){
-                                    CellSignalStrengthWcdma strengthWcdma = ((CellInfoWcdma) info).getCellSignalStrength();
-                                    strength = Math.max(strength, strengthWcdma.getDbm());
+                                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                                    if (info instanceof CellInfoWcdma && currentNetwork.equals("WCDMA")) {
+                                        CellSignalStrengthWcdma strengthWcdma = ((CellInfoWcdma) info).getCellSignalStrength();
+                                        strength = Math.max(strength, strengthWcdma.getDbm());
+                                    }
                                 }
                             }
                         }
+                        //                    Logger.d(TAG, currentNetwork + " strength: " + strength + " dBm");
                     }
-                    Logger.d(TAG, currentNetwork + " strength: " + strength + " dBm");
+                } catch (SecurityException e) {
+                    return 1;
                 }
             }
         }
@@ -1762,7 +1757,12 @@ public final class SamplingLibrary {
 
     private static Location getLastKnownLocation(Context context, String provider) {
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        return lm.getLastKnownLocation(provider);
+        try {
+            return lm.getLastKnownLocation(provider);
+        } catch (SecurityException se) {
+            System.out.println("No permissions so just sending a default location");
+            return new Location("memes");
+        }
     }
 
     /* Get the distance users between two locations */
@@ -1784,12 +1784,14 @@ public final class SamplingLibrary {
         double latitude, longitude;
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         if (provider != null && !provider.equals("gps")) {
-            Location location = lm.getLastKnownLocation(provider);
             try {
+                Location location = lm.getLastKnownLocation(provider);
                 latitude = location.getLatitude();
                 longitude = location.getLongitude();
                 return String.valueOf(latitude)+","+String.valueOf(longitude);
-            } catch (Throwable th){
+            } catch (SecurityException ex){
+                System.out.println(ex);
+            } catch (Throwable te) {
 //                if(Constants.DEBUG){
 //                    Logger.d("SamplingLibrary", "Failed getting coarse location!", th);
 //                }
@@ -1822,12 +1824,16 @@ public final class SamplingLibrary {
         return provider;
     }
 
-    private static String getDeviceId(Context context) {
-        TelephonyManager telManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        if (telManager == null)
-            return null;
-        return telManager.getDeviceId();
-    }
+//    private static String getDeviceId(Context context) {
+//        TelephonyManager telManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+//        if (telManager == null)
+//            return null;
+//        try {
+//            return telManager.getDeviceId();
+//        } catch (SecurityException se) {
+//            System.out.println(se);
+//        }
+//    }
 
     /* Get network type */
     public static String getMobileNetworkType(Context context) {
@@ -1993,77 +1999,77 @@ public final class SamplingLibrary {
      * governors usage How to motivate user to upload more samples.
      */
 
-    /**
-     * Safely terminate (kill) the given app.
-     *
-     * @param context
-     * @param packageName
-     * @param label
-     * @return
-     */
-    public static boolean killApp(Context context, String packageName, String label) {
-        ActivityManager am = (ActivityManager) context.getSystemService(Activity.ACTIVITY_SERVICE);
-        if (am != null) {
-            try {
-                PackageInfo p = getPackageInfo(context, packageName);
-                // Log.v(STAG, "Trying to kill proc=" + packageName + " pak=" +
-                // p.packageName);
-                am.killBackgroundProcesses(packageName);
-				/*Toast.makeText(context, context.getResources().getString(R.string.stopping) + ((label == null) ? "" : " "+label),
-						Toast.LENGTH_SHORT).show();*/
-                return true;
-            } catch (Throwable th) {
-                Toast.makeText(context,  context.getResources().getString(R.string.stopping_failed),
-                        Toast.LENGTH_SHORT).show();
-                Logger.e(STAG, "Could not kill process: " + packageName, th);
-            }
-        }
-        return false;
-    }
+//    /**
+//     * Safely terminate (kill) the given app.
+//     *
+//     * @param context
+//     * @param packageName
+//     * @param label
+//     * @return
+//     */
+//    public static boolean killApp(Context context, String packageName, String label) {
+//        ActivityManager am = (ActivityManager) context.getSystemService(Activity.ACTIVITY_SERVICE);
+//        if (am != null) {
+//            try {
+//                PackageInfo p = getPackageInfo(context, packageName);
+//                // Log.v(STAG, "Trying to kill proc=" + packageName + " pak=" +
+//                // p.packageName);
+//                am.killBackgroundProcesses(packageName);
+//				/*Toast.makeText(context, context.getResources().getString(R.string.stopping) + ((label == null) ? "" : " "+label),
+//						Toast.LENGTH_SHORT).show();*/
+//                return true;
+//            } catch (Throwable th) {
+//                Toast.makeText(context,  context.getResources().getString(R.string.stopping_failed),
+//                        Toast.LENGTH_SHORT).show();
+//                Logger.e(STAG, "Could not kill process: " + packageName, th);
+//            }
+//        }
+//        return false;
+//    }
 
-    /**
-     * Open application manager
-     *
-     * @param context
-     * @param packageName
-     * @return
-     */
-    public static boolean openAppManager(Context context, String packageName){
-        Intent intent = new Intent();
-        // Use this in case of frequent AndroidRuntimeExceptions
-        // intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        final int sdkLevel = Build.VERSION.SDK_INT;
-
-        // API levels greater or equal than 9
-        if (sdkLevel >= Build.VERSION_CODES.GINGERBREAD) {
-            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            Uri uri = Uri.fromParts("package", packageName, null);
-            intent.setData(uri);
-        } else {
-            //API levels 8 and below
-            final String extension = (sdkLevel == Build.VERSION_CODES.FROYO
-                    ? "pkg"
-                    : "com.android.settings.ApplicationPkgName");
-            intent.setAction(Intent.ACTION_VIEW);
-            intent.setClassName(
-                    "com.android.settings",
-                    "com.android.settings.InstalledAppDetails"
-            );
-            //Send information to activity
-            intent.putExtra(extension, packageName);
-        }
-        try{
-            context.startActivity(intent);
-        } catch(Exception e){
-            if(e.getLocalizedMessage() != null){
-                Toast.makeText(context,  context.getResources().getString(R.string.opening_manager_failed),
-                        Toast.LENGTH_SHORT).show();
-                Log.v("error", "Failed to open application manager", e);
-            }
-            return false;
-        }
-        return true;
-    }
+//    /**
+//     * Open application manager
+//     *
+//     * @param context
+//     * @param packageName
+//     * @return
+//     */
+//    public static boolean openAppManager(Context context, String packageName){
+//        Intent intent = new Intent();
+//        // Use this in case of frequent AndroidRuntimeExceptions
+//        // intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        final int sdkLevel = Build.VERSION.SDK_INT;
+//
+//        // API levels greater or equal than 9
+//        if (sdkLevel >= Build.VERSION_CODES.GINGERBREAD) {
+//            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+//            Uri uri = Uri.fromParts("package", packageName, null);
+//            intent.setData(uri);
+//        } else {
+//            //API levels 8 and below
+//            final String extension = (sdkLevel == Build.VERSION_CODES.FROYO
+//                    ? "pkg"
+//                    : "com.android.settings.ApplicationPkgName");
+//            intent.setAction(Intent.ACTION_VIEW);
+//            intent.setClassName(
+//                    "com.android.settings",
+//                    "com.android.settings.InstalledAppDetails"
+//            );
+//            //Send information to activity
+//            intent.putExtra(extension, packageName);
+//        }
+//        try{
+//            context.startActivity(intent);
+//        } catch(Exception e){
+//            if(e.getLocalizedMessage() != null){
+//                Toast.makeText(context,  context.getResources().getString(R.string.opening_manager_failed),
+//                        Toast.LENGTH_SHORT).show();
+//                Log.v("error", "Failed to open application manager", e);
+//            }
+//            return false;
+//        }
+//        return true;
+//    }
 
     private static String convertToHex(byte[] data) {
         StringBuilder buf = new StringBuilder();
@@ -2340,152 +2346,152 @@ public final class SamplingLibrary {
         return operator;
     }
 
-    /**
-     * Storage details for internal, external, secondary and system partitions.
-     * External and secondary storage details are not exactly reliable.
-     * @return Thrift-compatible StorageDetails object
-     */
-    public static StorageDetails getStorageDetails(){
-        StorageDetails sd = new StorageDetails();
+//    /**
+//     * Storage details for internal, external, secondary and system partitions.
+//     * External and secondary storage details are not exactly reliable.
+//     * @return Thrift-compatible StorageDetails object
+//     */
+//    public static StorageDetails getStorageDetails(){
+//        StorageDetails sd = new StorageDetails();
+//
+//        // Internal
+//        File path = Environment.getDataDirectory();
+//        long[] internal = getStorageDetailsForPath(path);
+//        if(internal.length == 2){
+//            sd.setFree((int)internal[0]);
+//            sd.setTotal((int)internal[1]);
+//        }
+//
+//        // External
+//        long[] external = getExternalStorageDetails();
+//        if(external.length == 2){
+//            sd.setFreeExternal((int)external[0]);
+//            sd.setTotalExternal((int)external[1]);
+//        }
+//
+//        // Secondary
+//        long[] secondary = getSecondaryStorageDetails();
+//        if(secondary.length == 2){
+//            sd.setFreeSecondary((int)secondary[0]);
+//            sd.setTotalSecondary((int)secondary[1]);
+//        }
+//
+//        // System
+//        path = Environment.getRootDirectory();
+//        long[] system = getStorageDetailsForPath(path);
+//        if(system.length == 2){
+//            sd.setFreeSystem((int)system[0]);
+//            sd.setTotalSystem((int)system[1]);
+//        }
+//
+//        return sd;
+//    }
 
-        // Internal
-        File path = Environment.getDataDirectory();
-        long[] internal = getStorageDetailsForPath(path);
-        if(internal.length == 2){
-            sd.setFree((int)internal[0]);
-            sd.setTotal((int)internal[1]);
-        }
+//    /**
+//     * Returns free and total external storage space
+//     * @return Two values as a pair or none
+//     */
+//    private static long[] getExternalStorageDetails(){
+//        File path = getStoragePathFromEnv("EXTERNAL_STORAGE");
+//        if(path != null && path.exists()){
+//            long[] storage = getStorageDetailsForPath(path);
+//            if(storage.length == 2) return storage;
+//        }
+//
+//        // Make sure external storage isn't a secondary device
+//        if(!isExternalStorageRemovable() || isExternalStorageEmulated()){
+//            path = Environment.getExternalStorageDirectory();
+//            if(path != null && path.exists()){
+//                long[] storage = getStorageDetailsForPath(path);
+//                return storage;
+//            }
+//        }
+//        return new long[]{};
+//    }
 
-        // External
-        long[] external = getExternalStorageDetails();
-        if(external.length == 2){
-            sd.setFreeExternal((int)external[0]);
-            sd.setTotalExternal((int)external[1]);
-        }
+//    /**
+//     * Returns free and total secondary storage space
+//     * @return Two values as a pair or none
+//     */
+//    private static long[] getSecondaryStorageDetails(){
+//        File path = getStoragePathFromEnv("SECONDARY_STORAGE");
+//        if(path != null && path.exists()){
+//            long[] storage = getStorageDetailsForPath(path);
+//            return storage;
+//        }
+//        // Make sure external storage is a secondary device
+//        if(isExternalStorageRemovable() && !isExternalStorageEmulated()){
+//            path = Environment.getExternalStorageDirectory();
+//            if(path != null && path.exists()){
+//                long[] storage = getStorageDetailsForPath(path);
+//                return storage;
+//            }
+//        }
+//        return new long[]{};
+//    }
 
-        // Secondary
-        long[] secondary = getSecondaryStorageDetails();
-        if(secondary.length == 2){
-            sd.setFreeSecondary((int)secondary[0]);
-            sd.setTotalSecondary((int)secondary[1]);
-        }
-
-        // System
-        path = Environment.getRootDirectory();
-        long[] system = getStorageDetailsForPath(path);
-        if(system.length == 2){
-            sd.setFreeSystem((int)system[0]);
-            sd.setTotalSystem((int)system[1]);
-        }
-
-        return sd;
-    }
-
-    /**
-     * Returns free and total external storage space
-     * @return Two values as a pair or none
-     */
-    private static long[] getExternalStorageDetails(){
-        File path = getStoragePathFromEnv("EXTERNAL_STORAGE");
-        if(path != null && path.exists()){
-            long[] storage = getStorageDetailsForPath(path);
-            if(storage.length == 2) return storage;
-        }
-
-        // Make sure external storage isn't a secondary device
-        if(!isExternalStorageRemovable() || isExternalStorageEmulated()){
-            path = Environment.getExternalStorageDirectory();
-            if(path != null && path.exists()){
-                long[] storage = getStorageDetailsForPath(path);
-                return storage;
-            }
-        }
-        return new long[]{};
-    }
-
-    /**
-     * Returns free and total secondary storage space
-     * @return Two values as a pair or none
-     */
-    private static long[] getSecondaryStorageDetails(){
-        File path = getStoragePathFromEnv("SECONDARY_STORAGE");
-        if(path != null && path.exists()){
-            long[] storage = getStorageDetailsForPath(path);
-            return storage;
-        }
-        // Make sure external storage is a secondary device
-        if(isExternalStorageRemovable() && !isExternalStorageEmulated()){
-            path = Environment.getExternalStorageDirectory();
-            if(path != null && path.exists()){
-                long[] storage = getStorageDetailsForPath(path);
-                return storage;
-            }
-        }
-        return new long[]{};
-    }
-
-    /**
-     * Returns a storage path from an environment variable, if supported.
-     * @param variable Variable name
-     * @return Storage path or null if not found
-     */
-    private static File getStoragePathFromEnv(String variable){
-        String path;
-        try{
-            path = System.getenv(variable);
-            return new File(path);
-        } catch (Exception e){
-            return null;
-        }
-    }
-
-    private static boolean isExternalStorageRemovable(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD){
-            return Environment.isExternalStorageRemovable();
-        }
-        return false;
-    }
-
-    /**
-     * Checks if external storage is emulated, works on API level 11+.
-     * @return True if method is supported and storage is emulated
-     */
-    private static boolean isExternalStorageEmulated(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-            return Environment.isExternalStorageEmulated();
-        }
-        return false;
-    }
-
-    /**
-     * Returns free and total storage space in bytes
-     * @param path Path to the storage medium
-     * @return Free and total space in long[]
-     */
-    private static long[] getStorageDetailsForPath(File path){
-        if(path == null) return new long[]{};
-        final int KB = 1024;
-        final int MB = KB*1024;
-        long free;
-        long total;
-        long blockSize;
-        try {
-            StatFs stats = new StatFs(path.getAbsolutePath());
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2){
-                free = stats.getAvailableBytes()/MB;
-                total = stats.getTotalBytes()/MB;
-                return new long[]{free, total};
-            } else {
-                blockSize = (long)stats.getBlockSize();
-                free = ((long)stats.getAvailableBlocks()*blockSize)/MB;
-                total = ((long)stats.getBlockCount()*blockSize)/MB;
-                if(free < 0 || total < 0) return new long[]{};
-                return new long[]{free, total};
-            }
-        } catch(Exception e){
-            return new long[]{};
-        }
-    }
+//    /**
+//     * Returns a storage path from an environment variable, if supported.
+//     * @param variable Variable name
+//     * @return Storage path or null if not found
+//     */
+//    private static File getStoragePathFromEnv(String variable){
+//        String path;
+//        try{
+//            path = System.getenv(variable);
+//            return new File(path);
+//        } catch (Exception e){
+//            return null;
+//        }
+//    }
+//
+//    private static boolean isExternalStorageRemovable(){
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD){
+//            return Environment.isExternalStorageRemovable();
+//        }
+//        return false;
+//    }
+//
+//    /**
+//     * Checks if external storage is emulated, works on API level 11+.
+//     * @return True if method is supported and storage is emulated
+//     */
+//    private static boolean isExternalStorageEmulated(){
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+//            return Environment.isExternalStorageEmulated();
+//        }
+//        return false;
+//    }
+//
+//    /**
+//     * Returns free and total storage space in bytes
+//     * @param path Path to the storage medium
+//     * @return Free and total space in long[]
+//     */
+//    private static long[] getStorageDetailsForPath(File path){
+//        if(path == null) return new long[]{};
+//        final int KB = 1024;
+//        final int MB = KB*1024;
+//        long free;
+//        long total;
+//        long blockSize;
+//        try {
+//            StatFs stats = new StatFs(path.getAbsolutePath());
+//            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2){
+//                free = stats.getAvailableBytes()/MB;
+//                total = stats.getTotalBytes()/MB;
+//                return new long[]{free, total};
+//            } else {
+//                blockSize = (long)stats.getBlockSize();
+//                free = ((long)stats.getAvailableBlocks()*blockSize)/MB;
+//                total = ((long)stats.getBlockCount()*blockSize)/MB;
+//                if(free < 0 || total < 0) return new long[]{};
+//                return new long[]{free, total};
+//            }
+//        } catch(Exception e){
+//            return new long[]{};
+//        }
+//    }
 
     /**
      * Retrieves sim operator name using an undocumented telephony manager call.
@@ -2596,25 +2602,25 @@ public final class SamplingLibrary {
         return (int)getWifiApState.invoke(wifiManager);
     }
 
-    /**
-     * Checks if bluetooth is enabled on the device
-     * @return True if bluetooth is enabled
-     */
-    public static boolean getBluetoothEnabled() {
-        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        return adapter != null && adapter.isEnabled();
-    }
-
-    public static boolean getRotationEnabled(Context context){
-        try {
-            ContentResolver cr = context.getContentResolver();
-            String setting = Settings.System.ACCELEROMETER_ROTATION;
-            return android.provider.Settings.System.getInt(cr, setting, 0) == 1;
-        } catch (Throwable th){
-            Logger.d(TAG, "Error while checking auto-rotation " + th);
-        }
-        return false;
-    }
+//    /**
+//     * Checks if bluetooth is enabled on the device
+//     * @return True if bluetooth is enabled
+//     */
+//    public static boolean getBluetoothEnabled() {
+//        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+//        return adapter != null && adapter.isEnabled();
+//    }
+//
+//    public static boolean getRotationEnabled(Context context){
+//        try {
+//            ContentResolver cr = context.getContentResolver();
+//            String setting = Settings.System.ACCELEROMETER_ROTATION;
+//            return android.provider.Settings.System.getInt(cr, setting, 0) == 1;
+//        } catch (Throwable th){
+//            Logger.d(TAG, "Error while checking auto-rotation " + th);
+//        }
+//        return false;
+//    }
 
 //    /**
 //     * Helper method to collect all the extra information we wish to add to the sample into the Extra Feature list.
@@ -2661,96 +2667,96 @@ public final class SamplingLibrary {
 //        return feature("vm", vm);
 //    }
 
-    public static List<String> getSignatures(PackageInfo pak) {
-        List<String> sigList = new LinkedList<String>();
-        String[] pmInfos = pak.requestedPermissions;
-        if (pmInfos != null) {
-            byte[] bytes = getPermissionBytes(pmInfos);
-            String hexB = convertToHex(bytes);
-            sigList.add(hexB);
-        }
-        Signature[] signatures = pak.signatures;
+//    public static List<String> getSignatures(PackageInfo pak) {
+//        List<String> sigList = new LinkedList<String>();
+//        String[] pmInfos = pak.requestedPermissions;
+//        if (pmInfos != null) {
+//            byte[] bytes = getPermissionBytes(pmInfos);
+//            String hexB = convertToHex(bytes);
+//            sigList.add(hexB);
+//        }
+//        Signature[] signatures = pak.signatures;
+//
+//        for (Signature s : signatures) {
+//            MessageDigest md = null;
+//            try {
+//                md = MessageDigest.getInstance("SHA-1");
+//                md.update(s.toByteArray());
+//                byte[] dig = md.digest();
+//                // Add SHA-1
+//                sigList.add(convertToHex(dig));
+//
+//                CertificateFactory fac = CertificateFactory.getInstance("X.509");
+//                if (fac == null)
+//                    continue;
+//                X509Certificate cert = (X509Certificate) fac.generateCertificate(new ByteArrayInputStream(s
+//                        .toByteArray()));
+//                if (cert == null)
+//                    continue;
+//                PublicKey pkPublic = cert.getPublicKey();
+//                if (pkPublic == null)
+//                    continue;
+//                String al = pkPublic.getAlgorithm();
+//                switch (al) {
+//                    case "RSA": {
+//                        md = MessageDigest.getInstance("SHA-256");
+//                        RSAPublicKey rsa = (RSAPublicKey) pkPublic;
+//                        byte[] data = rsa.getModulus().toByteArray();
+//                        if (data[0] == 0) {
+//                            byte[] copy = new byte[data.length - 1];
+//                            System.arraycopy(data, 1, copy, 0, data.length - 1);
+//                            md.update(copy);
+//                        } else
+//                            md.update(data);
+//                        dig = md.digest();
+//                        // Add SHA-256 of modulus
+//                        sigList.add(convertToHex(dig));
+//                        break;
+//                    }
+//                    case "DSA": {
+//                        DSAPublicKey dsa = (DSAPublicKey) pkPublic;
+//                        md = MessageDigest.getInstance("SHA-256");
+//                        byte[] data = dsa.getY().toByteArray();
+//                        if (data[0] == 0) {
+//                            byte[] copy = new byte[data.length - 1];
+//                            System.arraycopy(data, 1, copy, 0, data.length - 1);
+//                            md.update(copy);
+//                        } else
+//                            md.update(data);
+//                        dig = md.digest();
+//                        // Add SHA-256 of public key (DSA)
+//                        sigList.add(convertToHex(dig));
+//                        break;
+//                    }
+//                    default:
+//                        Logger.e("SamplingLibrary", "Weird algorithm: " + al + " for " + pak.packageName);
+//                        break;
+//                }
+//            } catch (NoSuchAlgorithmException | CertificateException e) {
+//                // Do nothing
+//            }
+//
+//        }
+//        return sigList;
+//    }
 
-        for (Signature s : signatures) {
-            MessageDigest md = null;
-            try {
-                md = MessageDigest.getInstance("SHA-1");
-                md.update(s.toByteArray());
-                byte[] dig = md.digest();
-                // Add SHA-1
-                sigList.add(convertToHex(dig));
-
-                CertificateFactory fac = CertificateFactory.getInstance("X.509");
-                if (fac == null)
-                    continue;
-                X509Certificate cert = (X509Certificate) fac.generateCertificate(new ByteArrayInputStream(s
-                        .toByteArray()));
-                if (cert == null)
-                    continue;
-                PublicKey pkPublic = cert.getPublicKey();
-                if (pkPublic == null)
-                    continue;
-                String al = pkPublic.getAlgorithm();
-                switch (al) {
-                    case "RSA": {
-                        md = MessageDigest.getInstance("SHA-256");
-                        RSAPublicKey rsa = (RSAPublicKey) pkPublic;
-                        byte[] data = rsa.getModulus().toByteArray();
-                        if (data[0] == 0) {
-                            byte[] copy = new byte[data.length - 1];
-                            System.arraycopy(data, 1, copy, 0, data.length - 1);
-                            md.update(copy);
-                        } else
-                            md.update(data);
-                        dig = md.digest();
-                        // Add SHA-256 of modulus
-                        sigList.add(convertToHex(dig));
-                        break;
-                    }
-                    case "DSA": {
-                        DSAPublicKey dsa = (DSAPublicKey) pkPublic;
-                        md = MessageDigest.getInstance("SHA-256");
-                        byte[] data = dsa.getY().toByteArray();
-                        if (data[0] == 0) {
-                            byte[] copy = new byte[data.length - 1];
-                            System.arraycopy(data, 1, copy, 0, data.length - 1);
-                            md.update(copy);
-                        } else
-                            md.update(data);
-                        dig = md.digest();
-                        // Add SHA-256 of public key (DSA)
-                        sigList.add(convertToHex(dig));
-                        break;
-                    }
-                    default:
-                        Logger.e("SamplingLibrary", "Weird algorithm: " + al + " for " + pak.packageName);
-                        break;
-                }
-            } catch (NoSuchAlgorithmException | CertificateException e) {
-                // Do nothing
-            }
-
-        }
-        return sigList;
-    }
-
-    public static byte[] getPermissionBytes(String[] perms) {
-        if (perms == null)
-            return null;
-        if (permList.size() == 0)
-            populatePermList();
-        // Logger.i(STAG, "PermList Size: " + permList.size());
-        byte[] bytes = new byte[permList.size() / 8 + 1];
-        for (String p : perms) {
-            int idx = permList.indexOf(p);
-            if (idx > 0) {
-                int i = idx / 8;
-                idx = (int) Math.pow(2, idx - i * 8);
-                bytes[i] = (byte) (bytes[i] | idx);
-            }
-        }
-        return bytes;
-    }
+//    public static byte[] getPermissionBytes(String[] perms) {
+//        if (perms == null)
+//            return null;
+//        if (permList.size() == 0)
+//            populatePermList();
+//        // Logger.i(STAG, "PermList Size: " + permList.size());
+//        byte[] bytes = new byte[permList.size() / 8 + 1];
+//        for (String p : perms) {
+//            int idx = permList.indexOf(p);
+//            if (idx > 0) {
+//                int i = idx / 8;
+//                idx = (int) Math.pow(2, idx - i * 8);
+//                bytes[i] = (byte) (bytes[i] | idx);
+//            }
+//        }
+//        return bytes;
+//    }
 
     private static final ArrayList<String> permList = new ArrayList<String>();
 
