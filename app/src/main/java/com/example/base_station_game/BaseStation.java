@@ -20,6 +20,6 @@ public class BaseStation {
 
     @Override
     public String toString(){
-        return ("This is Station " + name + "with the ID: +"StationId+ "at the coordinates: Latitude: +"+latitude+ "and Longitude: "+ longitude);
+        return (" This is Station '" + name + "' with the ID: " +StationId+ " at the coordinates: Latitude: +"+latitude+ " and Longitude: "+ longitude);
     }
 }

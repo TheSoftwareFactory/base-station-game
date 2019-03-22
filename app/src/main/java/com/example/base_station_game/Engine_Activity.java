@@ -44,18 +44,18 @@ public class Engine_Activity extends AppCompatActivity {
 
 
 
-        writeNewBaseStation("1","user1","mail1");
-        writeNewBaseStation("2","user2","mail2");
-        writeNewBaseStation("3","user3","mail3");
+        writeNewBaseStation("1","user1", 60.6,50.5);
+        writeNewBaseStation("2","user2",60.6,50.5);
+        writeNewBaseStation("3","user3",60.6,50.5);
         //t.setText(mDatabase.child("users").child("111").getKey());
 
         mDatabase.child("stations").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
             for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                String key = ds.getKey();
-                BaseStation value = ds.getValue(BaseStation.class);
-                Log.d("TAG", key + value.toString());
+                String id = ds.getKey();
+                BaseStation station = ds.getValue(BaseStation.class);
+                t.append(station.toString());
             }
                 //BaseStation station = dataSnapshot.getValue(BaseStation.class);
                 //t.setText(station.toString());
@@ -69,8 +69,8 @@ public class Engine_Activity extends AppCompatActivity {
 
     }
 
-    private void writeNewBaseStation(String StationId, String name, String conquerer) {
-        BaseStation station = new BaseStation(StationId,name,conquerer);
+    private void writeNewBaseStation(String StationId, String name, double latitude, double longitude) {
+        BaseStation station = new BaseStation(StationId,name,latitude,longitude);
         mDatabase.child("stations").child(StationId).setValue(station);
     }
 
