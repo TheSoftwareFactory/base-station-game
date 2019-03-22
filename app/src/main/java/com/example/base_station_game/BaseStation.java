@@ -3,11 +3,11 @@ package com.example.base_station_game;
 
 public class BaseStation {
     public String name;
-    public String StationId;
+    public int StationId;
     public Double latitude;
     public Double longitude;
 
-    public BaseStation(String StationId, String name, double latitude, double longitude) {
+    public BaseStation(int StationId, String name, double latitude, double longitude) {
         this.name = name;
         this.StationId = StationId;
         this.latitude = latitude;
