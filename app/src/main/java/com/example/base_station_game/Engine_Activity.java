@@ -25,7 +25,9 @@ import com.example.base_station_game.BaseStation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import com.example.base_station_game.User;
 
 public class Engine_Activity extends AppCompatActivity {
 
@@ -38,8 +40,9 @@ public class Engine_Activity extends AppCompatActivity {
     private TextView t_output;
     private ArrayList stations;
     private static final int RC_SIGN_IN = 123;
-
-
+    //public FirebaseUser firebaseUser;
+    public User user;
+    public FirebaseAuth auth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -53,6 +56,8 @@ public class Engine_Activity extends AppCompatActivity {
         t_longitude = findViewById(R.id.longitude);
         t_output = findViewById(R.id.value);
         stations = new ArrayList();
+
+        //final FirebaseAuth auth = FirebaseAuth.getInstance();
 
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -77,6 +82,27 @@ public class Engine_Activity extends AppCompatActivity {
                         .build(),
                 RC_SIGN_IN);
 
+
+    }
+
+    private void load_or_create_user(final FirebaseUser firebaseUser){
+        DatabaseReference ref=mDatabase.child("Users").child(firebaseUser.getUid()); //check at reference of user if it already exists
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.hasChild("email")){  //user already exists
+                     user = dataSnapshot.getValue(User.class);
+                }
+                else{  //create new user
+                    user = new User(firebaseUser.getUid(),firebaseUser.getEmail(),firebaseUser.getDisplayName(),0);
+                    mDatabase.child("Users").child(user.getUID()).setValue(user);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
     }
 
 
@@ -89,7 +115,8 @@ public class Engine_Activity extends AppCompatActivity {
 
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                load_or_create_user(firebaseUser);
                 // ...
             } else {
                 // Sign in failed. If response is null the user canceled the
@@ -98,6 +125,8 @@ public class Engine_Activity extends AppCompatActivity {
                 // ...
             }
         }
+
+
     }
 
     public void update_stations(){
@@ -158,24 +187,4 @@ public class Engine_Activity extends AppCompatActivity {
         //send data to database
         deleteBaseStationFromDatabase(id,name,latitude,longitude);
     }
-
-
-    /*public void get_stations(){
-        mDatabase.child("stations").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                t5.setText("");
-                for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    String id = ds.getKey();
-                    BaseStation station = ds.getValue(BaseStation.class);
-                    t5.append(station.toString()+"\n");
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d("error message:","The read failed: " + databaseError.getCode());
-            }
-        });
-
-    }*/
 }
