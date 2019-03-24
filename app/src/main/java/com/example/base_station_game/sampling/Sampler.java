@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 import com.example.base_station_game.sampling.utils.BatteryUtils;
 import com.example.base_station_game.sampling.utils.PowerUtils;
 import com.example.base_station_game.sampling.utils.Util;
+import com.example.base_station_game.thrift.BatteryDetails;
 
 import java.util.concurrent.TimeUnit;
 
@@ -118,18 +119,18 @@ public class Sampler {
 //        return sample;
 //    }
 //
-//    private static BatteryDetails getBatteryDetails(Context context, Intent intent){
-//        if(intent == null) return null;
-//
-//        BatteryDetails details = new BatteryDetails();
-//        details.setBatteryHealth(getHealthString(intent));
-//        details.setBatteryTechnology(intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY));
-//        details.setBatteryTemperature(intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10.0);
-//        details.setBatteryVoltage(intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0) / 1000.0);
-//        details.setBatteryCharger(getChargerString(intent));
-//        details.setBatteryCapacity(SamplingLibrary.getBatteryCapacity(context));
-//        return details;
-//    }
+    private static BatteryDetails getBatteryDetails(Context context, Intent intent){
+        if(intent == null) return null;
+
+        BatteryDetails details = new BatteryDetails();
+        details.setBatteryHealth(getHealthString(intent));
+        details.setBatteryTechnology(intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY));
+        details.setBatteryTemperature(intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10.0);
+        details.setBatteryVoltage(intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0) / 1000.0);
+        details.setBatteryCharger(getChargerString(intent));
+        details.setBatteryCapacity(SamplingLibrary.getBatteryCapacity(context));
+        return details;
+    }
 //
 //    private static String getBatteryStatusString(SharedPreferences prefs, Intent intent){
 //        String lastState = "Unknown";
@@ -214,18 +215,18 @@ public class Sampler {
 //        }
 //    }
 //
-//    private static String getHealthString(Intent intent){
-//        int health = intent.getIntExtra(BatteryManager.EXTRA_HEALTH, 0);
-//        switch(health){
-//            case BatteryManager.BATTERY_HEALTH_DEAD: return "Dead";
-//            case BatteryManager.BATTERY_HEALTH_GOOD: return "Good";
-//            case BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE: return "Over voltage";
-//            case BatteryManager.BATTERY_HEALTH_OVERHEAT: return "Overheat";
-//            case BatteryManager.BATTERY_HEALTH_UNKNOWN: return "Unknown";
-//            case BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE: return "Unspecified failure";
-//            default: return "Unknown";
-//        }
-//    }
+    private static String getHealthString(Intent intent){
+        int health = intent.getIntExtra(BatteryManager.EXTRA_HEALTH, 0);
+        switch(health){
+            case BatteryManager.BATTERY_HEALTH_DEAD: return "Dead";
+            case BatteryManager.BATTERY_HEALTH_GOOD: return "Good";
+            case BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE: return "Over voltage";
+            case BatteryManager.BATTERY_HEALTH_OVERHEAT: return "Overheat";
+            case BatteryManager.BATTERY_HEALTH_UNKNOWN: return "Unknown";
+            case BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE: return "Unspecified failure";
+            default: return "Unknown";
+        }
+    }
 //
 //    public static boolean isEssentiallyIdentical(Sample s1, Sample s2){
 //        if(s2 != null){
