@@ -2299,19 +2299,23 @@ public final class SamplingLibrary {
     private static String getSIMOperators(Context context){
         String operators = "";
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1){
-            List<SubscriptionInfo> subscriptions = SubscriptionManager.from(context).getActiveSubscriptionInfoList();
-            if(subscriptions != null && subscriptions.size() > 0){
-                for(SubscriptionInfo info : subscriptions){
-                    int subId = info.getSubscriptionId();
-                    String operator = getSimOperatorNameForSubscription(context, subId);
-                    if(operator != null && operator.length() > 0){
-                        operators += operator + ";";
+            try {
+                List<SubscriptionInfo> subscriptions = SubscriptionManager.from(context).getActiveSubscriptionInfoList();
+                if (subscriptions != null && subscriptions.size() > 0) {
+                    for (SubscriptionInfo info : subscriptions) {
+                        int subId = info.getSubscriptionId();
+                        String operator = getSimOperatorNameForSubscription(context, subId);
+                        if (operator != null && operator.length() > 0) {
+                            operators += operator + ";";
+                        }
+                    }
+                    // Remove last delimiter
+                    if (operators.length() > 1) {
+                        operators = operators.substring(0, operators.length() - 1);
                     }
                 }
-                // Remove last delimiter
-                if(operators.length() > 1){
-                    operators = operators.substring(0, operators.length()-1);
-                }
+            } catch (SecurityException se) {
+                System.out.println(se);
             }
         }
         return operators;
@@ -2328,18 +2332,22 @@ public final class SamplingLibrary {
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1){
             SubscriptionManager subscriptionManager = SubscriptionManager.from(context);
             if(subscriptionManager != null){
-                List<SubscriptionInfo> subscriptions = subscriptionManager.getActiveSubscriptionInfoList();
-                if(subscriptions != null){
-                    for(SubscriptionInfo info : subscriptions){
-                        CharSequence carrierName = info.getCarrierName();
-                        if(carrierName != null && carrierName.length() > 0){
-                            operator += carrierName + ";";
+                try {
+                    List<SubscriptionInfo> subscriptions = subscriptionManager.getActiveSubscriptionInfoList();
+                    if(subscriptions != null){
+                        for(SubscriptionInfo info : subscriptions){
+                            CharSequence carrierName = info.getCarrierName();
+                            if(carrierName != null && carrierName.length() > 0){
+                                operator += carrierName + ";";
+                            }
+                        }
+                        // Remove last delimiter
+                        if(operator.length() >= 1){
+                            operator = operator.substring(0, operator.length()-1);
                         }
                     }
-                    // Remove last delimiter
-                    if(operator.length() >= 1){
-                        operator = operator.substring(0, operator.length()-1);
-                    }
+                } catch (SecurityException se) {
+                    System.out.println(se);
                 }
             }
         }
