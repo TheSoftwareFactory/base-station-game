@@ -11,8 +11,7 @@ import com.example.base_station_game.sampling.Keys;
 import com.example.base_station_game.sampling.SamplingLibrary;
 
 import java.util.Locale;
-
-import edu.berkeley.cs.amplab.carat.android.Keys;
+import java.util.Locale;
 
 /**
  * Created by Jonatan on 14.8.2017.
@@ -53,12 +52,11 @@ public class NetworkingUtil {
             String networkType = SamplingLibrary.getNetworkType(context);
 
             boolean isConnected = status.equalsIgnoreCase(SamplingLibrary.NETWORKSTATUS_CONNECTED);
-            boolean wifiOnly = prefs.getBoolean(Keys.useWifiOnly, false);
             boolean isWifi =  networkType.equalsIgnoreCase("WIFI");
-            boolean isAllowed = !wifiOnly || isWifi;
+            boolean isAllowed = isWifi;
 
-            String format = "isConnected: %b, wifiOnly: %b, isWifi: %b, isAllowed: %b";
-            Logger.d(TAG, String.format(Locale.getDefault(), format, isConnected, wifiOnly, isWifi, isAllowed));
+//            String format = "isConnected: %b, wifiOnly: %b, isWifi: %b, isAllowed: %b";
+//            Logger.d(TAG, String.format(Locale.getDefault(), format, isConnected, wifiOnly, isWifi, isAllowed));
 
             return isConnected && isAllowed;
         }

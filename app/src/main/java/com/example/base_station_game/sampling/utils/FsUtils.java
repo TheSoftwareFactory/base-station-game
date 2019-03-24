@@ -180,13 +180,13 @@ public class FsUtils {
                                 pageSum += Long.parseLong(tokens[1]);
                             } catch (NumberFormatException e){
                                 // This happens when lines aren't in proper key-value format
-                                Logger.d(TAG, "Skipping line in /proc/zoneinfo");
+//                                Logger.d(TAG, "Skipping line in /proc/zoneinfo");
                             }
                         }
                     }
                 }
             } catch (IOException e) {
-                Logger.e(TAG, "Failed reading zoneinfo: " + e);
+//                Logger.e(TAG, "Failed reading zoneinfo: " + e);
             }
             return pageSum * 4; // Assume 4KB page size for ARM
         }
@@ -216,12 +216,12 @@ public class FsUtils {
                         } else if(valueClass == String.class){
                             value = (V) readString(path);
                         } else {
-                            Logger.e(TAG, "Unsupported type: " + valueClass.getSimpleName());
+//                            Logger.e(TAG, "Unsupported type: " + valueClass.getSimpleName());
                         }
                         values.put(id, value);
                     }
                 } catch (Exception e){
-                    Logger.d(TAG, "Failed reading " + file.getPath());
+//                    Logger.d(TAG, "Failed reading " + file.getPath());
                 }
             }
         }
@@ -250,13 +250,13 @@ public class FsUtils {
                             Long value = Long.parseLong(tokens[1]);
                             result.put(key, value);
                         } catch (NumberFormatException e){
-                            Logger.d(TAG, "Unexpected format when reading /proc/meminfo");
+//                            Logger.d(TAG, "Unexpected format when reading /proc/meminfo");
                         }
                     }
                 }
             }
         } catch (IOException e)  {
-            Logger.e(TAG, "Error when reading /proc/meminfo: " + e);
+//            Logger.e(TAG, "Error when reading /proc/meminfo: " + e);
         }
         return result;
     }
@@ -267,7 +267,7 @@ public class FsUtils {
             try {
                 return Long.parseLong(content);
             } catch (NumberFormatException e){
-                Logger.d(TAG,  "Unable to convert to long " + e);
+//                Logger.d(TAG,  "Unable to convert to long " + e);
             }
         }
         return INVALID_VALUE;
@@ -286,7 +286,7 @@ public class FsUtils {
                 return new String(buffer, 0, length);
             }
         } catch (IOException e) {
-            Logger.d(TAG, "Unable to file " + path + ", " + e);
+//            Logger.d(TAG, "Unable to file " + path + ", " + e);
         } finally {
             if(inputStream != null){
                 try {

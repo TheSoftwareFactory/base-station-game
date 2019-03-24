@@ -29,13 +29,13 @@ public class BatteryUtils {
 
         // TODO: Remove logging while confirmed working. This floods the log.
         if(level < 0){
-            Logger.d(TAG,
-                    "Missing battery level information or negative for " + intent.getAction());
+//            Logger.d(TAG,
+//                    "Missing battery level information or negative for " + intent.getAction());
             level = DEFAULT_LEVEL;
         }
         if(scale <= 0){
-            Logger.d(TAG,
-                    "Missing battery scale information or invalid value for " + intent.getAction());
+//            Logger.d(TAG,
+//                    "Missing battery scale information or invalid value for " + intent.getAction());
             scale = DEFAULT_SCALE;
         }
 
@@ -48,7 +48,7 @@ public class BatteryUtils {
     public static boolean isFull(Intent intent){
         int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
         if(status == -1){
-            Logger.d(TAG, "Missing battery status");
+//            Logger.d(TAG, "Missing battery status");
         }
         double level = BatteryUtils.getBatteryLevel(intent);
         return status == BatteryManager.BATTERY_STATUS_FULL || level >= 100;
