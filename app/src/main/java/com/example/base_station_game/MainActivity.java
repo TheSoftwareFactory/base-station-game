@@ -22,32 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG =
         MainActivity.class.getSimpleName();
-    //TextView tv1;
-    //TextView tv2;
-    //int counter=0;
-    //Handler handler = new Handler();
-    //int millisecondsOfDelay = 1000;
-    // timesToReapeat = 100;
 
-    /*
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        tv1 = (TextView)findViewById(R.id.textViewUP);
-        tv2 = (TextView)findViewById(R.id.textViewDOWN);
-
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                counter++;
-                tv1.setText(""+counter);
-                tv2.setText(""+counter);
-                if(counter<timesToReapeat) {
-                    handler.postDelayed(this, millisecondsOfDelay);
-                }
-            }
-        }, millisecondsOfDelay);
-    }
-    */
     private Button b;
     private TextView t;
     private LocationManager locationManager;
@@ -121,6 +96,11 @@ public class MainActivity extends AppCompatActivity {
     public void launchSecondActivity(View view) {
         Log.d(LOG_TAG, "Button clicked!");
         Intent intent = new Intent(this, SecondActivity.class);
+        startActivity(intent);
+    }
+
+    public void google_engine(View view) {
+        Intent intent = new Intent(this, Engine_Activity.class);
         startActivity(intent);
     }
 }

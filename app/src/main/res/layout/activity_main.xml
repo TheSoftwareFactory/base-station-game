@@ -5,6 +5,17 @@
     android:layout_height="match_parent"
     tools:context="testing.gps_location.MainActivity">
 
+    <Button
+        android:id="@+id/google_engine"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/stop_gps"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="4dp"
+        android:onClick="google_engine"
+        android:text="google engine" />
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"

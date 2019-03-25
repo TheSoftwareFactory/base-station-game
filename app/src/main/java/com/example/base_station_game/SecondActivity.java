@@ -1,14 +1,11 @@
 package com.example.base_station_game;
 
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.config.Configuration;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -24,15 +21,39 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.util.Log;
+import android.widget.Toast;
+
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.MapController;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
+import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlay;
+import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlayOptions;
+import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class SecondActivity extends AppCompatActivity {
 
 
     private LocationManager locationManager;
     private LocationListener listener;
-    private MapView map = null;
-    private Marker marker = null;
+    private GeoPoint actualPosition = null;
+
+    MapView map = null;
+    Marker marker =null;
+
+    private static final String LOG_TAG =
+            SecondActivity.class.getSimpleName();
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,21 +78,123 @@ public class SecondActivity extends AppCompatActivity {
         map.setMultiTouchControls(true);
         map.getController().setZoom(3);
 
+        //creating fare station list
+        double startKumpulaLatitude = 60.205637;
+        double startKumpulaLongitute = 24.962433;
+
+        //Adding base stations with Simple Fast Point Overlay
+
+        List<BaseStation> lbs = new ArrayList<BaseStation>();
+        for(int i=0;i<30;i++){
+            lbs.add(new BaseStation(i,"Station "+i,startKumpulaLatitude + (Math.random() * 0.01),startKumpulaLongitute + (Math.random() * 0.02)));
+        }
+
+
+        // create 10k labelled points
+        // in most cases, there will be no problems of displaying >100k points, feel free to try
+        List<IGeoPoint> points = new ArrayList<>();
+        for (int i = 0; i < lbs.size(); i++) {
+            Log.d(LOG_TAG, "inserting iteration" + i);
+            points.add(new LabelledGeoPoint(lbs.get(i).getLatitude(), lbs.get(i).getLongitude(), lbs.get(i).getName()));
+        }
+
+        // wrap them in a theme
+        SimplePointTheme pt = new SimplePointTheme(points, true);
+/*
+        for (int i = 0; i < 25; i++) {
+            Log.d(LOG_TAG, "deleting iteration" + i);
+            points.remove(points.size()-i-1);
+        }
+*/
+        // create label style
+        Paint textStyle = new Paint();
+        textStyle.setStyle(Paint.Style.FILL);
+        textStyle.setColor(Color.parseColor("#0000ff"));
+        textStyle.setTextAlign(Paint.Align.CENTER);
+        textStyle.setTextSize(24);
+
+        // create point style
+        Paint pointStyle = new Paint();
+        pointStyle.setStyle(Paint.Style.FILL);
+        pointStyle.setColor(Color.parseColor("#0000ff"));
+        pointStyle.setTextAlign(Paint.Align.CENTER);
+
+        // create selected point style
+        Paint selectedPointStyle = new Paint();
+        selectedPointStyle.setStyle(Paint.Style.FILL);
+        selectedPointStyle.setColor(Color.parseColor("#00ff00"));
+        selectedPointStyle.setTextAlign(Paint.Align.CENTER);
+
+        // set some visual options for the overlay
+        // we use here MAXIMUM_OPTIMIZATION algorithm, which works well with >100k points
+        SimpleFastPointOverlayOptions opt = SimpleFastPointOverlayOptions.getDefaultStyle()
+                .setAlgorithm(SimpleFastPointOverlayOptions.RenderingAlgorithm.MAXIMUM_OPTIMIZATION)
+                .setRadius(10)
+                .setIsClickable(true)
+                .setCellSize(15)
+                .setTextStyle(textStyle)
+                .setPointStyle(pointStyle)
+                .setSelectedPointStyle(selectedPointStyle);
+
+        // create the overlay with the theme
+        final SimpleFastPointOverlay sfpo = new SimpleFastPointOverlay(pt, opt);
+
+        // onClick callback
+        sfpo.setOnClickListener(new SimpleFastPointOverlay.OnClickListener() {
+            @Override
+            public void onClick(SimpleFastPointOverlay.PointAdapter points, Integer point) {
+                Toast.makeText(map.getContext()
+                        , "You clicked on " + ((LabelledGeoPoint) points.get(point)).getLabel()
+                        , Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // add overlay
+        map.getOverlays().add(sfpo);
+
+        /*
+        //Adding base stations with Overlay Items
+
+        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+        items.add(new OverlayItem("Title", "Description", new GeoPoint(0.0d,0.0d))); // Lat/Lon decimal degrees
+
+            //the overlay
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items,
+                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                    @Override
+                    public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+                        //do something
+                        return true;
+                    }
+                    @Override
+                    public boolean onItemLongPress(final int index, final OverlayItem item) {
+                        return false;
+                    }
+                });
+
+        mOverlay.setFocusItemsOnTap(true);
+
+        map.getOverlays().add(mOverlay);
+        */
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
 
         listener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 GeoPoint newlocation = new GeoPoint(location);
-                if (marker == null){
+                actualPosition = newlocation;
+                if (marker == null) {
                     marker = new Marker(map);
                     map.getOverlays().add(marker);
+                    marker.setPosition(newlocation);
                     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                } else{
+                    marker.setTitle("test");
+                }
+                else {
                     marker.setPosition(newlocation);
                 }
-                map.getController().setCenter(newlocation);
-                map.getController().setZoom(18);
+                map.getController().animateTo(newlocation,(double)18,1500L);
+                map.invalidate();
             }
 
             public void onStatusChanged(String s, int i, Bundle bundle) {
