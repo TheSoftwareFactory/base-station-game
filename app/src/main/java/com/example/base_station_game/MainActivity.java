@@ -99,6 +99,12 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void launchSampleDebugActivity() {
+        Log.d(LOG_TAG, "Button clicked!");
+        Intent intent = new Intent(this, SamplingDebugActivity.class);
+        startActivity(intent);
+    }
+
     public void google_engine(View view) {
         Intent intent = new Intent(this, Engine_Activity.class);
         startActivity(intent);

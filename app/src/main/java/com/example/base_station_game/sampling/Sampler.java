@@ -113,7 +113,7 @@ public class Sampler {
 //        return sample;
 //    }
 //
-    private static Sample createSample(Context context, Intent batteryIntent) {
+    public static Sample createSample(Context context, Intent batteryIntent) {
         Sample sample = new Sample();
         sample.setBatteryDetails(getBatteryDetails(context, batteryIntent));
         sample.setBatteryLevel(BatteryUtils.getBatteryLevel(batteryIntent));
