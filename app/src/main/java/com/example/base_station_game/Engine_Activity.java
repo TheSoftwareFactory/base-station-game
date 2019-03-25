@@ -20,7 +20,7 @@ import java.util.Map;
 //import com.google.firebase
 
 public class Engine_Activity extends AppCompatActivity {
-
+/*
 
     private DatabaseReference mDatabase;
     private TextView t;
@@ -74,5 +74,5 @@ public class Engine_Activity extends AppCompatActivity {
         mDatabase.child("stations").child(StationId).setValue(station);
     }
 
-
+*/
 }
