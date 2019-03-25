@@ -94,7 +94,7 @@ public class Engine_Activity extends AppCompatActivity {
                      user = dataSnapshot.getValue(User.class);
                 }
                 else{  //create new user
-                    user = new User(firebaseUser.getUid(),firebaseUser.getEmail(),firebaseUser.getDisplayName(),0);
+                    user = new User(firebaseUser.getUid(),firebaseUser.getEmail(),firebaseUser.getDisplayName(),0,15,0);
                     mDatabase.child("Users").child(user.getUID()).setValue(user);
                 }
             }
@@ -158,13 +158,13 @@ public class Engine_Activity extends AppCompatActivity {
     }
 
     private void writeNewBaseStationToDatabase(int StationId, String name, double latitude, double longitude) {
-        BaseStation station = new BaseStation(StationId,name,latitude,longitude);   //create station
+        BaseStation station = new BaseStation(StationId,name,latitude,longitude, 5);   //create station
         mDatabase.child("stations").child(Integer.toString(StationId)).setValue(station);   //attach station to database
     }
 
-    private void deleteBaseStationFromDatabase(int StationId, String name, double latitude, double longitude) {
-        BaseStation station = new BaseStation(StationId,name,latitude,longitude);   //create station
-        mDatabase.child("stations").child(Integer.toString(station.getID())).removeValue();  //remove station to database
+    private void deleteBaseStationFromDatabase(int StationId) {
+         //create station
+        mDatabase.child("stations").child(Integer.toString(StationId)).removeValue();  //remove station to database
     }
 
     public void add_station(View view) {
@@ -181,10 +181,7 @@ public class Engine_Activity extends AppCompatActivity {
     public void delete_station(View view) {
         // collect data from ui
         int id= Integer.valueOf(t_id.getText().toString());
-        String name= t_name.getText().toString();
-        double latitude= Double.parseDouble(t_latitude.getText().toString());
-        double longitude= Double.parseDouble(t_longitude.getText().toString());
         //send data to database
-        deleteBaseStationFromDatabase(id,name,latitude,longitude);
+        deleteBaseStationFromDatabase(id);
     }
 }

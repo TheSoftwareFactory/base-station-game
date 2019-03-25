@@ -1,17 +1,21 @@
 package com.example.base_station_game;
 
 
-public class BaseStation extends Object{
+public class BaseStation{
     private String name;
     private int id;
     private Double latitude;
     private Double longitude;
+    private boolean active;
+    private int timeToLive;
 
-    public BaseStation(int id, String name, double latitude, double longitude) {
+    public BaseStation(int id, String name, double latitude, double longitude, int timeToLive) {
         this.name = name;
         this.id = id;
         this.latitude = latitude;
         this.longitude= longitude;
+        this.active=true;
+        this.timeToLive=timeToLive;
     }
 
     public BaseStation() {
@@ -39,13 +43,29 @@ public class BaseStation extends Object{
     @Override
     public boolean equals(Object o) {
         BaseStation station= (BaseStation) o;
-        if (((BaseStation) o).getID() ==this.id && ((BaseStation) o).getName() ==this.name && ((BaseStation) o).getLatitude() ==this.latitude && ((BaseStation) o).getLongitude() ==this.longitude){
+        if ((station.getID() == this.id) && (station.getName() == this.name) && (station.getLatitude() == this.latitude) && (station.getLongitude() == this.longitude))
+        {
             return true;
         }
         else
         {
             return false;
         }
+    }
 
+    public int getTimeToLive() {
+        return timeToLive;
+    }
+
+    public void setTimeToLive(int timeToLive) {
+        this.timeToLive = timeToLive;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
