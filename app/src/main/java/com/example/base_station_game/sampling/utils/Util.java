@@ -20,9 +20,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import edu.berkeley.cs.amplab.carat.android.R;
-import edu.berkeley.cs.amplab.carat.thrift.PackageProcess;
-
 /**
  * General utilities for handling different data types.
  * Created by Jonatan Hamberg on 1.2.2017.
@@ -134,25 +131,25 @@ public class Util {
                 wl.release();
             }
         } catch(Throwable th){
-            Logger.d(TAG, "Releasing wakelock failed: " + th);
+//            Logger.d(TAG, "Releasing wakelock failed: " + th);
         }
     }
 
-    public static PackageProcess getDefaultPackageProcess(){
-        int ERR_VAL = -1;
-        return new PackageProcess()
-                .setProcessName("Unknown")
-                .setProcessCount(ERR_VAL)
-                .setUId(ERR_VAL)
-                .setSleeping(false)
-                .setForeground(false)
-                .setForegroundTime(ERR_VAL)
-                .setLaunchCount(ERR_VAL)
-                .setImportance(ERR_VAL)
-                .setCrashCount(ERR_VAL)
-                .setLastStartSinceBoot(ERR_VAL)
-                .setLastStartTimestamp(ERR_VAL);
-    }
+//    public static PackageProcess getDefaultPackageProcess(){
+//        int ERR_VAL = -1;
+//        return new PackageProcess()
+//                .setProcessName("Unknown")
+//                .setProcessCount(ERR_VAL)
+//                .setUId(ERR_VAL)
+//                .setSleeping(false)
+//                .setForeground(false)
+//                .setForegroundTime(ERR_VAL)
+//                .setLaunchCount(ERR_VAL)
+//                .setImportance(ERR_VAL)
+//                .setCrashCount(ERR_VAL)
+//                .setLastStartSinceBoot(ERR_VAL)
+//                .setLastStartTimestamp(ERR_VAL);
+//    }
 
     public static void openStorePage(Context context, String packageName){
         try {
@@ -164,20 +161,20 @@ public class Util {
         }
     }
 
-    public static void showConfirmationDialog(Context context, String text, Runnable ok, Runnable cancel){
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setMessage(text);
-        builder.setCancelable(false);
-        builder.setPositiveButton(context.getString(R.string.dialog_ok), (dialog, id) -> ok.run());
-        builder.setNegativeButton(context.getString(R.string.dialog_cancel2), (dialog, id) -> cancel.run());
-        AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(dialogInterface -> {
-            // TODO: Rather than doing this programmatically, change the theme.
-            dialog.getButton(Dialog.BUTTON_NEGATIVE).setTextColor(Color.rgb(248, 176, 58));
-            dialog.getButton(Dialog.BUTTON_POSITIVE).setTextColor(Color.rgb(248, 176, 58));
-        });
-        dialog.show();
-    }
+//    public static void showConfirmationDialog(Context context, String text, Runnable ok, Runnable cancel){
+//        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//        builder.setMessage(text);
+//        builder.setCancelable(false);
+//        builder.setPositiveButton(context.getString(R.string.dialog_ok), (dialog, id) -> ok.run());
+//        builder.setNegativeButton(context.getString(R.string.dialog_cancel2), (dialog, id) -> cancel.run());
+//        AlertDialog dialog = builder.create();
+//        dialog.setOnShowListener(dialogInterface -> {
+//            // TODO: Rather than doing this programmatically, change the theme.
+//            dialog.getButton(Dialog.BUTTON_NEGATIVE).setTextColor(Color.rgb(248, 176, 58));
+//            dialog.getButton(Dialog.BUTTON_POSITIVE).setTextColor(Color.rgb(248, 176, 58));
+//        });
+//        dialog.show();
+//    }
 
     public static Integer getDigits(String string){
         Integer result = null;
@@ -186,7 +183,7 @@ public class Util {
                 String digits = string.replaceAll("\\D+", "");
                 result = Integer.parseInt(digits);
             } catch (Exception e){
-                Logger.d(TAG, "Failed getting digits out of string \"" + string + "\"");
+//                Logger.d(TAG, "Failed getting digits out of string \"" + string + "\"");
             }
         }
         return result;
@@ -200,43 +197,43 @@ public class Util {
         return builder.toString();
     }
 
-    public static String getTimeString(Context context, long elapsed, String defaultValue){
-        if(context != null){
-            Resources resources = context.getResources();
-            if(resources != null){
-                Locale locale = Locale.getDefault();
-                String format = "%s %s";
-                String ago = context.getString(R.string.ago);
-                if(elapsed < TimeUnit.MINUTES.toMillis(1)){
-                    // Less than a minute ago
-                    String lessThanMinute = context.getString(R.string.less_than_minute);
-                    return String.format(locale, format, lessThanMinute, ago);
-                } else if(elapsed < TimeUnit.MINUTES.toMillis(2)){
-                    // One minute ago
-                    return context.getString(R.string.oneMinute) + " " + ago;
-                } else if(elapsed < TimeUnit.HOURS.toMillis(1)){
-                    // Minutes ago
-                    int minutes = (int) TimeUnit.MILLISECONDS.toMinutes(elapsed);
-                    String unit = resources.getQuantityString(R.plurals.minutes, minutes, minutes);
-                    return String.format(locale, format, unit, ago);
-                } else if(elapsed < TimeUnit.HOURS.toMillis(2)){
-                    // One hour ago
-                    return context.getString(R.string.oneHour) + " " + ago;
-                } else if(elapsed < TimeUnit.DAYS.toMillis(1)){
-                    // Hours ago
-                    int hours = (int) TimeUnit.MILLISECONDS.toHours(elapsed);
-                    String unit = resources.getQuantityString(R.plurals.hours, hours, hours);
-                    return String.format(locale, format, unit, ago);
-                }
-            }
-        }
-        return defaultValue;
-    }
+//    public static String getTimeString(Context context, long elapsed, String defaultValue){
+//        if(context != null){
+//            Resources resources = context.getResources();
+//            if(resources != null){
+//                Locale locale = Locale.getDefault();
+//                String format = "%s %s";
+//                String ago = context.getString(R.string.ago);
+//                if(elapsed < TimeUnit.MINUTES.toMillis(1)){
+//                    // Less than a minute ago
+//                    String lessThanMinute = context.getString(R.string.less_than_minute);
+//                    return String.format(locale, format, lessThanMinute, ago);
+//                } else if(elapsed < TimeUnit.MINUTES.toMillis(2)){
+//                    // One minute ago
+//                    return context.getString(R.string.oneMinute) + " " + ago;
+//                } else if(elapsed < TimeUnit.HOURS.toMillis(1)){
+//                    // Minutes ago
+//                    int minutes = (int) TimeUnit.MILLISECONDS.toMinutes(elapsed);
+//                    String unit = resources.getQuantityString(R.plurals.minutes, minutes, minutes);
+//                    return String.format(locale, format, unit, ago);
+//                } else if(elapsed < TimeUnit.HOURS.toMillis(2)){
+//                    // One hour ago
+//                    return context.getString(R.string.oneHour) + " " + ago;
+//                } else if(elapsed < TimeUnit.DAYS.toMillis(1)){
+//                    // Hours ago
+//                    int hours = (int) TimeUnit.MILLISECONDS.toHours(elapsed);
+//                    String unit = resources.getQuantityString(R.plurals.hours, hours, hours);
+//                    return String.format(locale, format, unit, ago);
+//                }
+//            }
+//        }
+//        return defaultValue;
+//    }
 
-    public static void printStackTrace(String tag, Throwable th){
-        Logger.e(tag, th.getCause()+"");
-        Logger.e(tag, getStackTrace(th));
-    }
+//    public static void printStackTrace(String tag, Throwable th){
+//        Logger.e(tag, th.getCause()+"");
+//        Logger.e(tag, getStackTrace(th));
+//    }
 
     public static String getStackTrace(Throwable th){
         StringBuilder buf = new StringBuilder();

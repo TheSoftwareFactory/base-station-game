@@ -2,17 +2,11 @@ package com.example.base_station_game.sampling;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.BatteryManager;
-import android.os.Build;
-import android.preference.PreferenceManager;
 
+import com.example.base_station_game.sampling.structs.BatteryDetails;
+import com.example.base_station_game.sampling.structs.Sample;
 import com.example.base_station_game.sampling.utils.BatteryUtils;
-import com.example.base_station_game.sampling.utils.PowerUtils;
-import com.example.base_station_game.sampling.utils.Util;
-import com.example.base_station_game.thrift.BatteryDetails;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Jonatan Hamberg on 2.2.2017.
@@ -119,6 +113,14 @@ public class Sampler {
 //        return sample;
 //    }
 //
+    private static Sample createSample(Context context, Intent batteryIntent) {
+        Sample sample = new Sample();
+        sample.setBatteryDetails(getBatteryDetails(context, batteryIntent));
+        sample.setBatteryLevel(BatteryUtils.getBatteryLevel(batteryIntent));
+        sample.setBatteryState(getBatteryStatusString(batteryIntent));
+        return sample;
+    }
+
     private static BatteryDetails getBatteryDetails(Context context, Intent intent){
         if(intent == null) return null;
 
@@ -131,30 +133,23 @@ public class Sampler {
         details.setBatteryCapacity(SamplingLibrary.getBatteryCapacity(context));
         return details;
     }
-//
-//    private static String getBatteryStatusString(SharedPreferences prefs, Intent intent){
-//        String lastState = "Unknown";
-//        if(prefs != null){
-//            lastState = prefs.getString(Keys.lastBatteryStatus, "Unknown");
-//        }
-//        if(intent != null){
-//            int id = intent.getIntExtra(BatteryManager.EXTRA_STATUS, 0);
-//            String status;
-//            switch(id){
-//                case BatteryManager.BATTERY_STATUS_CHARGING: status =  "Charging"; break;
-//                case BatteryManager.BATTERY_STATUS_DISCHARGING: status = "Discharging"; break;
-//                case BatteryManager.BATTERY_STATUS_FULL: status = "Full"; break;
-//                case BatteryManager.BATTERY_STATUS_NOT_CHARGING: status = "Not charging"; break;
-//                case BatteryManager.BATTERY_STATUS_UNKNOWN: status = "Unknown"; break;
-//                default: status = lastState;
-//            }
-//            if(prefs != null){
-//                prefs.edit().putString(Keys.lastBatteryStatus, status).apply();
-//            }
-//            return status;
-//        }
-//        return lastState;
-//    }
+
+    private static String getBatteryStatusString(Intent intent){
+        if(intent != null){
+            int id = intent.getIntExtra(BatteryManager.EXTRA_STATUS, 0);
+            String status;
+            switch(id){
+                case BatteryManager.BATTERY_STATUS_CHARGING: status =  "Charging"; break;
+                case BatteryManager.BATTERY_STATUS_DISCHARGING: status = "Discharging"; break;
+                case BatteryManager.BATTERY_STATUS_FULL: status = "Full"; break;
+                case BatteryManager.BATTERY_STATUS_NOT_CHARGING: status = "Not charging"; break;
+                case BatteryManager.BATTERY_STATUS_UNKNOWN: status = "Unknown"; break;
+                default: status = null;
+            }
+            return status;
+        }
+        return null;
+    }
 //
 //    private static NetworkDetails constructNetworkDetails(Context context){
 //        NetworkDetails details = new NetworkDetails();
@@ -205,15 +200,15 @@ public class Sampler {
 //        return settings;
 //    }
 //
-//    private static String getChargerString(Intent intent){
-//        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0);
-//        switch(plugged){
-//            case BatteryManager.BATTERY_PLUGGED_AC: return "ac";
-//            case BatteryManager.BATTERY_PLUGGED_USB: return "usb";
-//            case BatteryManager.BATTERY_PLUGGED_WIRELESS: return "wireless";
-//            default: return "unplugged";
-//        }
-//    }
+    private static String getChargerString(Intent intent){
+        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0);
+        switch(plugged){
+            case BatteryManager.BATTERY_PLUGGED_AC: return "ac";
+            case BatteryManager.BATTERY_PLUGGED_USB: return "usb";
+            case BatteryManager.BATTERY_PLUGGED_WIRELESS: return "wireless";
+            default: return "unplugged";
+        }
+    }
 //
     private static String getHealthString(Intent intent){
         int health = intent.getIntExtra(BatteryManager.EXTRA_HEALTH, 0);

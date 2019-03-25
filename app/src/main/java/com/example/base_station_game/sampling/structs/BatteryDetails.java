@@ -1,4 +1,4 @@
-package com.example.base_station_game.thrift;
+package com.example.base_station_game.sampling.structs;
 
 public class BatteryDetails {
     private String batteryCharger;
