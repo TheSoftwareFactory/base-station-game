@@ -15,6 +15,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <service
+            android:name=".DatabaseService"
+            android:exported="false"></service>
+
         <activity android:name=".Engine_Activity" />
         <activity
             android:name=".SecondActivity"
