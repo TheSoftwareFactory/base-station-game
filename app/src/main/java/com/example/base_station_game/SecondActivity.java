@@ -33,6 +33,7 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
 import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlay;
 import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlayOptions;
@@ -49,8 +50,18 @@ public class SecondActivity extends AppCompatActivity {
     private LocationListener listener;
     private GeoPoint actualPosition = null;
 
+    //creating fake station list
+    double startKumpulaLatitude = 60.205637;
+    double startKumpulaLongitude = 24.962433;
+
+    List<BaseStation> lbs = null;
+
     MapView map = null;
-    Marker marker =null;
+    Marker marker = null;
+
+    Paint textStyle = new Paint();
+    Paint pointStyle = new Paint();
+    Paint selectedPointStyle = new Paint();
 
     private static final String LOG_TAG =
             SecondActivity.class.getSimpleName();
@@ -78,79 +89,138 @@ public class SecondActivity extends AppCompatActivity {
         map.setMultiTouchControls(true);
         map.getController().setZoom(3);
 
-        //creating fare station list
-        double startKumpulaLatitude = 60.205637;
-        double startKumpulaLongitute = 24.962433;
-
         //Adding base stations with Simple Fast Point Overlay
 
-        List<BaseStation> lbs = new ArrayList<BaseStation>();
-        for(int i=0;i<30;i++){
-            lbs.add(new BaseStation(i,"Station "+i,startKumpulaLatitude + (Math.random() * 0.01),startKumpulaLongitute + (Math.random() * 0.02)));
+        lbs = new ArrayList<>();
+        for (int i = 0; i < 30; i++) {
+            lbs.add(new BaseStation(i, "Station " + i, startKumpulaLatitude + ((Math.random()*2-1) * 0.005), startKumpulaLongitude + ((Math.random()*2-1) * 0.0028)));
         }
 
-
-        // create 10k labelled points
-        // in most cases, there will be no problems of displaying >100k points, feel free to try
-        List<IGeoPoint> points = new ArrayList<>();
-        for (int i = 0; i < lbs.size(); i++) {
-            Log.d(LOG_TAG, "inserting iteration" + i);
-            points.add(new LabelledGeoPoint(lbs.get(i).getLatitude(), lbs.get(i).getLongitude(), lbs.get(i).getName()));
-        }
-
-        // wrap them in a theme
-        SimplePointTheme pt = new SimplePointTheme(points, true);
-/*
-        for (int i = 0; i < 25; i++) {
-            Log.d(LOG_TAG, "deleting iteration" + i);
-            points.remove(points.size()-i-1);
-        }
-*/
         // create label style
-        Paint textStyle = new Paint();
+
         textStyle.setStyle(Paint.Style.FILL);
         textStyle.setColor(Color.parseColor("#0000ff"));
         textStyle.setTextAlign(Paint.Align.CENTER);
         textStyle.setTextSize(24);
 
         // create point style
-        Paint pointStyle = new Paint();
+
         pointStyle.setStyle(Paint.Style.FILL);
         pointStyle.setColor(Color.parseColor("#0000ff"));
         pointStyle.setTextAlign(Paint.Align.CENTER);
 
         // create selected point style
-        Paint selectedPointStyle = new Paint();
+
         selectedPointStyle.setStyle(Paint.Style.FILL);
         selectedPointStyle.setColor(Color.parseColor("#00ff00"));
         selectedPointStyle.setTextAlign(Paint.Align.CENTER);
 
-        // set some visual options for the overlay
-        // we use here MAXIMUM_OPTIMIZATION algorithm, which works well with >100k points
-        SimpleFastPointOverlayOptions opt = SimpleFastPointOverlayOptions.getDefaultStyle()
-                .setAlgorithm(SimpleFastPointOverlayOptions.RenderingAlgorithm.MAXIMUM_OPTIMIZATION)
-                .setRadius(10)
-                .setIsClickable(true)
-                .setCellSize(15)
-                .setTextStyle(textStyle)
-                .setPointStyle(pointStyle)
-                .setSelectedPointStyle(selectedPointStyle);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        // create the overlay with the theme
-        final SimpleFastPointOverlay sfpo = new SimpleFastPointOverlay(pt, opt);
 
-        // onClick callback
-        sfpo.setOnClickListener(new SimpleFastPointOverlay.OnClickListener() {
-            @Override
-            public void onClick(SimpleFastPointOverlay.PointAdapter points, Integer point) {
-                Toast.makeText(map.getContext()
-                        , "You clicked on " + ((LabelledGeoPoint) points.get(point)).getLabel()
-                        , Toast.LENGTH_SHORT).show();
+        listener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+                GeoPoint newlocation = new GeoPoint(location);
+                actualPosition = newlocation;
+                if (marker == null) {
+
+                    List<GeoPoint> circle = Polygon.pointsAsCircle(newlocation, 100);
+                    Polygon p = new Polygon(map);
+                    p.setPoints(circle);
+                    map.getOverlayManager().add(p);
+
+                    marker = new Marker(map);
+                    map.getOverlays().add(marker);
+                    marker.setPosition(newlocation);
+                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                    marker.setTitle("test");
+                    updateStationsOnMap();
+
+
+                } else {
+                    marker.setPosition(newlocation);
+                }
+                map.getController().animateTo(newlocation, (double) 18, 1500L);
+                map.invalidate();
             }
-        });
 
-        // add overlay
-        map.getOverlays().add(sfpo);
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            public void onProviderEnabled(String s) {
+
+            }
+
+            public void onProviderDisabled(String s) {
+
+                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(i);
+            }
+        };
+    }
+
+
+    public void sendMessage(View view) {
+        //check weather gps is enabled
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET}
+                        , 10);
+            }
+            return;
+        }
+
+        locationManager.requestLocationUpdates("gps", 5000, 0, listener);
+    }
+
+    private void updateStationsOnMap() {
+        if (lbs != null) {
+            // create 10k labelled points
+            // in most cases, there will be no problems of displaying >100k points, feel free to try
+            List<IGeoPoint> points = new ArrayList<>();
+            for (int i = 0; i < lbs.size(); i++) {
+                float [] dist = new float[1];
+                Location.distanceBetween(actualPosition.getLatitudeE6() / 1e6, actualPosition.getLongitudeE6() / 1e6 , lbs.get(i).getLatitude() ,  lbs.get(i).getLongitude() , dist);
+                Log.d(LOG_TAG,  i + "---------------------------------------------------------------------------------------Distance = " + dist[0]);
+                points.add(new LabelledGeoPoint(lbs.get(i).getLatitude(), lbs.get(i).getLongitude(), lbs.get(i).getName()));
+            }
+
+            // wrap them in a theme
+            SimplePointTheme pt = new SimplePointTheme(points, true);
+/*
+        for (int i = 0; i < 25; i++) {
+            Log.d(LOG_TAG, "deleting iteration" + i);
+            points.remove(points.size()-i-1);
+        }
+*/
+
+            // set some visual options for the overlay
+            // we use here MAXIMUM_OPTIMIZATION algorithm, which works well with >100k points
+            SimpleFastPointOverlayOptions opt = SimpleFastPointOverlayOptions.getDefaultStyle()
+                    .setAlgorithm(SimpleFastPointOverlayOptions.RenderingAlgorithm.MAXIMUM_OPTIMIZATION)
+                    .setRadius(10)
+                    .setIsClickable(true)
+                    .setCellSize(15)
+                    .setTextStyle(textStyle)
+                    .setPointStyle(pointStyle)
+                    .setSelectedPointStyle(selectedPointStyle);
+
+            // create the overlay with the theme
+            final SimpleFastPointOverlay sfpo = new SimpleFastPointOverlay(pt, opt);
+
+            // onClick callback
+            sfpo.setOnClickListener(new SimpleFastPointOverlay.OnClickListener() {
+                @Override
+                public void onClick(SimpleFastPointOverlay.PointAdapter points, Integer point) {
+                    Toast.makeText(map.getContext()
+                            , "You clicked on " + ((LabelledGeoPoint) points.get(point)).getLabel()
+                            , Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            // add overlay
+            map.getOverlays().add(sfpo);
 
         /*
         //Adding base stations with Overlay Items
@@ -176,57 +246,11 @@ public class SecondActivity extends AppCompatActivity {
 
         map.getOverlays().add(mOverlay);
         */
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-
-        listener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                GeoPoint newlocation = new GeoPoint(location);
-                actualPosition = newlocation;
-                if (marker == null) {
-                    marker = new Marker(map);
-                    map.getOverlays().add(marker);
-                    marker.setPosition(newlocation);
-                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                    marker.setTitle("test");
-                }
-                else {
-                    marker.setPosition(newlocation);
-                }
-                map.getController().animateTo(newlocation,(double)18,1500L);
-                map.invalidate();
-            }
-
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            public void onProviderEnabled(String s) {
-
-            }
-
-            public void onProviderDisabled(String s) {
-
-                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(i);
-            }
-        };
-    }
-
-    public void sendMessage(View view) {
-        //check weather gps is enabled
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.INTERNET}
-                        ,10);
-            }
-            return;
         }
 
-        locationManager.requestLocationUpdates("gps", 5000, 0, listener);
     }
 
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         //this will refresh the osmdroid configuration on resuming.
         //if you make changes to the configuration, use
@@ -235,7 +259,7 @@ public class SecondActivity extends AppCompatActivity {
         map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
     }
 
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         //this will refresh the osmdroid configuration on resuming.
         //if you make changes to the configuration, use
