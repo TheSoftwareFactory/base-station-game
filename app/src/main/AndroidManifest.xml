@@ -15,9 +15,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity
+            android:name=".ServiceActivity"
+            android:label="@string/title_activity_service"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
         <service
             android:name=".DatabaseService"
-            android:exported="false"></service>
+            android:exported="false" />
 
         <activity android:name=".Engine_Activity" />
         <activity
