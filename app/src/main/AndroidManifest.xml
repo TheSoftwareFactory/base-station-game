@@ -16,7 +16,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SamplingDebugActivity"></activity>
+        <activity android:name=".MinigameActivity"></activity>
+        <activity android:name=".SamplingDebugActivity" />
         <activity android:name=".Engine_Activity" />
         <activity
             android:name=".SecondActivity"
