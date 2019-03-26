@@ -6,26 +6,6 @@
     tools:context=".ServiceActivity">
 
 
-    <EditText
-        android:id="@+id/text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="94dp"
-        android:layout_marginLeft="94dp"
-        android:layout_marginTop="170dp"
-        android:layout_marginEnd="104dp"
-        android:layout_marginRight="104dp"
-        android:layout_marginBottom="516dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name" />
-
     <Button
         android:id="@+id/click"
         android:layout_width="wrap_content"
@@ -44,4 +24,24 @@
         android:layout_marginBottom="301dp"
         android:onClick="click"
         android:text="Button" />
+
+    <EditText
+        android:id="@+id/text"
+        android:layout_width="248dp"
+        android:layout_height="176dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="89dp"
+        android:layout_marginLeft="89dp"
+        android:layout_marginTop="66dp"
+        android:layout_marginEnd="74dp"
+        android:layout_marginRight="74dp"
+        android:layout_marginBottom="489dp"
+        android:ems="10"
+        android:inputType="textMultiLine" />
+
 </RelativeLayout>
