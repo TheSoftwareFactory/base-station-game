@@ -55,4 +55,22 @@ public class BatteryDetails {
     public void setBatteryCapacity(double batteryCapacity) {
         this.batteryCapacity = batteryCapacity;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder string = new StringBuilder();
+        string
+                .append(batteryCharger)
+                .append("\n")
+                .append(batteryHealth)
+                .append("\n")
+                .append(batteryVoltage)
+                .append("\n")
+                .append(batteryTemperature)
+                .append("\n")
+                .append(batteryTechnology)
+                .append("\n")
+                .append(batteryCapacity);
+        return string.toString();
+    }
 }

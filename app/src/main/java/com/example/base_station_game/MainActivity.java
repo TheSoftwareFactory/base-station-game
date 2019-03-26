@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void launchSampleDebugActivity() {
+    public void launchSampleDebugActivity(View view) {
         Log.d(LOG_TAG, "Button clicked!");
         Intent intent = new Intent(this, SamplingDebugActivity.class);
         startActivity(intent);

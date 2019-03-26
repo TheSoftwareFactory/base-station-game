@@ -26,7 +26,7 @@ public class SamplingDebugActivity extends AppCompatActivity {
     public void sample() {
         Intent batteryIntent = SamplingLibrary.getLastBatteryIntent(this);
         this.sample = Sampler.createSample(this, batteryIntent);
-        this.text.getEditableText().clear();
+//        this.text.getEditableText().clear();
         this.text.append(this.sample.toString());
     }
 

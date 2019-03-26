@@ -28,4 +28,15 @@ public class Sample {
     public void setBatteryState(String batteryState) {
         this.batteryState = batteryState;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder string = new StringBuilder()
+            .append(batteryDetails.toString())
+            .append("\n")
+            .append(batteryLevel)
+            .append("\n")
+            .append(batteryState);
+        return string.toString();
+    }
 }
