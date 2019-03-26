@@ -3,10 +3,14 @@ package com.example.base_station_game.sampling;
 import android.content.Context;
 import android.content.Intent;
 import android.os.BatteryManager;
+import android.os.Build;
 
+import com.example.base_station_game.sampling.models.SystemLoadPoint;
 import com.example.base_station_game.sampling.structs.BatteryDetails;
+import com.example.base_station_game.sampling.structs.CpuStatus;
 import com.example.base_station_game.sampling.structs.Sample;
 import com.example.base_station_game.sampling.utils.BatteryUtils;
+import com.example.base_station_game.sampling.utils.FsUtils;
 
 /**
  * Created by Jonatan Hamberg on 2.2.2017.
@@ -114,10 +118,13 @@ public class Sampler {
 //    }
 //
     public static Sample createSample(Context context, Intent batteryIntent) {
+        SystemLoadPoint load1 = SamplingLibrary.getSystemLoad();
         Sample sample = new Sample();
         sample.setBatteryDetails(getBatteryDetails(context, batteryIntent));
         sample.setBatteryLevel(BatteryUtils.getBatteryLevel(batteryIntent));
         sample.setBatteryState(getBatteryStatusString(batteryIntent));
+        SystemLoadPoint load2 = SamplingLibrary.getSystemLoad();
+        sample.setCpuStatus(constructCpuStatus(load1, load2));
         return sample;
     }
 
@@ -173,24 +180,24 @@ public class Sampler {
 //        return details;
 //    }
 //
-//    private static CpuStatus constructCpuStatus(SystemLoadPoint load1, SystemLoadPoint load2){
-//        CpuStatus cpuStatus = new CpuStatus();
-//        if(load1 == null || load2 == null){
+    private static CpuStatus constructCpuStatus(SystemLoadPoint load1, SystemLoadPoint load2){
+        CpuStatus cpuStatus = new CpuStatus();
+        if(load1 == null || load2 == null){
 //            Logger.d(TAG, "CPU usage was null when constructing sample!"); // Typical on O
-//            if(Build.VERSION.SDK_INT >= 26 /* Hardcoded Android O */){
-//                cpuStatus.setCpuUsage(SamplingLibrary.getCpuUsageEstimate());
-//            }
-//        } else {
-//            cpuStatus.setCpuUsage(SamplingLibrary.getCpuUsage(load1, load2));
-//        }
-//        cpuStatus.setUptime(SamplingLibrary.getUptime());
-//        cpuStatus.setSleeptime(SamplingLibrary.getSleepTime());
-//
-//        cpuStatus.setCurrentFrequencies(FsUtils.CPU.getCurrentFrequencies());
-//        cpuStatus.setMinFrequencies(FsUtils.CPU.getMinimumFrequencies());
-//        cpuStatus.setMaxFrequencies(FsUtils.CPU.getMaximumFrequencies());
-//        return cpuStatus;
-//    }
+            if(Build.VERSION.SDK_INT >= 26 /* Hardcoded Android O */){
+                cpuStatus.setCpuUsage(SamplingLibrary.getCpuUsageEstimate());
+            }
+        } else {
+            cpuStatus.setCpuUsage(SamplingLibrary.getCpuUsage(load1, load2));
+        }
+        cpuStatus.setUptime(SamplingLibrary.getUptime());
+        cpuStatus.setSleeptime(SamplingLibrary.getSleepTime());
+
+        cpuStatus.setCurrentFrequencies(FsUtils.CPU.getCurrentFrequencies());
+        cpuStatus.setMinFrequencies(FsUtils.CPU.getMinimumFrequencies());
+        cpuStatus.setMaxFrequencies(FsUtils.CPU.getMaximumFrequencies());
+        return cpuStatus;
+    }
 //
 //    private static Settings constructSettings(Context context){
 //        Settings settings = new Settings();

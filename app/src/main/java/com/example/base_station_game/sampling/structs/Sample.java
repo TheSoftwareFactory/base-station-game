@@ -4,6 +4,7 @@ public class Sample {
     private BatteryDetails batteryDetails;
     private double batteryLevel;
     private String batteryState;
+    private CpuStatus cpuStatus;
 
     public BatteryDetails getBatteryDetails() {
         return batteryDetails;
@@ -31,12 +32,23 @@ public class Sample {
 
     @Override
     public String toString() {
-        StringBuilder string = new StringBuilder()
-            .append(batteryDetails.toString())
-            .append("\n")
-            .append(batteryLevel)
-            .append("\n")
-            .append(batteryState);
+        StringBuilder string = new StringBuilder();
+        string
+                .append(batteryDetails.toString())
+                .append("\n")
+                .append(batteryLevel)
+                .append("\n")
+                .append(batteryState)
+                .append("\n")
+                .append(cpuStatus);
         return string.toString();
+    }
+
+    public CpuStatus getCpuStatus() {
+        return cpuStatus;
+    }
+
+    public void setCpuStatus(CpuStatus cpuStatus) {
+        this.cpuStatus = cpuStatus;
     }
 }
