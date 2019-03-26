@@ -171,7 +171,7 @@ public class SecondActivity extends AppCompatActivity {
             return;
         }
 
-        locationManager.requestLocationUpdates("gps", 5000, 0, listener);
+        locationManager.requestLocationUpdates("gps", 6000, 0, listener);
     }
 
     private void updateStationsOnMap() {
@@ -210,12 +210,23 @@ public class SecondActivity extends AppCompatActivity {
             final SimpleFastPointOverlay sfpo = new SimpleFastPointOverlay(pt, opt);
 
             // onClick callback
+
+            // CREATE THE FUNCTION OUTISDEEEEEEEEEEE
             sfpo.setOnClickListener(new SimpleFastPointOverlay.OnClickListener() {
                 @Override
                 public void onClick(SimpleFastPointOverlay.PointAdapter points, Integer point) {
-                    Toast.makeText(map.getContext()
-                            , "You clicked on " + ((LabelledGeoPoint) points.get(point)).getLabel()
-                            , Toast.LENGTH_SHORT).show();
+                    float [] dist = new float[1];
+                    Location.distanceBetween(actualPosition.getLatitudeE6() / 1e6, actualPosition.getLongitudeE6() / 1e6 , points.get(point).getLatitude() ,  points.get(point).getLongitude(), dist);
+                    if(dist[0] < 100) {
+                        Toast.makeText(map.getContext()
+                                , " YOUR CAN CONQUER " + ((LabelledGeoPoint) points.get(point)).getLabel()
+                                , Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        Toast.makeText(map.getContext()
+                                , "YOUR CANNOT CONQUER " + ((LabelledGeoPoint) points.get(point)).getLabel()
+                                , Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
 
