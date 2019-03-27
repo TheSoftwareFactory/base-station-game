@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.Context;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
@@ -31,6 +32,7 @@ public class DatabaseService extends IntentService {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         stations = new ArrayList();
         update_stations();
+        sendMessage();
     }
 
     public class LocalBinder extends Binder {
@@ -43,6 +45,7 @@ public class DatabaseService extends IntentService {
     public ArrayList getStations(){
         return stations;
     }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         // Normally we would do some work here, like download a file.
@@ -78,6 +81,24 @@ public class DatabaseService extends IntentService {
     }
 
 
+    private void sendMessage() {
+        // The string "my-integer" will be used to filer the intent
+        Intent intent = new Intent("my-integer");
+        // Adding some data
+
+        intent.putExtra("message", 5);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+    private void sendMessage(BaseStation station) {
+        // The string "my-integer" will be used to filer the intent
+        Intent intent = new Intent("my-integer");
+        intent.putExtra("station",station);
+        // Adding some data
+
+        intent.putExtra("message", 5);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+    
     public void update_stations() {
         mDatabase.child("stations").addChildEventListener(new ChildEventListener() {
             @Override
@@ -85,6 +106,9 @@ public class DatabaseService extends IntentService {
                 BaseStation station = ds.getValue(BaseStation.class);  //get station object
                 stations.add(station);                                 //add station object to list of station
                 //t_output.setText(stations.toString());                       //update ui
+                sendMessage(station);
+                //broadcast to activity
+
             }
 
             @Override

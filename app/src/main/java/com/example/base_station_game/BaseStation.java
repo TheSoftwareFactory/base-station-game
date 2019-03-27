@@ -1,7 +1,9 @@
 package com.example.base_station_game;
 
 
-public class BaseStation{
+import java.io.Serializable;
+
+public class BaseStation implements Serializable {
     private String name;
     private int id;
     private Double latitude;
