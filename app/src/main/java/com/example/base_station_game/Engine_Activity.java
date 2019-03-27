@@ -71,12 +71,6 @@ public class Engine_Activity extends AppCompatActivity {
                         .build(),
                 RC_SIGN_IN);
 */
-
-    }
-
-    public void runservice(View view){
-        Intent intent = new Intent(this,  ServiceActivity.class);
-        startActivity(intent);
     }
 
     private void load_or_create_user(final FirebaseUser firebaseUser){
@@ -121,6 +115,11 @@ public class Engine_Activity extends AppCompatActivity {
         }
 
 
+    }
+
+    public void runservice(View view){
+        Intent intent = new Intent(this,  ServiceActivity.class);
+        startActivity(intent);
     }
 
     public void update_stations(){

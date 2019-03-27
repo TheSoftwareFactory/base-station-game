@@ -8,6 +8,10 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.IdpResponse;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -15,24 +19,40 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+
+import static android.app.Activity.RESULT_OK;
 
 
 public class DatabaseService extends IntentService {
 
     private final IBinder binder = new LocalBinder();
-    // Random number generator
-    private final Random mGenerator = new Random();
 
     private DatabaseReference mDatabase;
     private ArrayList stations;
+    private static final int RC_SIGN_IN = 123;
+    public User user;
 
     public DatabaseService() {
-        super("DatabaseService2");
+        super("DatabaseService");
+
+        /*List<AuthUI.IdpConfig> providers = Arrays.asList(
+                new AuthUI.IdpConfig.EmailBuilder().build());
+
+        // Create and launch sign-in intent
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .build(),
+                RC_SIGN_IN);*/
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
         stations = new ArrayList();
         update_stations();
-        sendMessage();
+
     }
 
     public class LocalBinder extends Binder {
@@ -68,34 +88,16 @@ public class DatabaseService extends IntentService {
         return binder;
     }
 
-    /** method for clients */
-    public int getRandomNumber() {
-        int a= mGenerator.nextInt(100);
-        return a;
-    }
-
-
     @Override
     public void onDestroy() {
         Toast.makeText(this, "ServiceActivity done", Toast.LENGTH_SHORT).show();
     }
 
-
-    private void sendMessage() {
-        // The string "my-integer" will be used to filer the intent
-        Intent intent = new Intent("my-integer");
-        // Adding some data
-
-        intent.putExtra("message", 5);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-    private void sendMessage(BaseStation station) {
-        // The string "my-integer" will be used to filer the intent
+    private void sendStation(BaseStation station,boolean delete) {
         Intent intent = new Intent("my-integer");
         intent.putExtra("station",station);
-        // Adding some data
+        intent.putExtra("delete",delete);
 
-        intent.putExtra("message", 5);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
     
@@ -105,10 +107,7 @@ public class DatabaseService extends IntentService {
             public void onChildAdded(DataSnapshot ds, String prevChildKey) {
                 BaseStation station = ds.getValue(BaseStation.class);  //get station object
                 stations.add(station);                                 //add station object to list of station
-                //t_output.setText(stations.toString());                       //update ui
-                sendMessage(station);
-                //broadcast to activity
-
+                sendStation(station,false);
             }
 
             @Override
@@ -117,9 +116,9 @@ public class DatabaseService extends IntentService {
 
             @Override
             public void onChildRemoved(DataSnapshot ds) {
-                BaseStation station = ds.getValue(BaseStation.class);    //get station object
+                BaseStation station = ds.getValue(BaseStation.class);  //get station object
                 stations.remove(station);                                //remove station object to list of station
-                //t_output.setText(stations.toString());                         //update ui
+                sendStation(station,true);
             }
 
             @Override
@@ -132,4 +131,25 @@ public class DatabaseService extends IntentService {
         });
 
     }
+
+    /*
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            IdpResponse response = IdpResponse.fromResultIntent(data);
+
+            if (resultCode == RESULT_OK) {
+                // Successfully signed in
+                FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                //load_or_create_user(firebaseUser);
+                // ...
+            } else {
+                // Sign in failed. If response is null the user canceled the
+                // sign-in flow using the back button. Otherwise check
+                // response.getError().getErrorCode() and handle the error.
+                // ...
+            }
+        }
+    }*/
 }
