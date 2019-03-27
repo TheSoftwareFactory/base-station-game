@@ -59,4 +59,13 @@
         android:onClick="sendMessage"
         android:text="Stop GPS" />
 
+    <Button
+        android:id="@+id/sample_debug"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/google_engine"
+        android:onClick="launchSampleDebugActivity"
+        android:text="Test Sampling"
+        />
+
 </RelativeLayout>

@@ -211,7 +211,7 @@ public class SecondActivity extends AppCompatActivity {
 
             // onClick callback
 
-            // CREATE THE FUNCTION OUTISDEEEEEEEEEEE
+            // CREATE THE FUNCTION OUTISDE
             sfpo.setOnClickListener(new SimpleFastPointOverlay.OnClickListener() {
                 @Override
                 public void onClick(SimpleFastPointOverlay.PointAdapter points, Integer point) {
