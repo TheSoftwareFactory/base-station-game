@@ -33,7 +33,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.google.firebase:firebase-core:16.0.8'
-<<<<<<< HEAD
+
     implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
 
     // Required only if Facebook login support is required
@@ -43,10 +43,8 @@ dependencies {
     // Required only if Twitter login support is required
     // Find the latest Twitter SDK releases here: https://goo.gl/E5wZvQ
     //implementation 'com.twitter.sdk.android:twitter-core:3.3'
-=======
-    implementation 'com.android.support:design:28.0.0'
->>>>>>> b0fe9177318480707c3d8d34c297f46c0dbb73b9
 
+    implementation 'com.android.support:design:28.0.0'
 
 }
 apply plugin: 'com.google.gms.google-services'
