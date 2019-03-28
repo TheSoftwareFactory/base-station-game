@@ -49,27 +49,27 @@ public class ServiceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_service);
+        if (FirebaseAuth.getInstance().getCurrentUser()==null) {
 
-                List<AuthUI.IdpConfig> providers = Arrays.asList(
-                new AuthUI.IdpConfig.EmailBuilder().build());
+         List<AuthUI.IdpConfig> providers = Arrays.asList(
+            new AuthUI.IdpConfig.EmailBuilder().build());
 
-        // Create and launch sign-in intent
+    // Create and launch sign-in intent
         startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build(),
-                RC_SIGN_IN);
-
-
-
+            AuthUI.getInstance()
+                    .createSignInIntentBuilder()
+                    .setAvailableProviders(providers)
+                    .build(),
+            RC_SIGN_IN);
+        }
 
         text = findViewById(R.id.text);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         //mDatabase.setValue("");
-
+        //logout();
     }
 
+    //binding:
     // Handling the received stations from the database
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -101,6 +101,8 @@ public class ServiceActivity extends AppCompatActivity {
         }
     };
 
+
+//activity methods:
     @Override
     protected void onPause() {
         // Unregister since the activity is not visible
@@ -135,6 +137,12 @@ public class ServiceActivity extends AppCompatActivity {
         super.onStop();
         unbindService(connection);
         mBound = false;
+    }
+
+    //authentification methods:
+
+    public void logout(){
+        FirebaseAuth.getInstance().signOut();
     }
 
     @Override

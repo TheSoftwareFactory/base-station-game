@@ -38,17 +38,6 @@ public class DatabaseService extends IntentService {
     public DatabaseService() {
         super("DatabaseService");
 
-        /*List<AuthUI.IdpConfig> providers = Arrays.asList(
-                new AuthUI.IdpConfig.EmailBuilder().build());
-
-        // Create and launch sign-in intent
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build(),
-                RC_SIGN_IN);*/
-
         mDatabase = FirebaseDatabase.getInstance().getReference();
         stations = new ArrayList();
         update_stations();
@@ -132,24 +121,4 @@ public class DatabaseService extends IntentService {
 
     }
 
-    /*
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-
-            if (resultCode == RESULT_OK) {
-                // Successfully signed in
-                FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                //load_or_create_user(firebaseUser);
-                // ...
-            } else {
-                // Sign in failed. If response is null the user canceled the
-                // sign-in flow using the back button. Otherwise check
-                // response.getError().getErrorCode() and handle the error.
-                // ...
-            }
-        }
-    }*/
 }

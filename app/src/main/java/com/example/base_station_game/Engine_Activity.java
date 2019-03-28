@@ -94,6 +94,11 @@ public class Engine_Activity extends AppCompatActivity {
     }
 
 
+    public void login(View view){
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        t_output.setText(firebaseUser.toString());
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
