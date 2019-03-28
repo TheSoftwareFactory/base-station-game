@@ -2,6 +2,7 @@ package com.example.base_station_game;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -14,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
@@ -49,6 +51,7 @@ public class SecondActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private LocationListener listener;
     private GeoPoint actualPosition = null;
+    Polygon p = null;
 
     //creating fake station list
     double startKumpulaLatitude = 60.205637;
@@ -88,12 +91,14 @@ public class SecondActivity extends AppCompatActivity {
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
         map.getController().setZoom(3);
-
+        p = new Polygon(map);
         //Adding base stations with Simple Fast Point Overlay
 
         lbs = new ArrayList<>();
         for (int i = 0; i < 30; i++) {
-            lbs.add(new BaseStation(i, "Station " + i, startKumpulaLatitude + ((Math.random()*2-1) * 0.005), startKumpulaLongitude + ((Math.random()*2-1) * 0.0028)));
+            lbs.add(new BaseStation(i, "Station " + i,
+                    startKumpulaLatitude + ((Math.random()*2-1) * 0.006),
+                    startKumpulaLongitude + ((Math.random()*2-1) * 0.007)));
         }
 
         // create label style
@@ -117,30 +122,26 @@ public class SecondActivity extends AppCompatActivity {
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-
         listener = new LocationListener() {
             public void onLocationChanged(Location location) {
-                GeoPoint newlocation = new GeoPoint(location);
-                actualPosition = newlocation;
+                Log.d(LOG_TAG, "New location --> "+ location.getLatitude() +" "+ location.getLongitude());
+                actualPosition = new GeoPoint(location);
                 if (marker == null) {
-
-                    List<GeoPoint> circle = Polygon.pointsAsCircle(newlocation, 100);
-                    Polygon p = new Polygon(map);
+                    //Not dynamic
+                    List<GeoPoint> circle = Polygon.pointsAsCircle(actualPosition, 100);
                     p.setPoints(circle);
                     map.getOverlayManager().add(p);
-
                     marker = new Marker(map);
-                    map.getOverlays().add(marker);
-                    marker.setPosition(newlocation);
+                    marker.setPosition(actualPosition);
                     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                     marker.setTitle("test");
+                    map.getOverlays().add(marker);
                     updateStationsOnMap();
-
-
                 } else {
-                    marker.setPosition(newlocation);
+                    p.setPoints(Polygon.pointsAsCircle(actualPosition, 100));
+                    marker.setPosition(actualPosition);
+
                 }
-                map.getController().animateTo(newlocation, (double) 18, 1500L);
                 map.invalidate();
             }
 
@@ -153,16 +154,10 @@ public class SecondActivity extends AppCompatActivity {
             }
 
             public void onProviderDisabled(String s) {
-
                 Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(i);
             }
         };
-    }
-
-
-    public void sendMessage(View view) {
-        //check weather gps is enabled
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET}
@@ -170,30 +165,26 @@ public class SecondActivity extends AppCompatActivity {
             }
             return;
         }
+        locationManager.requestLocationUpdates("gps", 5000, 0, listener);
+    }
 
-        locationManager.requestLocationUpdates("gps", 6000, 0, listener);
+
+    public void localize(View view) {
+        //check weather gps is enabled
+        map.getController().animateTo(actualPosition, (double) 18, 1500L);
+        map.invalidate();
     }
 
     private void updateStationsOnMap() {
         if (lbs != null) {
-            // create 10k labelled points
-            // in most cases, there will be no problems of displaying >100k points, feel free to try
             List<IGeoPoint> points = new ArrayList<>();
             for (int i = 0; i < lbs.size(); i++) {
                 float [] dist = new float[1];
-                Location.distanceBetween(actualPosition.getLatitudeE6() / 1e6, actualPosition.getLongitudeE6() / 1e6 , lbs.get(i).getLatitude() ,  lbs.get(i).getLongitude() , dist);
-                Log.d(LOG_TAG,  i + "---------------------------------------------------------------------------------------Distance = " + dist[0]);
                 points.add(new LabelledGeoPoint(lbs.get(i).getLatitude(), lbs.get(i).getLongitude(), lbs.get(i).getName()));
             }
 
             // wrap them in a theme
             SimplePointTheme pt = new SimplePointTheme(points, true);
-/*
-        for (int i = 0; i < 25; i++) {
-            Log.d(LOG_TAG, "deleting iteration" + i);
-            points.remove(points.size()-i-1);
-        }
-*/
 
             // set some visual options for the overlay
             // we use here MAXIMUM_OPTIMIZATION algorithm, which works well with >100k points
@@ -215,23 +206,44 @@ public class SecondActivity extends AppCompatActivity {
             sfpo.setOnClickListener(new SimpleFastPointOverlay.OnClickListener() {
                 @Override
                 public void onClick(SimpleFastPointOverlay.PointAdapter points, Integer point) {
+                    AlertDialog alertDialog = new AlertDialog.Builder(SecondActivity.this,R.style.AlertDialogTheme).create();
+                    alertDialog.setTitle(((LabelledGeoPoint) points.get(point)).getLabel());
                     float [] dist = new float[1];
-                    Location.distanceBetween(actualPosition.getLatitudeE6() / 1e6, actualPosition.getLongitudeE6() / 1e6 , points.get(point).getLatitude() ,  points.get(point).getLongitude(), dist);
+                    Location.distanceBetween(actualPosition.getLatitude(), actualPosition.getLongitude(), points.get(point).getLatitude() ,  points.get(point).getLongitude(), dist);
                     if(dist[0] < 100) {
-                        Toast.makeText(map.getContext()
-                                , " YOUR CAN CONQUER " + ((LabelledGeoPoint) points.get(point)).getLabel()
-                                , Toast.LENGTH_SHORT).show();
+                        alertDialog.setMessage("Do you want to conquer this station?");
+                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent intent = new Intent(SecondActivity.this, MinigameActivity.class);
+                                        startActivityForResult(intent,1);
+                                        dialog.dismiss();
+                                    }
+                                });
+                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        alertDialog.show();
                     }
                     else{
-                        Toast.makeText(map.getContext()
-                                , "YOUR CANNOT CONQUER " + ((LabelledGeoPoint) points.get(point)).getLabel()
-                                , Toast.LENGTH_SHORT).show();
+                        alertDialog.setMessage("You cant conquer this station, get closer!");
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        alertDialog.show();
                     }
                 }
             });
 
             // add overlay
             map.getOverlays().add(sfpo);
+
 
         /*
         //Adding base stations with Overlay Items
@@ -259,6 +271,28 @@ public class SecondActivity extends AppCompatActivity {
         */
         }
 
+    }
+
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        AlertDialog alertDialog = new AlertDialog.Builder(SecondActivity.this,R.style.AlertDialogTheme).create();
+        alertDialog.setTitle("Result:");
+        if (requestCode == 1 && resultCode == 1) {
+            long score = data.getLongExtra("score", 0);
+            if (score == 0){
+                alertDialog.setMessage("You lost! :(");
+            }
+            else{
+                alertDialog.setMessage("You won! You gain "+score+" exp! :)");
+            }
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        }
     }
 
     public void onResume() {
