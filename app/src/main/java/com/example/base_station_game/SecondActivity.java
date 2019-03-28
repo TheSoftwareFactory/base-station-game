@@ -1,9 +1,12 @@
 package com.example.base_station_game;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,6 +14,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
@@ -24,6 +28,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.google.firebase.database.DatabaseReference;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -47,6 +53,12 @@ import java.util.Random;
 
 public class SecondActivity extends AppCompatActivity {
 
+    DatabaseService mService;
+    boolean mBound = false;
+    private DatabaseReference mDatabase;
+    private static final int RC_SIGN_IN = 123;
+    private ArrayList stations = new ArrayList();
+    public User user;
 
     private LocationManager locationManager;
     private LocationListener listener;
@@ -166,6 +178,7 @@ public class SecondActivity extends AppCompatActivity {
             return;
         }
         locationManager.requestLocationUpdates("gps", 5000, 0, listener);
+
     }
 
 
@@ -316,4 +329,37 @@ public class SecondActivity extends AppCompatActivity {
         }
         locationManager.removeUpdates(listener);
     }
+
+    //binding:
+    // Handling the received stations from the database
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Extract data included in the Intent
+            BaseStation station = (BaseStation) intent.getSerializableExtra("station");
+            boolean delete = (boolean) intent.getBooleanExtra("delete",true);
+            if (station != null){
+                if (delete){ stations.remove(station);}
+                else{ stations.add(station); }
+                //text.setText(stations.toString());
+            }
+        }
+    };
+
+    // Defines callbacks for ServiceActivity binding, passed to bindService()
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            DatabaseService.LocalBinder binder = (DatabaseService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
 }

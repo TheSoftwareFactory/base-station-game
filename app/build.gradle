@@ -45,6 +45,7 @@ dependencies {
     //implementation 'com.twitter.sdk.android:twitter-core:3.3'
 
     implementation 'com.android.support:design:28.0.0'
+    implementation 'org.jetbrains:annotations:15.0'
 
 }
 apply plugin: 'com.google.gms.google-services'

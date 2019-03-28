@@ -51,16 +51,16 @@ public class ServiceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_service);
         if (FirebaseAuth.getInstance().getCurrentUser()==null) {
 
-         List<AuthUI.IdpConfig> providers = Arrays.asList(
+            List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.EmailBuilder().build());
 
     // Create and launch sign-in intent
-        startActivityForResult(
+            startActivityForResult(
             AuthUI.getInstance()
                     .createSignInIntentBuilder()
                     .setAvailableProviders(providers)
                     .build(),
-            RC_SIGN_IN);
+             RC_SIGN_IN);
         }
 
         text = findViewById(R.id.text);

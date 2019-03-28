@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         };
-
+        //runservice();
     }
 
 
@@ -108,4 +108,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, Engine_Activity.class);
         startActivity(intent);
     }
+
+   /* public void runservice(){
+        Intent intent = new Intent(this,  ServiceActivity.class);
+        startActivity(intent);
+    }*/
 }
