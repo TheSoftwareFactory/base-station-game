@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch (view.getId())
         {
-            case R.id.button: {t.setText("asdfghjkl");  locationManager.requestLocationUpdates("gps", 5000, 0, listener); break;}
+            case R.id.button: {t.setText("");  locationManager.requestLocationUpdates("gps", 5000, 0, listener); break;}
             case R.id.reset: t.setText(""); break;
             case R.id.stop_gps:  {t.append("GPS STOPPED");  onPause(); break;}
         }
@@ -95,6 +95,12 @@ public class MainActivity extends AppCompatActivity {
     public void launchSecondActivity(View view) {
         Log.d(LOG_TAG, "Button clicked!");
         Intent intent = new Intent(this, SecondActivity.class);
+        startActivity(intent);
+    }
+
+    public void launchSampleDebugActivity(View view) {
+        Log.d(LOG_TAG, "Button clicked!");
+        Intent intent = new Intent(this, SamplingDebugActivity.class);
         startActivity(intent);
     }
 

@@ -19,7 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class Engine_Activity extends AppCompatActivity {
-
+/*
 
     private DatabaseReference mDatabase;
     private TextView t_id;
@@ -175,6 +175,7 @@ public class Engine_Activity extends AppCompatActivity {
          writeNewBaseStationToDatabase(id,name,latitude,longitude);
     }
 
+<<<<<<< HEAD
 
     public void delete_station(View view) {
         // collect data from ui
@@ -182,4 +183,7 @@ public class Engine_Activity extends AppCompatActivity {
         //send data to database
         deleteBaseStationFromDatabase(id);
     }
+=======
+*/
+>>>>>>> b0fe9177318480707c3d8d34c297f46c0dbb73b9
 }

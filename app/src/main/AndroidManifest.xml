@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+<<<<<<< HEAD
         <activity
             android:name=".ServiceActivity"
             android:label="@string/title_activity_service"
@@ -24,6 +26,10 @@
             android:name=".DatabaseService"
             android:exported="false" />
 
+=======
+        <activity android:name=".MinigameActivity"></activity>
+        <activity android:name=".SamplingDebugActivity" />
+>>>>>>> b0fe9177318480707c3d8d34c297f46c0dbb73b9
         <activity android:name=".Engine_Activity" />
         <activity
             android:name=".SecondActivity"
