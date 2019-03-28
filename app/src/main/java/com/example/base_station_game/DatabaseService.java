@@ -60,7 +60,7 @@ public class DatabaseService extends IntentService {
         // Normally we would do some work here, like download a file.
         // For our sample, we just sleep for 5 seconds.
         try {
-            Thread.sleep(5000);
+            Thread.sleep(5);
         } catch (InterruptedException e) {
             // Restore interrupt status.
             Thread.currentThread().interrupt();

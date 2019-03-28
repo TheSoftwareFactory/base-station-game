@@ -48,7 +48,7 @@ public class Engine_Activity extends AppCompatActivity {
 
         //final FirebaseAuth auth = FirebaseAuth.getInstance();
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         //reset database:

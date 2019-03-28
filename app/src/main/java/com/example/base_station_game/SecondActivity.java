@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -19,6 +20,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,7 +31,13 @@ import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.IdpResponse;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -286,6 +294,20 @@ public class SecondActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onStart(){
+        super.onStart();
+        Intent intent = new Intent(this, DatabaseService.class);
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(connection);
+        mBound = false;
+    }
+
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         AlertDialog alertDialog = new AlertDialog.Builder(SecondActivity.this,R.style.AlertDialogTheme).create();
@@ -315,6 +337,9 @@ public class SecondActivity extends AppCompatActivity {
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
         map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(mMessageReceiver,
+                        new IntentFilter("my-integer"));
     }
 
     public void onPause() {
@@ -328,6 +353,11 @@ public class SecondActivity extends AppCompatActivity {
             return;
         }
         locationManager.removeUpdates(listener);
+
+            // Unregister since the activity is not visible
+            LocalBroadcastManager.getInstance(this)
+                    .unregisterReceiver(mMessageReceiver);
+
     }
 
     //binding:
@@ -335,6 +365,7 @@ public class SecondActivity extends AppCompatActivity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Toast.makeText(context,"message received",Toast.LENGTH_LONG);
             // Extract data included in the Intent
             BaseStation station = (BaseStation) intent.getSerializableExtra("station");
             boolean delete = (boolean) intent.getBooleanExtra("delete",true);
@@ -342,6 +373,7 @@ public class SecondActivity extends AppCompatActivity {
                 if (delete){ stations.remove(station);}
                 else{ stations.add(station); }
                 //text.setText(stations.toString());
+                Log.d("stations",stations.toString());
             }
         }
     };
@@ -361,5 +393,26 @@ public class SecondActivity extends AppCompatActivity {
             mBound = false;
         }
     };
+
+    private void load_or_create_user(final FirebaseUser firebaseUser){
+        DatabaseReference ref=mDatabase.child("Users").child(firebaseUser.getUid()); //check at reference of user if it already exists
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.hasChild("email")){  //user already exists
+                    user = dataSnapshot.getValue(User.class);
+                }
+                else{  //create new user
+                    user = new User(firebaseUser.getUid(),firebaseUser.getEmail(),firebaseUser.getDisplayName(),0,15,0);
+                    mDatabase.child("Users").child(user.getUID()).setValue(user);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
 
 }
