@@ -11,7 +11,7 @@ exports.addMessage = functions.https.onRequest((req, res) => {
   // Grab the text parameter.
   const original = req.query.text;
   // Push the new message into the Realtime Database using the Firebase Admin SDK.
-  return admin.database().ref('/stations').push({"added": original}).then((snapshot) => {
+  return admin.database().ref('/stations').push({"id": "123","name":"name","latitude":"5","longitude":"4","timeToLive":"4","active":"true"}).then((snapshot) => {
     // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
     return res.redirect(303, snapshot.ref.toString());
   });
@@ -19,7 +19,7 @@ exports.addMessage = functions.https.onRequest((req, res) => {
 
 // Listens for new messages added to /messages/:pushId/original and creates an
 // uppercase version of the message to /messages/:pushId/uppercase
-exports.makeUppercase = functions.database.ref('/stations/{id}/name')
+/*exports.makeUppercase = functions.database.ref('/stations/{id}/name')
     .onCreate((snapshot, context) => {
       // Grab the current value of what was written to the Realtime Database.
       const original = snapshot.val();
@@ -29,4 +29,4 @@ exports.makeUppercase = functions.database.ref('/stations/{id}/name')
       // writing to the Firebase Realtime Database.
       // Setting an "uppercase" sibling in the Realtime Database returns a Promise.
       return snapshot.ref.parent.child('name').set(uppercase);
-    });
+    });*/

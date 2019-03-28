@@ -17,15 +17,28 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.util.Log;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Arrays;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG =
         MainActivity.class.getSimpleName();
-
+    private static final int RC_SIGN_IN = 123;
     private Button b;
     private TextView t;
     private LocationManager locationManager;
     private LocationListener listener;
+    private DatabaseReference mDatabase;
+    public User user;
 
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,7 +71,39 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         };
-        //runservice();
+
+        //FirebaseAuth.getInstance().signOut();
+        List<AuthUI.IdpConfig> providers = Arrays.asList(
+                new AuthUI.IdpConfig.EmailBuilder().build());
+
+        // Create and launch sign-in intent
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .build(),
+                RC_SIGN_IN);
+        load_or_create_user(FirebaseAuth.getInstance().getCurrentUser());
+    }
+
+    private void load_or_create_user(final FirebaseUser firebaseUser){
+        DatabaseReference ref=mDatabase.child("Users").child(firebaseUser.getUid()); //check at reference of user if it already exists
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.hasChild("email")){  //user already exists
+                    user = dataSnapshot.getValue(User.class);
+                }
+                else{  //create new user
+                    user = new User(firebaseUser.getUid(),firebaseUser.getEmail(),firebaseUser.getDisplayName(),0,15,0);
+                    mDatabase.child("Users").child(user.getUID()).setValue(user);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
     }
 
 
@@ -109,8 +154,4 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-   /* public void runservice(){
-        Intent intent = new Intent(this,  ServiceActivity.class);
-        startActivity(intent);
-    }*/
 }

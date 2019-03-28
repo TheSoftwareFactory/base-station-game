@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -56,6 +57,7 @@ import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlayOptions;
 import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -65,7 +67,6 @@ public class SecondActivity extends AppCompatActivity {
     boolean mBound = false;
     private DatabaseReference mDatabase;
     private static final int RC_SIGN_IN = 123;
-    private ArrayList stations = new ArrayList();
     public User user;
 
     private LocationManager locationManager;
@@ -115,7 +116,7 @@ public class SecondActivity extends AppCompatActivity {
         //Adding base stations with Simple Fast Point Overlay
 
         lbs = new ArrayList<>();
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 0; i++) {
             lbs.add(new BaseStation(i, "Station " + i,
                     startKumpulaLatitude + ((Math.random()*2-1) * 0.0064),
                     startKumpulaLongitude + ((Math.random()*2-1) * 0.007),4));
@@ -186,7 +187,16 @@ public class SecondActivity extends AppCompatActivity {
             return;
         }
         locationManager.requestLocationUpdates("gps", 5000, 0, listener);
+        List<AuthUI.IdpConfig> providers = Arrays.asList(
+                new AuthUI.IdpConfig.EmailBuilder().build());
 
+        // Create and launch sign-in intent
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .build(),
+                RC_SIGN_IN);
     }
 
 
@@ -370,10 +380,11 @@ public class SecondActivity extends AppCompatActivity {
             BaseStation station = (BaseStation) intent.getSerializableExtra("station");
             boolean delete = (boolean) intent.getBooleanExtra("delete",true);
             if (station != null){
-                if (delete){ stations.remove(station);}
-                else{ stations.add(station); }
+                if (delete){ lbs.remove(station);}
+                else{ lbs.add(station);}
                 //text.setText(stations.toString());
-                Log.d("stations",stations.toString());
+                updateStationsOnMap();
+                Log.d("stations",lbs.toString());
             }
         }
     };
