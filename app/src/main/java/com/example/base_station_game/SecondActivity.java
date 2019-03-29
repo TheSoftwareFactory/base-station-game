@@ -119,7 +119,7 @@ public class SecondActivity extends AppCompatActivity {
 
         lbs = new ArrayList<>();
         for (int i = 0; i < 0; i++) {
-            lbs.add(new BaseStation(i, "Station " + i,
+            lbs.add(new BaseStation("Station " + i,
                     startKumpulaLatitude + ((Math.random()*2-1) * 0.0064),
                     startKumpulaLongitude + ((Math.random()*2-1) * 0.007),4));
         }

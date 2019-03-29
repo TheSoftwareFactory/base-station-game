@@ -3,16 +3,16 @@ import java.io.Serializable;
 
 public class BaseStation implements Serializable {
     private String name;
-    private int id;
+    private String id;
     private Double latitude;
     private Double longitude;
     private boolean active;
     private int timeToLive;
 
-    public BaseStation(int id, String name, double latitude, double longitude, int timeToLive) {
+    public BaseStation(String name, double latitude, double longitude, int timeToLive) {
 
         this.name = name;
-        this.id = id;
+        //this.id = id;
         this.latitude = latitude;
         this.longitude= longitude;
         this.active=true;
@@ -61,7 +61,7 @@ public class BaseStation implements Serializable {
     public String getName(){
         return this.name;
     }
-    public int getID(){
+    public String getID(){
         return this.id;
     }
     public double getLatitude(){
@@ -70,7 +70,7 @@ public class BaseStation implements Serializable {
     public double getLongitude(){
         return this.longitude;
     }
-    public void setId(int id){
+    public void setId(String id){
         this.id=id;
     }
 }

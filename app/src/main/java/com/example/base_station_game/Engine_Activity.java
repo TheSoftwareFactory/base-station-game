@@ -132,6 +132,7 @@ public class Engine_Activity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot ds, String prevChildKey) {
                 BaseStation station = ds.getValue(BaseStation.class);  //get station object
+                station.setId(ds.getKey());
                 stations.add(station);                                 //add station object to list of station
                 t_output.setText(stations.toString());                       //update ui
             }
@@ -142,6 +143,7 @@ public class Engine_Activity extends AppCompatActivity {
             @Override
             public void onChildRemoved(DataSnapshot ds) {
                 BaseStation station = ds.getValue(BaseStation.class);    //get station object
+                station.setId(ds.getKey());
                 stations.remove(station);                                //remove station object to list of station
                 t_output.setText(stations.toString());                         //update ui
             }
@@ -156,13 +158,13 @@ public class Engine_Activity extends AppCompatActivity {
     }
 
     private void writeNewBaseStationToDatabase(int StationId, String name, double latitude, double longitude) {
-        BaseStation station = new BaseStation(StationId,name,latitude,longitude, 5);   //create station
+        BaseStation station = new BaseStation(name,latitude,longitude, 5);   //create station
         mDatabase.child("stations").child(Integer.toString(StationId)).setValue(station);   //attach station to database
     }
 
-    private void deleteBaseStationFromDatabase(int StationId) {
+    private void deleteBaseStationFromDatabase(String StationId) {
          //create station
-        mDatabase.child("stations").child(Integer.toString(StationId)).removeValue();  //remove station to database
+        mDatabase.child("stations").child(StationId).removeValue();  //remove station to database
     }
 
     public void add_station(View view) {
@@ -177,7 +179,7 @@ public class Engine_Activity extends AppCompatActivity {
 
     public void delete_station(View view) {
         // collect data from ui
-        int id= Integer.valueOf(t_id.getText().toString());
+        String id= t_id.getText().toString();
         //send data to database
         deleteBaseStationFromDatabase(id);
     }
