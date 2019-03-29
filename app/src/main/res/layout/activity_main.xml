@@ -9,63 +9,32 @@
         android:id="@+id/google_engine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/stop_gps"
+        android:layout_above="@+id/buttonMAP"
         android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:layout_marginStart="0dp"
-        android:layout_marginTop="4dp"
-        android:onClick="google_engine"
+        android:layout_marginTop="42dp"
+        android:layout_marginBottom="81dp"
+        android:onClick="onClick"
         android:text="google engine" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:gravity="left"
-        android:text="Coordinates: "
-        android:textSize="18sp" />
-
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="sendMessage"
-        android:text="Request Location" />
 
     <Button
         android:id="@+id/buttonMAP"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView"
-        android:onClick="launchSecondActivity"
+        android:layout_above="@+id/sample_debug"
+        android:layout_marginBottom="83dp"
+        android:onClick="onClick"
         android:text="show map" />
-
-    <Button
-        android:id="@+id/reset"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/buttonMAP"
-        android:onClick="sendMessage"
-        android:text="Reset" />
-
-    <Button
-        android:id="@+id/stop_gps"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/reset"
-        android:onClick="sendMessage"
-        android:text="Stop GPS" />
 
     <Button
         android:id="@+id/sample_debug"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/google_engine"
-        android:onClick="launchSampleDebugActivity"
-        android:text="Test Sampling"
-        />
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="371dp"
+        android:onClick="onClick"
+        android:text="Test Sampling" />
 
 </RelativeLayout>
