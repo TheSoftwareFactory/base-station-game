@@ -37,6 +37,8 @@ public class User implements Serializable {
         return uid;
     }
 
+    public void setUID(String uid) {this.uid=uid;}
+
     public int getLevel() {
         return level;
     }

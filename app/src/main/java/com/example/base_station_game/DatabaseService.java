@@ -91,6 +91,8 @@ public class DatabaseService extends IntentService {
             @Override
             public void onChildAdded(DataSnapshot ds, String prevChildKey) {
                 BaseStation station = ds.getValue(BaseStation.class);  //get station object
+                //int a= Integer.parseInt(ds.getKey());
+                //station.setId(a);
                 stations.add(station);                                 //add station object to list of station
                 sendStation(station,false);
             }

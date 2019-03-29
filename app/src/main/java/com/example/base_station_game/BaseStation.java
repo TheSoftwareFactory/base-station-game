@@ -70,4 +70,7 @@ public class BaseStation implements Serializable {
     public double getLongitude(){
         return this.longitude;
     }
+    public void setId(int id){
+        this.id=id;
+    }
 }

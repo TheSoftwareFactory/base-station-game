@@ -40,8 +40,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //mDatabase = FirebaseDatabase.getInstance().getReference();
+        //logout();
         login();
+        load_or_create_user();
     }
 
     private void login(){
@@ -55,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
                         .setAvailableProviders(providers)
                         .build(),
                 RC_SIGN_IN);
-        load_or_create_user();
+
     }
 
     private void logout(){
