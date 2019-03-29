@@ -59,12 +59,8 @@ public class DatabaseService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         // Normally we would do some work here, like download a file.
         // For our sample, we just sleep for 5 seconds.
-        try {
-            Thread.sleep(5);
-        } catch (InterruptedException e) {
-            // Restore interrupt status.
-            Thread.currentThread().interrupt();
-        }
+        user= (User) intent.getSerializableExtra("user");
+
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {

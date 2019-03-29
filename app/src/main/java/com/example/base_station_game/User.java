@@ -1,6 +1,8 @@
 package com.example.base_station_game;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 
     private String username;
     private String email;

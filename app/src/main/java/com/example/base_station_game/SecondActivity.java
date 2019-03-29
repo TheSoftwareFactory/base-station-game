@@ -67,9 +67,7 @@ public class SecondActivity extends AppCompatActivity {
     DatabaseService mService;
     boolean mBound = false;
     private DatabaseReference mDatabase;
-    private static final int RC_SIGN_IN = 123;
-    public User user;
-
+    private User user;
     private LocationManager locationManager;
     private LocationListener listener;
     private GeoPoint actualPosition = null;
@@ -93,6 +91,9 @@ public class SecondActivity extends AppCompatActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        User user = (User)getIntent().getSerializableExtra("user");
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
         //handle permissions first, before map is created. not depicted here
 
@@ -300,6 +301,7 @@ public class SecondActivity extends AppCompatActivity {
     public void onStart(){
         super.onStart();
         Intent intent = new Intent(this, DatabaseService.class);
+        intent.putExtra("user",user);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
@@ -341,7 +343,7 @@ public class SecondActivity extends AppCompatActivity {
         map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mMessageReceiver,
-                        new IntentFilter("my-integer"));
+                        new IntentFilter());
     }
 
     public void onPause() {
@@ -396,26 +398,4 @@ public class SecondActivity extends AppCompatActivity {
             mBound = false;
         }
     };
-
-    private void load_or_create_user(final FirebaseUser firebaseUser){
-        DatabaseReference ref=mDatabase.child("Users").child(firebaseUser.getUid()); //check at reference of user if it already exists
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.hasChild("email")){  //user already exists
-                    user = dataSnapshot.getValue(User.class);
-                }
-                else{  //create new user
-                    user = new User(firebaseUser.getUid(),firebaseUser.getEmail(),firebaseUser.getDisplayName(),0,15,0);
-                    mDatabase.child("Users").child(user.getUID()).setValue(user);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-    }
-
-
 }

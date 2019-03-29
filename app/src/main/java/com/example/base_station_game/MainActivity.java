@@ -31,50 +31,20 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG =
-        MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final int RC_SIGN_IN = 123;
-    private Button b;
-    private TextView t;
-    private LocationManager locationManager;
-    private LocationListener listener;
     private DatabaseReference mDatabase;
     public User user;
 
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.setValue("");
         setContentView(R.layout.activity_main);
 
-        t = (TextView) findViewById(R.id.textView);
-        b = (Button) findViewById(R.id.button);
+        login();
+    }
 
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-
-        listener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                t.append("\n " + location.getLongitude() + " " + location.getLatitude());
-            }
-
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            public void onProviderEnabled(String s) {
-
-            }
-
-            public void onProviderDisabled(String s) {
-
-                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(i);
-            }
-        };
-
-        //FirebaseAuth.getInstance().signOut();
+    private void login(){
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build());
 
@@ -85,75 +55,57 @@ public class MainActivity extends AppCompatActivity {
                         .setAvailableProviders(providers)
                         .build(),
                 RC_SIGN_IN);
-        load_or_create_user(FirebaseAuth.getInstance().getCurrentUser());
+        load_or_create_user();
     }
 
-    private void load_or_create_user(final FirebaseUser firebaseUser){
-        DatabaseReference ref=mDatabase.child("Users").child(firebaseUser.getUid()); //check at reference of user if it already exists
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.hasChild("email")){  //user already exists
-                    user = dataSnapshot.getValue(User.class);
+    private void logout(){
+        FirebaseAuth.getInstance().signOut();
+    }
+
+    private void load_or_create_user(){
+        if (FirebaseAuth.getInstance().getCurrentUser()!=null) {
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            DatabaseReference ref = mDatabase.child("Users").child(firebaseUser.getUid()); //check at reference of user if it already exists
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.hasChild("email")) {  //user already exists
+                        user = dataSnapshot.getValue(User.class);
+                    } else {  //create new user
+                        user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), firebaseUser.getDisplayName(), 0, 15, 0);
+                        mDatabase.child("Users").child(user.getUID()).setValue(user);
+                    }
                 }
-                else{  //create new user
-                    user = new User(firebaseUser.getUid(),firebaseUser.getEmail(),firebaseUser.getDisplayName(),0,15,0);
-                    mDatabase.child("Users").child(user.getUID()).setValue(user);
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
                 }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-    }
-
-
-    public void sendMessage(View view) {
-        //check weather gps is enabled
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.INTERNET}
-                        ,10);
-            }
-            t.setText("error");
-            return;
-        }
-
-        switch (view.getId())
-        {
-            case R.id.button: {t.setText("");  locationManager.requestLocationUpdates("gps", 5000, 0, listener); break;}
-            case R.id.reset: t.setText(""); break;
-            case R.id.stop_gps:  {t.append("GPS STOPPED");  onPause(); break;}
+            });
         }
     }
 
-    //stop gps
-    protected void onPause() {
-        super.onPause();
-        //check gps permissions
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.buttonMAP: {
+                Intent intent = new Intent(this, SecondActivity.class);
+                intent.putExtra("user",user);
+                startActivity(intent);
+                break;
+            }
+            case R.id.sample_debug: {
+                Intent intent = new Intent(this, SamplingDebugActivity.class);
+                intent.putExtra("user",user);
+                startActivity(intent);
+                break;
+            }
+            case R.id.google_engine: {
+                Intent intent = new Intent(this, Engine_Activity.class);
+                intent.putExtra("user",user);
+                startActivity(intent);
+                break;
+            }
+            default:
+                throw new RuntimeException("Unknown button ID");
         }
-        locationManager.removeUpdates(listener);
     }
-
-
-    public void launchSecondActivity(View view) {
-        Log.d(LOG_TAG, "Button clicked!");
-        Intent intent = new Intent(this, SecondActivity.class);
-        startActivity(intent);
-    }
-
-    public void launchSampleDebugActivity(View view) {
-        Log.d(LOG_TAG, "Button clicked!");
-        Intent intent = new Intent(this, SamplingDebugActivity.class);
-        startActivity(intent);
-    }
-
-    public void google_engine(View view) {
-        Intent intent = new Intent(this, Engine_Activity.class);
-        startActivity(intent);
-    }
-
 }
