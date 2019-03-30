@@ -6,7 +6,6 @@ public class BaseStation implements Serializable {
     private String id;
     private Double latitude;
     private Double longitude;
-    private boolean active;
     private int timeToLive;
 
     public BaseStation(String name, double latitude, double longitude, int timeToLive) {
@@ -15,7 +14,6 @@ public class BaseStation implements Serializable {
         //this.id = id;
         this.latitude = latitude;
         this.longitude= longitude;
-        this.active=true;
         this.timeToLive=timeToLive;
     }
 
@@ -32,7 +30,7 @@ public class BaseStation implements Serializable {
     @Override
     public boolean equals(Object o) {
         BaseStation station= (BaseStation) o;
-        if ((station.getID() == this.id) && (station.getName() == this.name) && (station.getLatitude() == this.latitude) && (station.getLongitude() == this.longitude))
+        if (station.getID().equals(this.id))
         {
             return true;
         }
@@ -48,14 +46,6 @@ public class BaseStation implements Serializable {
 
     public void setTimeToLive(int timeToLive) {
         this.timeToLive = timeToLive;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
     }
 
     public String getName(){

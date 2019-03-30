@@ -157,9 +157,9 @@ public class Engine_Activity extends AppCompatActivity {
 
     }
 
-    private void writeNewBaseStationToDatabase(int StationId, String name, double latitude, double longitude) {
+    private void writeNewBaseStationToDatabase(String StationId, String name, double latitude, double longitude) {
         BaseStation station = new BaseStation(name,latitude,longitude, 5);   //create station
-        mDatabase.child("stations").child(Integer.toString(StationId)).setValue(station);   //attach station to database
+        mDatabase.child("stations").child(StationId).setValue(station);   //attach station to database
     }
 
     private void deleteBaseStationFromDatabase(String StationId) {
@@ -169,7 +169,7 @@ public class Engine_Activity extends AppCompatActivity {
 
     public void add_station(View view) {
         // collect data from ui
-         int id= Integer.valueOf(t_id.getText().toString());
+         String id= t_id.getText().toString();
          String name= t_name.getText().toString();
          double latitude= Double.parseDouble(t_latitude.getText().toString());
          double longitude= Double.parseDouble(t_longitude.getText().toString());
