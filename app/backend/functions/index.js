@@ -47,8 +47,23 @@ exports.addStation = functions.https.onRequest((req, res) => {
   console.log(a[0]);
   // Push the new message into the Realtime Database using the Firebase Admin SDK.
 
-  return admin.database().ref('/stations').push({"name":a[0],"latitude":a[1],"longitude":a[2],"timeToLive":a[3],"RedConquerer":{"dummy":0},"BlueConquerers":{"dummy":0}}).then((snapshot) => {
+  return admin.database().ref('/stations').push({"name":a[0],"latitude":parseInt(a[1]),"longitude":parseInt(a[2]),"timeToLive":parseInt(a[3]),"RedConquerer":{"dummy":0},"BlueConquerer":{"dummy":0}}).then((snapshot) => {
     // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
     return res.redirect(302, snapshot.ref.toString());
   });
 });
+
+
+//todo für morgen: backend oder app funktion schreiben die timeto live auf 0 setzt
+
+exports.stationDies = functions.database.ref('/stations/{stationId}/timeToLive')
+    .onUpdate((change,context) => {
+      // Grab the current value of what was written to the Realtime Database.
+      const newValue = change.after.data();
+      console.log('Time to live of station', context.params.stationId, newValue);
+      if (newValue===0){
+        console.log('station dies');
+      }
+        
+      return ;
+    });
