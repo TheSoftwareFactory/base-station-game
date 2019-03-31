@@ -7,17 +7,24 @@ import android.os.Bundle;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 public class MinigameActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
     private int progressStatus = 0;
     private TextView textView;
     private Handler handler = new Handler();
+    private User user;
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_minigame);
+        user = (User)getIntent().getSerializableExtra("user");
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         Intent data = new Intent();
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -49,5 +56,19 @@ public class MinigameActivity extends AppCompatActivity {
             }
         }).start();
 
+    }
+
+    // function for minigame activity: pushes score to base station tag in database
+    public void conquered(BaseStation station,double score){
+
+        if (user.getTeam()==1){
+            mDatabase.child("stations").child(station.getID()).child("BlueConquerer").child(user.getUID()).setValue(score);
+        }
+        else
+        {
+            mDatabase.child("stations").child(station.getID()).child("RedConquerer").child(user.getUID()).setValue(score);
+        }
+
+        mDatabase.child("Users").child(user.getUID()).child("conqueredStations").child(station.getID()).setValue(score);
     }
 }
