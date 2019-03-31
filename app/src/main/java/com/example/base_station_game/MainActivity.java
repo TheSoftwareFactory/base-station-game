@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {  //create new user
                         user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), firebaseUser.getDisplayName(), 0, 15, 0);
                         mDatabase.child("Users").child(user.getUID()).setValue(user);
+                        mDatabase.child("Users").child(user.getUID()).child("ConqueredStations").setValue("");
                     }
                 }
                 @Override
