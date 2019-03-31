@@ -73,6 +73,8 @@ public class SecondActivity extends AppCompatActivity {
     private GeoPoint actualPosition = new GeoPoint(0,0);
     Polygon p = null;
 
+    int MAX_DISTANCE = 200;
+
     //creating fake station list
     double startKumpulaLatitude = 60.205637;
     double startKumpulaLongitude = 24.962433;
@@ -120,8 +122,8 @@ public class SecondActivity extends AppCompatActivity {
         lbs = new ArrayList<>();
         for (int i = 0; i < 0; i++) {
             lbs.add(new BaseStation("Station " + i,
-                    startKumpulaLatitude + ((Math.random()*2-1) * 0.0064),
-                    startKumpulaLongitude + ((Math.random()*2-1) * 0.007),""+4));
+                    startKumpulaLatitude + ((Math.random()*2-1) * 0.0054),
+                    startKumpulaLongitude + ((Math.random()*2-1) * 0.004),4));
         }
 
         // create label style
@@ -151,7 +153,7 @@ public class SecondActivity extends AppCompatActivity {
                 actualPosition = new GeoPoint(location);
                 if (marker == null) {
                     //Not dynamic
-                    List<GeoPoint> circle = Polygon.pointsAsCircle(actualPosition, 100);
+                    List<GeoPoint> circle = Polygon.pointsAsCircle(actualPosition, MAX_DISTANCE);
                     p.setPoints(circle);
                     map.getOverlayManager().add(p);
                     marker = new Marker(map);
@@ -161,7 +163,7 @@ public class SecondActivity extends AppCompatActivity {
                     map.getOverlays().add(marker);
                     updateStationsOnMap();
                 } else {
-                    p.setPoints(Polygon.pointsAsCircle(actualPosition, 100));
+                    p.setPoints(Polygon.pointsAsCircle(actualPosition, MAX_DISTANCE));
                     marker.setPosition(actualPosition);
 
                 }
@@ -238,7 +240,7 @@ public class SecondActivity extends AppCompatActivity {
                     alertDialog.setTitle(((LabelledGeoPoint) points.get(point)).getLabel());
                     float [] dist = new float[1];
                     Location.distanceBetween(actualPosition.getLatitude(), actualPosition.getLongitude(), points.get(point).getLatitude() ,  points.get(point).getLongitude(), dist);
-                    if(dist[0] < 100) {
+                    if(dist[0] < MAX_DISTANCE) {
                         alertDialog.setMessage("Do you want to conquer this station?");
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                                 new DialogInterface.OnClickListener() {
@@ -374,6 +376,7 @@ public class SecondActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Toast.makeText(context,"message received",Toast.LENGTH_LONG);
+            Log.d("message received!!!!!", "-------");
             // Extract data included in the Intent
             BaseStation station = (BaseStation) intent.getSerializableExtra("station");
             boolean delete = (boolean) intent.getBooleanExtra("delete",true);

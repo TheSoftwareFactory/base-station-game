@@ -6,15 +6,15 @@ public class BaseStation implements Serializable {
     private String id = null;
     private Double latitude;
     private Double longitude;
-    private String timeToLive;
+    private Integer timeToLive;
 
-    public BaseStation(String name, double latitude, double longitude, String timeToLive) {
+    public BaseStation(String name, Double latitude, Double longitude, Integer timeToLive) {
 
         this.name = name;
         //this.id = id;
         this.latitude = latitude;
         this.longitude= longitude;
-        this.timeToLive=(timeToLive);
+        this.timeToLive=timeToLive;
     }
 
     public BaseStation() {
@@ -40,11 +40,11 @@ public class BaseStation implements Serializable {
         }
     }
 
-    public String getTimeToLive() {
+    public Integer getTimeToLive() {
         return timeToLive;
     }
 
-    public void setTimeToLive(String timeToLive) {
+    public void setTimeToLive(Integer timeToLive) {
         this.timeToLive = timeToLive;
     }
 
