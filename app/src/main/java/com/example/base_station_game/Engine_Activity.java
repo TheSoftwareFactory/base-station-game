@@ -158,7 +158,7 @@ public class Engine_Activity extends AppCompatActivity {
     }
 
     private void writeNewBaseStationToDatabase(String StationId, String name, double latitude, double longitude) {
-        BaseStation station = new BaseStation(name,latitude,longitude, 5);   //create station
+        BaseStation station = new BaseStation(name,latitude,longitude, ""+5);   //create station
         mDatabase.child("stations").child(StationId).setValue(station);   //attach station to database
     }
 

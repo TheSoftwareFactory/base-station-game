@@ -18,20 +18,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
+        <activity android:name=".UserProfile"></activity>
+        <activity android:name=".Settings" />
         <activity
             android:name=".ServiceActivity"
             android:label="@string/title_activity_service"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service
             android:name=".DatabaseService"
             android:exported="false" />
 
-
-        <activity android:name=".MinigameActivity"></activity>
+        <activity android:name=".MinigameActivity" />
         <activity android:name=".SamplingDebugActivity" />
-
         <activity android:name=".Engine_Activity" />
         <activity
             android:name=".SecondActivity"

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -90,11 +91,18 @@ public class DatabaseService extends IntentService {
         mDatabase.child("stations").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot ds, String prevChildKey) {
-                BaseStation station = ds.getValue(BaseStation.class);  //get station object
-                //int a= Integer.parseInt(ds.getKey());
-                //station.setId(a);
-                stations.add(station);                                 //add station object to list of station
-                sendStation(station,false);
+                try {
+                    Log.e("Logging datasnapshot", ds.toString());
+                    //Log.e("Logging datasnapshot", ds.child(  ).getValue() );
+                    BaseStation station = ds.getValue(BaseStation.class);  //get station object
+                    //int a= Integer.parseInt(ds.getKey());
+                    //station.setId(a);
+                    stations.add(station);                                 //add station object to list of station
+                    sendStation(station, false);
+                }
+                catch(Exception e) {
+                    Log.e("DATABA SESERVICE", "update_stations -> onChildAdded : probably some shit in the database" + e.toString());
+                }
             }
 
             @Override

@@ -70,7 +70,7 @@ public class SecondActivity extends AppCompatActivity {
     private User user;
     private LocationManager locationManager;
     private LocationListener listener;
-    private GeoPoint actualPosition = null;
+    private GeoPoint actualPosition = new GeoPoint(0,0);
     Polygon p = null;
 
     //creating fake station list
@@ -121,7 +121,7 @@ public class SecondActivity extends AppCompatActivity {
         for (int i = 0; i < 0; i++) {
             lbs.add(new BaseStation("Station " + i,
                     startKumpulaLatitude + ((Math.random()*2-1) * 0.0064),
-                    startKumpulaLongitude + ((Math.random()*2-1) * 0.007),4));
+                    startKumpulaLongitude + ((Math.random()*2-1) * 0.007),""+4));
         }
 
         // create label style
@@ -188,22 +188,26 @@ public class SecondActivity extends AppCompatActivity {
             }
             return;
         }
-        locationManager.requestLocationUpdates("gps", 5000, 0, listener);
+        locationManager.requestLocationUpdates("gps", 3000, 0, listener);
 
     }
 
 
     public void localize(View view) {
         //check weather gps is enabled
-        map.getController().animateTo(actualPosition, (double) 18, 1500L);
-        map.invalidate();
+        if (actualPosition != null && actualPosition.getLatitude() != 0 && actualPosition.getLongitude() != 0){
+            map.getController().animateTo(actualPosition, (double) 18, 1500L);
+            map.invalidate();
+        }
+        else{
+            Toast.makeText(this,"Waiting for location...",Toast.LENGTH_LONG).show();
+        }
     }
 
     private void updateStationsOnMap() {
         if (lbs != null) {
             List<IGeoPoint> points = new ArrayList<>();
             for (int i = 0; i < lbs.size(); i++) {
-                float [] dist = new float[1];
                 points.add(new LabelledGeoPoint(lbs.get(i).getLatitude(), lbs.get(i).getLongitude(), lbs.get(i).getName()));
             }
 
@@ -374,8 +378,12 @@ public class SecondActivity extends AppCompatActivity {
             BaseStation station = (BaseStation) intent.getSerializableExtra("station");
             boolean delete = (boolean) intent.getBooleanExtra("delete",true);
             if (station != null){
-                if (delete){ lbs.remove(station);}
-                else{ lbs.add(station);}
+                if (delete){
+                    lbs.remove(station);
+                }
+                else{
+                    lbs.add(station);
+                }
                 //text.setText(stations.toString());
                 updateStationsOnMap();
                 Log.d("stations",lbs.toString());
