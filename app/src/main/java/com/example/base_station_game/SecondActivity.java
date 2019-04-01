@@ -378,11 +378,10 @@ public class SecondActivity extends AppCompatActivity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context,"message received",Toast.LENGTH_LONG);
-            Log.d("message received!!!!!", "-------");
             // Extract data included in the Intent
             BaseStation station = (BaseStation) intent.getSerializableExtra("station");
             boolean delete = (boolean) intent.getBooleanExtra("delete",true);
+            Log.d("Message received!!!!!", " New station -------->" + station);
             if (station != null){
                 if (delete){
                     lbs.remove(station);
@@ -392,7 +391,6 @@ public class SecondActivity extends AppCompatActivity {
                 }
                 //text.setText(stations.toString());
                 updateStationsOnMap();
-                Log.d("stations",lbs.toString());
             }
         }
     };

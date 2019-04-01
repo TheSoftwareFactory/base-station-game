@@ -1,6 +1,7 @@
 package com.example.base_station_game;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -10,10 +11,12 @@ import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.util.Log;
 
@@ -25,6 +28,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         load_or_create_user();
     }
 
-    private void login(){
+    private void login() {
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build());
 
@@ -61,12 +66,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void logout(){
+    private void logout() {
         FirebaseAuth.getInstance().signOut();
     }
 
-    private void load_or_create_user(){
-        if (FirebaseAuth.getInstance().getCurrentUser()!=null) {
+    private void load_or_create_user() {
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             mDatabase = FirebaseDatabase.getInstance().getReference();
             FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
             DatabaseReference ref = mDatabase.child("Users").child(firebaseUser.getUid()); //check at reference of user if it already exists
@@ -76,11 +81,28 @@ public class MainActivity extends AppCompatActivity {
                     if (dataSnapshot.hasChild("email")) {  //user already exists
                         user = dataSnapshot.getValue(User.class);
                     } else {  //create new user
-                        user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), firebaseUser.getDisplayName(), 0, 15, 0);
-                        mDatabase.child("Users").child(user.getUID()).setValue(user);
-                        mDatabase.child("Users").child(user.getUID()).child("ConqueredStations").setValue("");
+                        // Make the user choice his team
+                        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme).create();
+                        alertDialog.setTitle("Choose you team!");
+                        final EditText et = new EditText(MainActivity.this);
+                        alertDialog.setMessage("Type the name of your team");
+                        alertDialog.setView(et);
+                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        String userinput = et.getText().toString();
+                                        if (userinput != "" && userinput != null) {
+                                            user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), firebaseUser.getDisplayName(), 0, 15, userinput);
+                                            mDatabase.child("Users").child(user.getUID()).setValue(user);
+                                            mDatabase.child("Users").child(user.getUID()).child("ConqueredStations").setValue("");
+                                            dialog.dismiss();
+                                        }
+                                    }
+                                });
+                        alertDialog.show();
                     }
                 }
+
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                 }
@@ -92,31 +114,31 @@ public class MainActivity extends AppCompatActivity {
         switch (v.getId()) {
             case R.id.buttonMAP: {
                 Intent intent = new Intent(this, SecondActivity.class);
-                intent.putExtra("user",user);
+                intent.putExtra("user", user);
                 startActivity(intent);
                 break;
             }
             case R.id.sample_debug: {
                 Intent intent = new Intent(this, SamplingDebugActivity.class);
-                intent.putExtra("user",user);
+                intent.putExtra("user", user);
                 startActivity(intent);
                 break;
             }
             case R.id.google_engine: {
                 Intent intent = new Intent(this, Engine_Activity.class);
-                intent.putExtra("user",user);
+                intent.putExtra("user", user);
                 startActivity(intent);
                 break;
             }
             case R.id.user_profile: {
                 Intent intent = new Intent(this, UserProfile.class);
-                intent.putExtra("user",user);
+                intent.putExtra("user", user);
                 startActivity(intent);
                 break;
             }
             case R.id.settings: {
                 Intent intent = new Intent(this, Settings.class);
-                intent.putExtra("user",user);
+                intent.putExtra("user", user);
                 startActivity(intent);
                 break;
             }

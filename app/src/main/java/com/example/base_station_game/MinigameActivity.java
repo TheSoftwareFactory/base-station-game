@@ -71,7 +71,7 @@ public class MinigameActivity extends AppCompatActivity {
     // function for minigame activity: pushes score to base station tag in database
     public void conquered(BaseStation station,double score){
 
-        if (user.getTeam()==1){
+        if (user.getTeam().equals("1")){
             mDatabase.child("stations").child(station.getID()).child("BlueConquerer").child(user.getUID()).setValue(score);
         }
         else
