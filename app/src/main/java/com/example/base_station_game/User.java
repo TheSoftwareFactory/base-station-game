@@ -1,6 +1,7 @@
 package com.example.base_station_game;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class User implements Serializable {
 
@@ -10,6 +11,7 @@ public class User implements Serializable {
     private int level;
     private long exp;
     private int team;
+    //private ArrayList conqueredStations;  //-> maybe useful later to display if stations are conquereable
     //private String password;
 
     public User(){
@@ -22,7 +24,7 @@ public class User implements Serializable {
         this.level=level;
         this.exp=exp;
         this.team=team;
-
+        //conqueredStations=new ArrayList();
     }
 
     public String getUsername() {

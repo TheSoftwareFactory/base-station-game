@@ -53,6 +53,18 @@ exports.addStation = functions.https.onRequest((req, res) => {
   });
 });
 
+exports.killStation = functions.https.onRequest((req, res) => {
+  // Grab the text parameter.
+  var original = req.query.text;
+  console.log(original);
+  // Push the new message into the Realtime Database using the Firebase Admin SDK.
+	console.log(admin.database());
+  return admin.database().ref('/stations/-LbJCKbLcIC-2BIbG1KJ/timeToLive').set(0).then((snapshot) => {
+    // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
+    return res.redirect(302, snapshot.ref.toString());
+  });
+});
+
 
 //todo für morgen: backend oder app funktion schreiben die timeto live auf 0 setzt
 
