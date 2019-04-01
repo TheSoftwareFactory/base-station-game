@@ -108,6 +108,18 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 break;
             }
+            case R.id.user_profile: {
+                Intent intent = new Intent(this, UserProfile.class);
+                intent.putExtra("user",user);
+                startActivity(intent);
+                break;
+            }
+            case R.id.settings: {
+                Intent intent = new Intent(this, Settings.class);
+                intent.putExtra("user",user);
+                startActivity(intent);
+                break;
+            }
             default:
                 throw new RuntimeException("Unknown button ID");
         }

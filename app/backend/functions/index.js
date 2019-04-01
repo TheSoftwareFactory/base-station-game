@@ -47,7 +47,7 @@ exports.addStation = functions.https.onRequest((req, res) => {
   console.log(a[0]);
   // Push the new message into the Realtime Database using the Firebase Admin SDK.
 
-  return admin.database().ref('/stations').push({"name":a[0],"latitude":parseInt(a[1]),"longitude":parseInt(a[2]),"timeToLive":parseInt(a[3]),"RedConquerer":{"init":0},"BlueConquerer":{"init":0}}).then((snapshot) => {
+  return admin.database().ref('/stations').push({"name":a[0],"latitude":parseFloat(a[1]),"longitude":parseFloat(a[2]),"timeToLive":parseInt(a[3]),"RedConquerer":{"init":0},"BlueConquerer":{"init":0}}).then((snapshot) => {
     // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
     return res.redirect(302, snapshot.ref.toString());
   });

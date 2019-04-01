@@ -3,12 +3,12 @@ import java.io.Serializable;
 
 public class BaseStation implements Serializable {
     private String name;
-    private String id;
+    private String id = null;
     private Double latitude;
     private Double longitude;
-    private int timeToLive;
+    private Integer timeToLive;
 
-    public BaseStation(String name, double latitude, double longitude, int timeToLive) {
+    public BaseStation(String name, Double latitude, Double longitude, Integer timeToLive) {
 
         this.name = name;
         //this.id = id;
@@ -40,11 +40,11 @@ public class BaseStation implements Serializable {
         }
     }
 
-    public int getTimeToLive() {
+    public Integer getTimeToLive() {
         return timeToLive;
     }
 
-    public void setTimeToLive(int timeToLive) {
+    public void setTimeToLive(Integer timeToLive) {
         this.timeToLive = timeToLive;
     }
 

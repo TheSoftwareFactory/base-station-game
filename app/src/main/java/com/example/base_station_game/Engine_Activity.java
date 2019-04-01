@@ -96,22 +96,10 @@ public class Engine_Activity extends AppCompatActivity {
     public void login(View view){
         BaseStation station=(BaseStation) stations.get(0);
         int score=14;
-        conquered(station,score);
+       // conquered(station,score);
     }
 
-    // function for minigame activity: pushes score to base station tag in database
-    public void conquered(BaseStation station,double score){
 
-        if (user.getTeam()==1){
-            mDatabase.child("stations").child(station.getID()).child("BlueConquerer").child(user.getUID()).setValue(score);
-        }
-        else
-        {
-            mDatabase.child("stations").child(station.getID()).child("RedConquerer").child(user.getUID()).setValue(score);
-        }
-
-        mDatabase.child("Users").child(user.getUID()).child("conqueredStations").child(station.getID()).setValue(score);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

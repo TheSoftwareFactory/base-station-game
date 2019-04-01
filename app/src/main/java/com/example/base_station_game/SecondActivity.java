@@ -70,8 +70,10 @@ public class SecondActivity extends AppCompatActivity {
     private User user;
     private LocationManager locationManager;
     private LocationListener listener;
-    private GeoPoint actualPosition = null;
+    private GeoPoint actualPosition = new GeoPoint(0,0);
     Polygon p = null;
+
+    int MAX_DISTANCE = 200;
 
     //creating fake station list
     double startKumpulaLatitude = 60.205637;
@@ -120,8 +122,8 @@ public class SecondActivity extends AppCompatActivity {
         lbs = new ArrayList<>();
         for (int i = 0; i < 0; i++) {
             lbs.add(new BaseStation("Station " + i,
-                    startKumpulaLatitude + ((Math.random()*2-1) * 0.0064),
-                    startKumpulaLongitude + ((Math.random()*2-1) * 0.007),4));
+                    startKumpulaLatitude + ((Math.random()*2-1) * 0.0054),
+                    startKumpulaLongitude + ((Math.random()*2-1) * 0.004),4));
         }
 
         // create label style
@@ -151,7 +153,7 @@ public class SecondActivity extends AppCompatActivity {
                 actualPosition = new GeoPoint(location);
                 if (marker == null) {
                     //Not dynamic
-                    List<GeoPoint> circle = Polygon.pointsAsCircle(actualPosition, 100);
+                    List<GeoPoint> circle = Polygon.pointsAsCircle(actualPosition, MAX_DISTANCE);
                     p.setPoints(circle);
                     map.getOverlayManager().add(p);
                     marker = new Marker(map);
@@ -161,7 +163,7 @@ public class SecondActivity extends AppCompatActivity {
                     map.getOverlays().add(marker);
                     updateStationsOnMap();
                 } else {
-                    p.setPoints(Polygon.pointsAsCircle(actualPosition, 100));
+                    p.setPoints(Polygon.pointsAsCircle(actualPosition, MAX_DISTANCE));
                     marker.setPosition(actualPosition);
 
                 }
@@ -188,22 +190,26 @@ public class SecondActivity extends AppCompatActivity {
             }
             return;
         }
-        locationManager.requestLocationUpdates("gps", 5000, 0, listener);
+        locationManager.requestLocationUpdates("gps", 3000, 0, listener);
 
     }
 
 
     public void localize(View view) {
         //check weather gps is enabled
-        map.getController().animateTo(actualPosition, (double) 18, 1500L);
-        map.invalidate();
+        if (actualPosition != null && actualPosition.getLatitude() != 0 && actualPosition.getLongitude() != 0){
+            map.getController().animateTo(actualPosition, (double) 18, 1500L);
+            map.invalidate();
+        }
+        else{
+            Toast.makeText(this,"Waiting for location...",Toast.LENGTH_LONG).show();
+        }
     }
 
     private void updateStationsOnMap() {
         if (lbs != null) {
             List<IGeoPoint> points = new ArrayList<>();
             for (int i = 0; i < lbs.size(); i++) {
-                float [] dist = new float[1];
                 points.add(new LabelledGeoPoint(lbs.get(i).getLatitude(), lbs.get(i).getLongitude(), lbs.get(i).getName()));
             }
 
@@ -234,7 +240,7 @@ public class SecondActivity extends AppCompatActivity {
                     alertDialog.setTitle(((LabelledGeoPoint) points.get(point)).getLabel());
                     float [] dist = new float[1];
                     Location.distanceBetween(actualPosition.getLatitude(), actualPosition.getLongitude(), points.get(point).getLatitude() ,  points.get(point).getLongitude(), dist);
-                    if(dist[0] < 100) {
+                    if(dist[0] < MAX_DISTANCE) {
                         alertDialog.setMessage("Do you want to conquer this station?");
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                                 new DialogInterface.OnClickListener() {
@@ -370,12 +376,17 @@ public class SecondActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Toast.makeText(context,"message received",Toast.LENGTH_LONG);
+            Log.d("message received!!!!!", "-------");
             // Extract data included in the Intent
             BaseStation station = (BaseStation) intent.getSerializableExtra("station");
             boolean delete = (boolean) intent.getBooleanExtra("delete",true);
             if (station != null){
-                if (delete){ lbs.remove(station);}
-                else{ lbs.add(station);}
+                if (delete){
+                    lbs.remove(station);
+                }
+                else{
+                    lbs.add(station);
+                }
                 //text.setText(stations.toString());
                 updateStationsOnMap();
                 Log.d("stations",lbs.toString());
