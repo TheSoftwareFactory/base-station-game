@@ -239,6 +239,7 @@ public class SecondActivity extends AppCompatActivity {
                     AlertDialog alertDialog = new AlertDialog.Builder(SecondActivity.this,R.style.AlertDialogTheme).create();
                     alertDialog.setTitle(((LabelledGeoPoint) points.get(point)).getLabel());
                     float [] dist = new float[1];
+                    BaseStation clicckedbasestation = lbs.get(point);
                     Location.distanceBetween(actualPosition.getLatitude(), actualPosition.getLongitude(), points.get(point).getLatitude() ,  points.get(point).getLongitude(), dist);
                     if(dist[0] < MAX_DISTANCE) {
                         alertDialog.setMessage("Do you want to conquer this station?");
@@ -246,6 +247,8 @@ public class SecondActivity extends AppCompatActivity {
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         Intent intent = new Intent(SecondActivity.this, MinigameActivity.class);
+                                        intent.putExtra("user", user);
+                                        intent.putExtra("station",  clicckedbasestation);
                                         startActivityForResult(intent,1);
                                         dialog.dismiss();
                                     }

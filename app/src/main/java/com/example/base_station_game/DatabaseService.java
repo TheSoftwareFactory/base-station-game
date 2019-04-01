@@ -112,6 +112,7 @@ public class DatabaseService extends IntentService {
                     blue = (HashMap) value.get("BlueConquerer");
 
                     BaseStation station = new BaseStation(name, latitude, longitude, timeToLive);
+                    station.setId(ds.getKey());
                     stations.add(station);                                 //add station object to list of station
                     sendStation(station, false);
 

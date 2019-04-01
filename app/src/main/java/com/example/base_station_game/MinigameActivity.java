@@ -17,6 +17,7 @@ public class MinigameActivity extends AppCompatActivity {
     private TextView textView;
     private Handler handler = new Handler();
     private User user;
+    private BaseStation station;
     private DatabaseReference mDatabase;
 
     @Override
@@ -24,6 +25,7 @@ public class MinigameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_minigame);
         user = (User)getIntent().getSerializableExtra("user");
+        station = (BaseStation)getIntent().getSerializableExtra("station");
         mDatabase = FirebaseDatabase.getInstance().getReference();
         Intent data = new Intent();
 
@@ -44,13 +46,21 @@ public class MinigameActivity extends AppCompatActivity {
                     });
                     try {
                         // Sleep for 200 milliseconds.
+
+                        // Check if the player is this in the Range
+                        // In case throw an exception
+
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
+                        // Something went WRONG
+
                         e.printStackTrace();
                     }
                 }
+                // Everything went GOOD
                 long score = 1000;
                 data.putExtra("score", score);
+                //conquered(station, score);
                 setResult(1, data);
                 finish();
             }
