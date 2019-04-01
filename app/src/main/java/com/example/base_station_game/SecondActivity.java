@@ -349,7 +349,7 @@ public class SecondActivity extends AppCompatActivity {
         map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mMessageReceiver,
-                        new IntentFilter());
+                        new IntentFilter("my-integer"));
     }
 
     public void onPause() {
