@@ -19,7 +19,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".UserProfile"></activity>
-        <activity android:name=".Settings" />
+        <activity android:name=".Settings" ></activity>
         <activity
             android:name=".ServiceActivity"
             android:label="@string/title_activity_service"

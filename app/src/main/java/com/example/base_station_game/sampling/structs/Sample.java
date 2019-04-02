@@ -1,10 +1,14 @@
 package com.example.base_station_game.sampling.structs;
 
-public class Sample {
+import java.io.Serializable;
+
+public class Sample implements Serializable {
+    private double timestamp;
     private BatteryDetails batteryDetails;
     private double batteryLevel;
     private String batteryState;
     private CpuStatus cpuStatus;
+    private String timeZone;
 
     public BatteryDetails getBatteryDetails() {
         return batteryDetails;
@@ -50,5 +54,21 @@ public class Sample {
 
     public void setCpuStatus(CpuStatus cpuStatus) {
         this.cpuStatus = cpuStatus;
+    }
+
+    public double getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(double timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
     }
 }
