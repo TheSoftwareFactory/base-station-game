@@ -122,14 +122,27 @@ exports.stationDies = functions.database.ref('/stations/{stationId}/timeToLive')
 });
 
 
-exports.updateTeamScores = functions.database.ref('/stations/')
+exports.updateTeamScores = functions.database.ref('stations/{stationId}/teams/{teamId}')
     .onUpdate((change,context) => {
-      const stationExp = 500;
       // Grab the current value of what was written to the Realtime Database.
       const newValue = change.after.val();
-      var id=context.params.stationId;
-      console.log('Time to live of station', id, newValue);
+      console.log('current value', newValue);
+      var station_id=context.params.stationId;
+      var team_id=context.params.teamId;
+      console.log("station id: ",station_id);
+      console.log("team id: ",team_id);
 
+
+      newValue.forEach(function(snapshot){
+          var teamscore=0;
+          console.log(snapshot.val()); 
+          teamscore=teamscore+snapshot.val();
+          /*snapshot.forEach(function(childSnapshot){
+            console.log(childSnapshot);
+            teamscore=teamscore+childSnapshot.val();
+          });*/
+      });
+      admin.database().ref('stations').child(station_id).child("teams").child(team_id).child("teamScore").set(teamscore);
     	return "nice";
 });
 
