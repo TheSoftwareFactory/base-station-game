@@ -107,11 +107,7 @@ public class DatabaseService extends IntentService {
                     name = (String) value.get("name");
                     longitude = (Double) value.get("longitude");
                     latitude =  (Double) value.get("latitude");
-                    timeToLive = new Integer(((Long) value.get("timeToLive")).intValue());
-                    red = (HashMap) value.get("RedConquerer");
-                    blue = (HashMap) value.get("BlueConquerer");
-
-                    BaseStation station = new BaseStation(name, latitude, longitude, timeToLive);
+                    BaseStation station = new BaseStation(name, latitude, longitude);
                     station.setId(ds.getKey());
                     stations.add(station);                                 //add station object to list of station
                     sendStation(station, false);

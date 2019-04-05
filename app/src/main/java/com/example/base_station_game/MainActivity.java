@@ -44,12 +44,12 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        login();
+        load_or_create_user();
         setContentView(R.layout.activity_main);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         //mDatabase.child("stations").setValue("");
         //logout();
-        login();
-        load_or_create_user();
     }
 
     private void login() {
@@ -90,11 +90,10 @@ public class MainActivity extends AppCompatActivity {
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
-                                        String userinput = et.getText().toString();
-                                        if (userinput != "" && userinput != null) {
+                                        String userinput = et.getText().toString().trim();
+                                        if (!userinput.isEmpty()) {
                                             user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), firebaseUser.getDisplayName(), 0, 15, userinput);
                                             mDatabase.child("Users").child(user.getUID()).setValue(user);
-                                            mDatabase.child("Users").child(user.getUID()).child("ConqueredStations").setValue("");
                                             // Check if the team already exits
                                             DatabaseReference refTeam = mDatabase.child("Teams"); //check at reference of user if it already exists
                                             refTeam.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -110,7 +109,10 @@ public class MainActivity extends AppCompatActivity {
 
                                                 }
                                             });
-                                        dialog.dismiss();
+                                            dialog.dismiss();
+                                        }
+                                        else{
+                                            et.setError("Please insert the name of your team.");
                                         }
                                     }
                                 });

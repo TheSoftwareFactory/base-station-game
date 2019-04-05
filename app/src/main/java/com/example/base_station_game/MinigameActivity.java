@@ -14,6 +14,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+
 public class MinigameActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
@@ -62,7 +64,7 @@ public class MinigameActivity extends AppCompatActivity {
                     }
                 }
                 // Everything went GOOD
-                long score = 1000;
+                Long score = new Long(1000);
                 data.putExtra("score", score);
                 conquered(station, score);
                 setResult(1, data);
@@ -73,16 +75,18 @@ public class MinigameActivity extends AppCompatActivity {
     }
 
     // function for minigame activity: pushes score to base station tag in database
-    public void conquered(BaseStation station, double score) {
+    public void conquered(BaseStation station, Long score) {
         // Undertand how to append
 
         try {
             //Update stations/teams/user.getTeam/ -> append user.getUID(),(score)
-            mDatabase.child("stations").child(station.getID()).child("Teams").setValue(user.getTeam());
-            mDatabase.child("stations").child(station.getID()).child("Teams").child(user.getTeam()).setValue(user.getUID(), (score));
+            //HashMap<String,Double> hm = new HashMap<>();
+            //hm.put(user.getUID(), score);
+            //mDatabase.child("stations").child(station.getID()).child("Teams").child(user.getTeam()).setValue();
+            mDatabase.child("stations").child(station.getID()).child("Teams").child(user.getTeam()).child(user.getUID()).setValue(score);
 
             // Update users/users.UID/conqueredstations -> append station.getID() (score)
-            mDatabase.child("Users").child(user.getUID()).child("conqueredStations").child(station.getID()).setValue(score);
+            mDatabase.child("Users").child(user.getUID()).child("PlayedStations").child(station.getID()).setValue(score);
 
             // Update users/users.UID/exp -> add score
 
@@ -91,8 +95,8 @@ public class MinigameActivity extends AppCompatActivity {
             ref.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot ds) {
-                    double oldvalue = (double) ds.getValue();
-                    Double newvalue = Double.valueOf(score + oldvalue);
+                    Long oldvalue = (Long) ds.getValue();
+                    Long newvalue =  score + oldvalue;
                     mDatabase.child("Users").child(user.getUID()).child("exp").setValue(newvalue);
                     user.setExp(newvalue.longValue());
                 }
@@ -103,7 +107,7 @@ public class MinigameActivity extends AppCompatActivity {
                 }
             });
         } catch (Exception e) {
-            Log.e("DATABASE SERVICE", "update_stations -> onChildAdded : probably some shit in the database" + e.toString());
+            Log.e("DATABASE SERVICE", "Probably some shit in the database" + e.toString());
         }
     }
 }

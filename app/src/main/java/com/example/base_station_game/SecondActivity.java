@@ -94,7 +94,7 @@ public class SecondActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        User user = (User)getIntent().getSerializableExtra("user");
+        this.user = (User)getIntent().getSerializableExtra("user");
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         //handle permissions first, before map is created. not depicted here
@@ -123,7 +123,7 @@ public class SecondActivity extends AppCompatActivity {
         for (int i = 0; i < 0; i++) {
             lbs.add(new BaseStation("Station " + i,
                     startKumpulaLatitude + ((Math.random()*2-1) * 0.0054),
-                    startKumpulaLongitude + ((Math.random()*2-1) * 0.004),4));
+                    startKumpulaLongitude + ((Math.random()*2-1) * 0.004)));
         }
 
         // create label style
@@ -242,7 +242,7 @@ public class SecondActivity extends AppCompatActivity {
                     BaseStation clicckedbasestation = lbs.get(point);
                     Location.distanceBetween(actualPosition.getLatitude(), actualPosition.getLongitude(), points.get(point).getLatitude() ,  points.get(point).getLongitude(), dist);
                     if(dist[0] < MAX_DISTANCE) {
-                        alertDialog.setMessage("Do you want to conquer this station?");
+                        alertDialog.setMessage("Do you want to conquer this station (ID:"+clicckedbasestation.getID()+")?");
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {

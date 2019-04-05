@@ -50,7 +50,7 @@ exports.addStation = functions.https.onRequest((req, res) => {
   var dt = new Date();
   dt.setHours( dt.getHours() + a[3] );
   dt = new Date(dt)
-  return admin.database().ref('/stations').push({"name":a[0],"latitude":parseFloat(a[1]),"longitude":parseFloat(a[2]),"timeToLive":dt.toISOString(),"Teams":{"init":"0"}}).then((snapshot) => {
+  return admin.database().ref('/stations').push({"name":a[0],"latitude":parseFloat(a[1]),"longitude":parseFloat(a[2]),"timeToLive":dt.toISOString()}).then((snapshot) => {
     // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
     return res.redirect(302, snapshot.ref.toString());
   });
