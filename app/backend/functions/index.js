@@ -68,20 +68,71 @@ exports.killStation = functions.https.onRequest((req, res) => {
   });
 });
 
-
-//todo für morgen: backend oder app funktion schreiben die timeto live auf 0 setzt
-
 exports.stationDies = functions.database.ref('/stations/{stationId}/timeToLive')
     .onUpdate((change,context) => {
+      const stationExp = 500;
       // Grab the current value of what was written to the Realtime Database.
-      const newValue = change.after.data();
-      console.log('Time to live of station', context.params.stationId, newValue);
-      if (newValue===0){
-        console.log('station dies');
+      const newValue = change.after.val();
+      var id=context.params.stationId;
+      console.log('Time to live of station', id, newValue);
+
+      //if station dies
+      if (newValue==="0"){
+        console.log("station dies");
+
+        //get snapshot of stations key
+        var starCountRef = admin.database().ref('stations');
+        starCountRef.on('value',function(snapshot) {
+
+          //get all stations as snapshot
+          snapshot.forEach(function(childSnapshot){
+            console.log(childSnapshot.val());
+
+            //get the conquerer list of each station
+            childSnapshot.child("BlueConquerer").forEach(function(babySnapshot){
+              var key = babySnapshot.key;
+              var val = babySnapshot.val();
+              console.log("erster conquerer: ")
+              console.log(key);
+              console.log(val);
+
+
+              admin.database().ref('Users').child(key).once("value",xd => {
+                if (xd.exists()){
+                  //const userData = xd.val();
+                  //console.log("exists!", userData);
+
+                  //update exp based on old exp
+                  admin.database().ref('Users').child(key).child("exp").once('value',function(conquerer){
+                    admin.database().ref('Users').child(key).child("exp").set(conquerer.val()+stationExp);
+                  });
+                  //update count of conquered base stations for user
+                  admin.database().ref('Users').child(key).child("ConqueredStations").once('value',function(conquerer){
+                    admin.database().ref('Users').child(key).child("ConqueredStations").set(conquerer.val()+1);
+                  });
+                }
+              });
+            });
+
+          });
+        //todo: delete station
+        //admin.database().ref('stations').remove(id);
+
+        });
       }
-        
-      return ;
-    });
+
+    	return "nice";
+});
 
 
-exports.stationUpdate = functions.database.ref('/stations/{stationId}/timeToLive')
+exports.updateTeamScores = functions.database.ref('/stations/')
+    .onUpdate((change,context) => {
+      const stationExp = 500;
+      // Grab the current value of what was written to the Realtime Database.
+      const newValue = change.after.val();
+      var id=context.params.stationId;
+      console.log('Time to live of station', id, newValue);
+
+    	return "nice";
+});
+
