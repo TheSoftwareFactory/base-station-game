@@ -30,12 +30,14 @@ public class Sampler {
 
         Intent batteryIntent = SamplingLibrary.getLastBatteryIntent(context);
         Sample lastSample = db.getLastSample(context);
+        System.out.println("Old:" + lastSample);
 //        if(checkIdentical(context, batteryIntent, lastSample)){
 ////            Logger.d(TAG, "Pre-check failed, sample would be essentially identical");
 //            return false;
 //        }
 
         Sample sample = createSample(context, batteryIntent);
+        System.out.println("new" + sample);
         if(sample != null){
             long id = db.putSample(sample);
 //            Logger.i(TAG, "Stored sample " + id + " for " + trigger + ":\n" + sample.toString());
@@ -117,6 +119,13 @@ public class Sampler {
         sample.setBatteryDetails(getBatteryDetails(context, batteryIntent));
         sample.setBatteryLevel(BatteryUtils.getBatteryLevel(batteryIntent));
         sample.setBatteryState(getBatteryStatusString(batteryIntent));
+        int[] memoryInfo = SamplingLibrary.readMeminfo();
+        if(memoryInfo.length == 4){
+            sample.setMemoryUser(memoryInfo[0]);
+            sample.setMemoryFree(memoryInfo[1]);
+            sample.setMemoryActive(memoryInfo[2]);
+            sample.setMemoryInactive(memoryInfo[3]);
+        }
         SystemLoadPoint load2 = SamplingLibrary.getSystemLoad();
         sample.setCpuStatus(constructCpuStatus(load1, load2));
         return sample;

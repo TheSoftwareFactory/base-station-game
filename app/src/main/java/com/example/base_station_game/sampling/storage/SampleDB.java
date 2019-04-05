@@ -39,7 +39,7 @@ public class SampleDB {
     public static final String COLUMN_TIMESTAMP = "timestamp";
     public static final String COLUMN_SAMPLE = "sample";
 
-    public static final String DATABASE_NAME = "caratdata";
+    public static final String DATABASE_NAME = "basestationdata";
     public static final String SAMPLES_VIRTUAL_TABLE = "sampleobjects";
     // TODO: Bump version here when changing the protocol, new one incompatible with old
     private static final int DATABASE_VERSION = 5;

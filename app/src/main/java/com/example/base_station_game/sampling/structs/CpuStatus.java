@@ -1,8 +1,9 @@
 package com.example.base_station_game.sampling.structs;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class CpuStatus {
+public class CpuStatus implements Serializable {
     private double cpuUsage;
     private double uptime;
     private double sleeptime;

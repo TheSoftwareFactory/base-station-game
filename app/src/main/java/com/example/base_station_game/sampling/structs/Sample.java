@@ -9,6 +9,10 @@ public class Sample implements Serializable {
     private String batteryState;
     private CpuStatus cpuStatus;
     private String timeZone;
+    private int memoryUser;
+    private int memoryFree;
+    private int memoryActive;
+    private int memoryInactive;
 
     public BatteryDetails getBatteryDetails() {
         return batteryDetails;
@@ -38,13 +42,25 @@ public class Sample implements Serializable {
     public String toString() {
         StringBuilder string = new StringBuilder();
         string
+                .append(timestamp)
+                .append("\n")
+                .append(timeZone)
+                .append("\n")
                 .append(batteryDetails.toString())
                 .append("\n")
                 .append(batteryLevel)
                 .append("\n")
                 .append(batteryState)
                 .append("\n")
-                .append(cpuStatus);
+                .append(cpuStatus)
+                .append("\n")
+                .append(memoryUser)
+                .append("\n")
+                .append(memoryFree)
+                .append("\n")
+                .append(memoryActive)
+                .append("\n")
+                .append(memoryInactive);
         return string.toString();
     }
 
@@ -70,5 +86,37 @@ public class Sample implements Serializable {
 
     public void setTimeZone(String timeZone) {
         this.timeZone = timeZone;
+    }
+
+    public int getMemoryUser() {
+        return memoryUser;
+    }
+
+    public void setMemoryUser(int memoryUser) {
+        this.memoryUser = memoryUser;
+    }
+
+    public int getMemoryFree() {
+        return memoryFree;
+    }
+
+    public void setMemoryFree(int memoryFree) {
+        this.memoryFree = memoryFree;
+    }
+
+    public int getMemoryActive() {
+        return memoryActive;
+    }
+
+    public void setMemoryActive(int memoryActive) {
+        this.memoryActive = memoryActive;
+    }
+
+    public int getMemoryInactive() {
+        return memoryInactive;
+    }
+
+    public void setMemoryInactive(int memoryInactive) {
+        this.memoryInactive = memoryInactive;
     }
 }
