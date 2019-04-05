@@ -95,7 +95,22 @@ public class MainActivity extends AppCompatActivity {
                                             user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), firebaseUser.getDisplayName(), 0, 15, userinput);
                                             mDatabase.child("Users").child(user.getUID()).setValue(user);
                                             mDatabase.child("Users").child(user.getUID()).child("ConqueredStations").setValue("");
-                                            dialog.dismiss();
+                                            // Check if the team already exits
+                                            DatabaseReference refTeam = mDatabase.child("Teams"); //check at reference of user if it already exists
+                                            refTeam.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                    if (!dataSnapshot.hasChild(userinput)) {  //user already exists
+                                                        mDatabase.child("Teams").child(userinput).setValue(0);
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(DatabaseError databaseError) {
+
+                                                }
+                                            });
+                                        dialog.dismiss();
                                         }
                                     }
                                 });

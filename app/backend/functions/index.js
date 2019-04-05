@@ -46,8 +46,11 @@ exports.addStation = functions.https.onRequest((req, res) => {
   console.log(a);
   console.log(a[0]);
   // Push the new message into the Realtime Database using the Firebase Admin SDK.
-
-  return admin.database().ref('/stations').push({"name":a[0],"latitude":parseFloat(a[1]),"longitude":parseFloat(a[2]),"timeToLive":parseInt(a[3]),"RedConquerer":{"init":0},"BlueConquerer":{"init":0}}).then((snapshot) => {
+  //UTC Date
+  var dt = new Date();
+  dt.setHours( dt.getHours() + a[3] );
+  dt = new Date(dt)
+  return admin.database().ref('/stations').push({"name":a[0],"latitude":parseFloat(a[1]),"longitude":parseFloat(a[2]),"timeToLive":dt.toISOString(),"Teams":{"init":"0"}}).then((snapshot) => {
     // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
     return res.redirect(302, snapshot.ref.toString());
   });
@@ -79,3 +82,6 @@ exports.stationDies = functions.database.ref('/stations/{stationId}/timeToLive')
         
       return ;
     });
+
+
+exports.stationUpdate = functions.database.ref('/stations/{stationId}/timeToLive')
