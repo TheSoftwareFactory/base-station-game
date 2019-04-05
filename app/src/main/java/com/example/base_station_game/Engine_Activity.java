@@ -82,7 +82,7 @@ public class Engine_Activity extends AppCompatActivity {
                      user = dataSnapshot.getValue(User.class);
                 }
                 else{  //create new user
-                    user = new User(firebaseUser.getUid(),firebaseUser.getEmail(),firebaseUser.getDisplayName(),0,15,0);
+                    user = new User(firebaseUser.getUid(),firebaseUser.getEmail(),firebaseUser.getDisplayName(),0,15,""+0);
                     mDatabase.child("Users").child(user.getUID()).setValue(user);
                 }
             }
@@ -160,7 +160,7 @@ public class Engine_Activity extends AppCompatActivity {
     }
 
     private void writeNewBaseStationToDatabase(String StationId, String name, double latitude, double longitude) {
-        BaseStation station = new BaseStation(name,latitude,longitude, 5);   //create station
+        BaseStation station = new BaseStation(name,latitude,longitude);   //create station
         mDatabase.child("stations").child(StationId).setValue(station);   //attach station to database
     }
 

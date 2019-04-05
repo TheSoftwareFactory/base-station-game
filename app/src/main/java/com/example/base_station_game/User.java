@@ -10,14 +10,14 @@ public class User implements Serializable {
     private String uid;
     private int level;
     private long exp;
-    private int team;
+    private String team;
     //private ArrayList conqueredStations;  //-> maybe useful later to display if stations are conquereable
     //private String password;
 
     public User(){
 
     }
-    public User(String uid,String email,String username,int level,long exp, int team){
+    public User(String uid,String email,String username,int level,long exp, String team){
         this.username=username;
         this.uid=uid;
         this.email=email;
@@ -57,11 +57,11 @@ public class User implements Serializable {
         this.exp = exp;
     }
 
-    public int getTeam() {
+    public String getTeam() {
         return team;
     }
 
-    public void setTeam(int team) {
+    public void setTeam(String team) {
         this.team = team;
     }
 }
