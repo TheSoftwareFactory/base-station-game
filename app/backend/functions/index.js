@@ -138,7 +138,7 @@ exports.stationDiesChrono = functions.https.onRequest((req, res) => {
       if (new Date(childSnapshot.child("timeToLive").val()) > new Date()) {
         console.log("station dies");
         //get the conquerer list of each station
-        childSnapshot.child("Teams").forEach(function (teamSnapshot) {
+        childSnapshot.child("Teams").child("Players").forEach(function (teamSnapshot) {
           //var key = teamSnapshot.key;
           //var val = teamSnapshot.val();
           //console.log("First conquerer: ");
@@ -179,27 +179,24 @@ exports.stationDiesChrono = functions.https.onRequest((req, res) => {
 });
 
 
-exports.updateTeamScores = functions.database.ref('stations/{stationId}/teams/{teamId}')
-  .onUpdate((change, context) => {
+exports.updateTeamScores = functions.database.ref('stations/{stationId}/Teams/{teamId}/Players')
+  .onWrite((change, context) => {
     // Grab the current value of what was written to the Realtime Database.
-    const newValue = change.after.val();
-    console.log('current value', newValue);
+    const newValue = change.after;
+    console.log('current value', newValue.val());
     var station_id = context.params.stationId;
     var team_id = context.params.teamId;
     console.log("station id: ", station_id);
     console.log("team id: ", team_id);
-
-
-    newValue.forEach(function (snapshot) {
-      var teamscore = 0;
+    console.log("erste conquerer: ",newValue.val());
+    var teamscore = 0;
+    newValue.forEach(function(snapshot){
+      
       console.log(snapshot.val());
       teamscore = teamscore + snapshot.val();
-      /*snapshot.forEach(function(childSnapshot){
-        console.log(childSnapshot);
-        teamscore=teamscore+childSnapshot.val();
-      });*/
     });
-    admin.database().ref('stations').child(station_id).child("teams").child(team_id).child("teamScore").set(teamscore);
+    console.log("teamscore: ",teamscore)
+    admin.database().ref('stations').child(station_id).child("Teams").child(team_id).child("teamScore").set(teamscore);
     return "nice";
   });
 
