@@ -1,5 +1,6 @@
 package com.example.base_station_game;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.base_station_game.sampling.Sampler;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,9 +39,11 @@ public class MinigameActivity extends AppCompatActivity {
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         textView = (TextView) findViewById(R.id.textView);
+        Context context = this;
         // Start long running operation in a background thread
         new Thread(new Runnable() {
             public void run() {
+                if (Sampler.sample(context)) System.out.println("sample inserted into the database.");
                 while (progressStatus < 100) {
                     progressStatus += 1;
                     // Update the progress bar and display the

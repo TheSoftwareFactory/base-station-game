@@ -1,6 +1,8 @@
 package com.example.base_station_game.sampling.structs;
 
-public class BatteryDetails {
+import java.io.Serializable;
+
+public class BatteryDetails implements Serializable {
     private String batteryCharger;
     private String batteryHealth;
     private double batteryVoltage;

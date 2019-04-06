@@ -200,3 +200,10 @@ exports.updateTeamScores = functions.database.ref('stations/{stationId}/Teams/{t
     return "nice";
   });
 
+exports.levelUp = functions.database.ref('Users/{userId}/score')
+    .onUpdate((change, context) => {
+      const newValue = change.after.val();
+      const user_id = context.params.userId;
+
+    }
+);

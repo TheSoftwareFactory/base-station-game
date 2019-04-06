@@ -6,11 +6,15 @@ import android.os.BatteryManager;
 import android.os.Build;
 
 import com.example.base_station_game.sampling.models.SystemLoadPoint;
+import com.example.base_station_game.sampling.storage.SampleDB;
 import com.example.base_station_game.sampling.structs.BatteryDetails;
 import com.example.base_station_game.sampling.structs.CpuStatus;
 import com.example.base_station_game.sampling.structs.Sample;
 import com.example.base_station_game.sampling.utils.BatteryUtils;
 import com.example.base_station_game.sampling.utils.FsUtils;
+import com.example.base_station_game.sampling.utils.Util;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Jonatan Hamberg on 2.2.2017.
@@ -18,50 +22,41 @@ import com.example.base_station_game.sampling.utils.FsUtils;
 public class Sampler {
     private static String TAG = Sampler.class.getSimpleName();
 
-//    public static boolean sample(Context context, String trigger){
-//        Logger.d(Constants.SF, "Sample called by " + trigger + " " +
-//                "in process " + ProcessUtil.getCurrentProcessName(context));
-//
-//        PrefsManager.MultiPrefs preferences = PrefsManager.getPreferences(context);
-//        if(preferences.getString(Keys.registeredUUID, null) == null){
-//            Logger.i(TAG, "Not registered yet, skipping");
-//            return false;
-//        }
-//
-//        boolean success = false;
-//        SampleDB db = SampleDB.getInstance(context);
-//        long monthAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30);
+    public static boolean sample(Context context){
+        boolean success = false;
+        SampleDB db = SampleDB.getInstance(context);
+        long monthAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30);
 //        long lastSampleTime =  preferences.getLong(Keys.lastSampleTimestamp, monthAgo);
-//
-//        Intent batteryIntent = SamplingLibrary.getLastBatteryIntent(context);
-//        Sample lastSample = db.getLastSample(context);
+
+        Intent batteryIntent = SamplingLibrary.getLastBatteryIntent(context);
+        Sample lastSample = db.getLastSample(context);
+        System.out.println("Old:" + lastSample);
 //        if(checkIdentical(context, batteryIntent, lastSample)){
-//            Logger.d(TAG, "Pre-check failed, sample would be essentially identical");
+////            Logger.d(TAG, "Pre-check failed, sample would be essentially identical");
 //            return false;
 //        }
-//
-//        Sample sample = constructSample(context, batteryIntent, trigger, lastSampleTime, true);
-//        if(sample != null){
-//            long id = db.putSample(sample);
+
+        Sample sample = createSample(context, batteryIntent);
+        System.out.println("new" + sample);
+        if(sample != null){
+            long id = db.putSample(sample);
 //            Logger.i(TAG, "Stored sample " + id + " for " + trigger + ":\n" + sample.toString());
 //            preferences.edit().putLong(Keys.lastSampleTimestamp, System.currentTimeMillis()).commit();
-//            success = true;
-//        }
+            success = true;
+        }
 //        int sampleCount = SampleDB.getInstance(context).countSamples();
-//        if(sampleCount >= Constants.SAMPLES_MAX_BACKLOG /* 250 */) {
+//        if(sampleCount >= SamplingConstants.SAMPLES_MAX_BACKLOG /* 250 */) {
 //            CaratApplication.postSamplesNotification(sampleCount);
 //        }
-//        return success;
-//    }
-//
+        return success;
+    }
+
 //    private static boolean checkIdentical(Context context, Intent batteryIntent, Sample last){
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-//
 //        // Create a dummy sample with less overhead
 //        Sample dummy = new Sample();
 //        dummy.setTimestamp(System.currentTimeMillis()/1000.0);
 //        dummy.setBatteryLevel(BatteryUtils.getBatteryLevel(batteryIntent)/100.0);
-//        dummy.setBatteryState(getBatteryStatusString(prefs, batteryIntent));
+//        dummy.setBatteryState(getBatteryStatusString(batteryIntent));
 //        dummy.setTimeZone(SamplingLibrary.getTimeZone(context));
 //        dummy.setBatteryDetails(getBatteryDetails(context, batteryIntent));
 //
@@ -117,12 +112,20 @@ public class Sampler {
 //        return sample;
 //    }
 //
+
     public static Sample createSample(Context context, Intent batteryIntent) {
         SystemLoadPoint load1 = SamplingLibrary.getSystemLoad();
         Sample sample = new Sample();
         sample.setBatteryDetails(getBatteryDetails(context, batteryIntent));
         sample.setBatteryLevel(BatteryUtils.getBatteryLevel(batteryIntent));
         sample.setBatteryState(getBatteryStatusString(batteryIntent));
+        int[] memoryInfo = SamplingLibrary.readMeminfo();
+        if(memoryInfo.length == 4){
+            sample.setMemoryUser(memoryInfo[0]);
+            sample.setMemoryFree(memoryInfo[1]);
+            sample.setMemoryActive(memoryInfo[2]);
+            sample.setMemoryInactive(memoryInfo[3]);
+        }
         SystemLoadPoint load2 = SamplingLibrary.getSystemLoad();
         sample.setCpuStatus(constructCpuStatus(load1, load2));
         return sample;
@@ -229,14 +232,14 @@ public class Sampler {
             default: return "Unknown";
         }
     }
-//
+
 //    public static boolean isEssentiallyIdentical(Sample s1, Sample s2){
 //        if(s2 != null){
-//            if(s1.getTimestamp() - s2.getTimestamp() < Constants.DUPLICATE_INTERVAL){
+//            if(s1.getTimestamp() - s2.getTimestamp() < SamplingConstants.DUPLICATE_INTERVAL){
 //
-//                Logger.d(TAG, "Sample was triggered within five minutes " +
-//                        "(diff: " + (s1.getTimestamp() - s2.getTimestamp()) + "s) " +
-//                        "of the last one. Checking if it's a duplicate..");
+////                Logger.d(TAG, "Sample was triggered within five minutes " +
+////                        "(diff: " + (s1.getTimestamp() - s2.getTimestamp()) + "s) " +
+////                        "of the last one. Checking if it's a duplicate..");
 //
 //                BatteryDetails bd1 = s1.getBatteryDetails();
 //                BatteryDetails bd2 = s2.getBatteryDetails();
@@ -251,18 +254,6 @@ public class Sampler {
 //                                && 	bd1.getBatteryTechnology().equals(bd2.getBatteryTechnology())
 //                                && 	bd1.getBatteryCharger().equals(bd2.getBatteryCharger())
 //                                && 	bd1.getBatteryHealth().equals(bd2.getBatteryHealth());
-//
-//                if(s1.isSetPiList() && !Util.isNullOrEmpty(s1.getPiList())){
-//                    for(ProcessInfo pi : s1.getPiList()){
-//                        if(pi.importance.equals(Constants.IMPORTANCE_INSTALLED)
-//                                || pi.importance.equals(Constants.IMPORTANCE_DISABLED)
-//                                || pi.importance.equals(Constants.IMPORTANCE_REPLACED)
-//                                || pi.importance.equals(Constants.IMPORTANCE_UNINSTALLED)){
-//                            Logger.i(TAG, "Installs changes, cannot discard as duplicate");
-//                            return false;
-//                        }
-//                    }
-//                }
 //                return isDuplicate;
 //            }
 //        }
