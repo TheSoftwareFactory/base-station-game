@@ -124,6 +124,23 @@ exports.stationDies = functions.database.ref('/stations/{stationId}/timeToLive')
     return "nice";
   });
 
+exports.winningteam = functions.https.onRequest((req, res) => {
+  var winningteam="";
+  var winningscore=0;
+  admin.database().ref("stations/-LbgosOgWMAFLQNOVw1z/Teams").once('value', function(snap){
+  snap.forEach(function(lol){
+    if (lol.child("teamScore").val()>winningscore){
+      winningscore=lol.child("teamScore").val();
+      winningteam=lol.key;
+    }
+      console.log("teamscore: ",lol.child("teamScore").val());     
+      console.log("team: ",winningteam)
+    });
+
+  });
+return "nice"
+})
+
 exports.stationDiesChrono = functions.https.onRequest((req, res) => {
   //StationId is going to die
   //get snapshot of stations key
@@ -131,51 +148,81 @@ exports.stationDiesChrono = functions.https.onRequest((req, res) => {
   starCountRef.on('value', function (snapshot) {
     //get all stations as snapshot
     snapshot.forEach(function (childSnapshot) {
+
+
+      var winningteam="";
+      var winningscore=0;
+      admin.database().ref("stations/-LbgosOgWMAFLQNOVw1z/Teams").once('value', function(snap){
+      snap.forEach(function(lol){
+        if (lol.child("teamScore").val()>winningscore){
+          winningscore=lol.child("teamScore").val();
+          winningteam=lol.key;
+        }         
+        });       
+      });
+      console.log("winningteam: ",winningteam)
+
+
       //Check for right condition
-      console.log(childSnapshot.val()['name'],"<------- station");
+      //console.log(childSnapshot.val()['name'],"<------- station");
+      //console.log(childSnapshot.val(),"<------- station");
       //console.log(childSnapshot.child('timeToLive').val())
       //console.log(new Date());
       if (new Date(childSnapshot.child("timeToLive").val()) > new Date()) {
-        console.log("station dies");
+        //console.log("station dies");
         //get the conquerer list of each station
-        childSnapshot.child("Teams").child("Players").forEach(function (teamSnapshot) {
+        //console.log("teamübersicht",childSnapshot.child("Teams").val());
+      
+        childSnapshot.child("Teams").forEach(function (teamSnapshot) {
           //var key = teamSnapshot.key;
-          //var val = teamSnapshot.val();
-          //console.log("First conquerer: ");
-          //console.log(key);
-          //console.log(val);
-          teamSnapshot.forEach(function (userScore) {
-            console.log(userScore.key);
-            console.log(userScore.val());
-            var key = userScore.key;
-            var val = userScore.val();
+          var teamname=teamSnapshot.key;
+          /*console.log("team snapshot, team:",teamSnapshot.val());
+            
+          //console.log("teamscore: ",lol.child("teamScore").val()); 
+          console.log("interessante infos:")    
+          console.log("winningteam: ",winningteam)
+          console.log("currentteam: ",teamname) */
+          if(teamname===winningteam){
 
-            admin.database().ref('Users').child(key).once("value", xd => {
-              if (xd.exists()) {
-                var userData = xd.val();
-                console.log("exists!", userData);
+            //console.log(val);
+            teamSnapshot.child("Players").forEach(function (userScore) {
+              //console.log(userScore.key);
+              //console.log(userScore.val());
+              var key = userScore.key;
+              var val = userScore.val();
 
-                //update exp based on old exp
-                admin.database().ref('Users').child(key).child("exp").once('value', function (conquerer) {
-                  admin.database().ref('Users').child(key).child("exp").set(conquerer.val() + val);
-                });
+              admin.database().ref('Users').child(key).once("value", xd => {
+                if (xd.exists()) {
+                  //var userData = xd.val();
+                  //console.log("user iteration", userData);
+
+                  //console.log("score",val);
+                  //update exp based on old exp
+                  admin.database().ref('Users').child(key).child("exp").once('value', function (conquerer) {
+                    //console.log("previousexp",conquerer.val());
+                    admin.database().ref('Users').child(key).child("exp").set(conquerer.val() + val);
+                      /* admin.database().ref('Users').child(key).child("exp").once('value', function (lol) {
+                        console.log("exp after",lol.val());
+                      }); */
+                      //return "done";
+                  });
                 
-                //update count of conquered base stations for user
-                admin.database().ref('Users').child(key).child("ConqueredStations").once('value', function (conquerer) {
-                  admin.database().ref('Users').child(key).child("ConqueredStations").child(childSnapshot.val()['name']).set(val);
-                });
-              }
-            });
-          })
-
+                  //update count of conquered base stations for user
+                  admin.database().ref('Users').child(key).child("ConqueredStations").once('value', function (conquerer) {
+                    admin.database().ref('Users').child(key).child("ConqueredStations").child(childSnapshot.val()['name']).set(val);
+                  });
+                }
+              });
+            })
+          }
         });
       }
     });
     //todo: delete station
     //admin.database().ref('stations').remove(id);
-
+  
   });
-  return res.write(200,"nice");
+  return "nice"
 });
 
 
@@ -204,6 +251,6 @@ exports.levelUp = functions.database.ref('Users/{userId}/score')
     .onUpdate((change, context) => {
       const newValue = change.after.val();
       const user_id = context.params.userId;
-
+      return "nice";
     }
 );
