@@ -252,6 +252,9 @@ exports.levelUp = functions.database.ref('Users/{userId}/exp')
       var exp = change.after.val();
       const user_id = context.params.userId;
       var level = admin.database.ref('Users').child(user_id).child("level").get();
+      if (level == 0) {
+        level += 1
+      }
       while (exp >= level*level) {
         exp -= level*level;
         level += 1;
