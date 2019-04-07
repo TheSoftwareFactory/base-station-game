@@ -203,10 +203,17 @@ exports.updateTeamScores = functions.database.ref('stations/{stationId}/teams/{t
     return "nice";
   });
 
-exports.levelUp = functions.database.ref('Users/{userId}/score')
+exports.levelUp = functions.database.ref('Users/{userId}/exp')
     .onUpdate((change, context) => {
-      const newValue = change.after.val();
+      var exp = change.after.val();
       const user_id = context.params.userId;
-
+      var level = admin.database.ref('Users').child(user_id).child("level").get();
+      while (exp >= level*level) {
+        exp -= level*level;
+        level += 1;
+      }
+      admin.database.ref('Users').child(user_id).child("level").set(level);
+      admin.database.ref('Users').child(user_id).child("exp").set(exp);
+      return "nice";
     }
 );
