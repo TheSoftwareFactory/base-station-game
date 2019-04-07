@@ -87,7 +87,7 @@ public class MinigameActivity extends AppCompatActivity {
             //HashMap<String,Double> hm = new HashMap<>();
             //hm.put(user.getUID(), score);
             //mDatabase.child("stations").child(station.getID()).child("Teams").child(user.getTeam()).setValue();
-            mDatabase.child("stations").child(station.getID()).child("Teams").child(user.getTeam()).child(user.getUID()).setValue(score);
+            mDatabase.child("stations").child(station.getID()).child("Teams").child(user.getTeam()).child("Players").child(user.getUID()).setValue(score);
 
             // Update users/users.UID/conqueredstations -> append station.getID() (score)
             mDatabase.child("Users").child(user.getUID()).child("PlayedStations").child(station.getID()).setValue(score);
