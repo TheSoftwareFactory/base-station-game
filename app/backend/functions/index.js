@@ -269,3 +269,11 @@ exports.levelUp = functions.database.ref('Users/{userId}/exp')
       return "nice";
     }
 );
+
+exports.scoreToExp = functions.database.ref('Users/{userId}/PlayedStations')
+  .onCreate((change, context) => {
+    const userId = context.params.userId;
+    const newStation = change.after;
+    
+  }
+);

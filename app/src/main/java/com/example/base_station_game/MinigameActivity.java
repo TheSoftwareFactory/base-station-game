@@ -109,7 +109,7 @@ public class MinigameActivity extends AppCompatActivity {
 //                public void onCancelled(DatabaseError databaseError) {
 //                    Log.e("TAG", "The read failed: " + databaseError.getCode());
 //                }
-            });
+//            });
         } catch (Exception e) {
             Log.e("DATABASE SERVICE", "Probably some shit in the database" + e.toString());
         }
