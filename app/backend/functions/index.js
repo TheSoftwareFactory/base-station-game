@@ -260,7 +260,7 @@ exports.levelUp = functions.database.ref('Users/{userId}/exp')
       //       exp -= level*level;
       //       level += 1;
       //     }
-      //     admin.database().ref('Users').child(user_id).child("level").set(level);
+      //     snapshot.set(level);
       //     admin.database().ref('Users').child(user_id).child("exp").set(exp);
       //   }
       // );
