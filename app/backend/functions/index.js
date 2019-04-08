@@ -249,21 +249,25 @@ exports.updateTeamScores = functions.database.ref('stations/{stationId}/Teams/{t
 
 exports.levelUp = functions.database.ref('Users/{userId}/exp')
     .onUpdate((change, context) => {
-      // var exp = change.after.val();
-      // console.log("" + typeof exp + " " + exp);
-      // const user_id = context.params.userId;
-      // admin.database().ref('Users').child(user_id).child("level").once(
-      //   'value', (snapshot) => {
-      //     var level = snapshot.val()
-      //     console.log("" + typeof level + " " + level);
-      //     while (exp >= level*level) {
-      //       exp -= level*level;
-      //       level += 1;
-      //     }
-      //     snapshot.set(level);
-      //     admin.database().ref('Users').child(user_id).child("exp").set(exp);
-      //   }
-      // );
+      var exp = change.after.val();
+      console.log("" + typeof exp + " " + exp);
+      const user_id = context.params.userId;
+      admin.database().ref('Users').child(user_id).child("level").once(
+        'value', (snapshot) => {
+          var level = snapshot.val()
+          console.log("" + typeof level + " " + level);
+          var change = false;
+          while (exp >= 4000) {
+            change = true;
+            exp -= 4000;
+            level += 1;
+          }
+          if (change) {
+            admin.database().ref('Users').child(user_id).child("level").set(level);
+            admin.database().ref('Users').child(user_id).child("exp").set(exp);
+          }
+        }
+      );
       return "nice";
     }
 );
