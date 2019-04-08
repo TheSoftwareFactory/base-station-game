@@ -94,21 +94,21 @@ public class MinigameActivity extends AppCompatActivity {
 
             // Update users/users.UID/exp -> add score
 
-            DatabaseReference ref = mDatabase.child("Users").child(user.getUID()).child("exp");
-            // Attach a listener to read the data at our posts reference
-            ref.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot ds) {
-                    Long oldvalue = (Long) ds.getValue();
-                    Long newvalue =  score + oldvalue;
-                    mDatabase.child("Users").child(user.getUID()).child("exp").setValue(newvalue);
-                    user.setExp(newvalue.longValue());
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.e("TAG", "The read failed: " + databaseError.getCode());
-                }
+//            DatabaseReference ref = mDatabase.child("Users").child(user.getUID()).child("exp");
+//            // Attach a listener to read the data at our posts reference
+//            ref.addValueEventListener(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot ds) {
+//                    Long oldvalue = (Long) ds.getValue();
+//                    Long newvalue =  score + oldvalue;
+//                    mDatabase.child("Users").child(user.getUID()).child("exp").setValue(newvalue);
+//                    user.setExp(newvalue.longValue());
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {
+//                    Log.e("TAG", "The read failed: " + databaseError.getCode());
+//                }
             });
         } catch (Exception e) {
             Log.e("DATABASE SERVICE", "Probably some shit in the database" + e.toString());
