@@ -124,21 +124,25 @@ exports.stationDies = functions.database.ref('/stations/{stationId}/timeToLive')
     return "nice";
   });
 
-exports.winningteam = functions.https.onRequest((req, res) => {
-  var winningteam="";
-  var winningscore=0;
-  admin.database().ref("stations/-LbgosOgWMAFLQNOVw1z/Teams").once('value', function(snap){
-  snap.forEach(function(lol){
-    if (lol.child("teamScore").val()>winningscore){
-      winningscore=lol.child("teamScore").val();
-      winningteam=lol.key;
-    }
-      console.log("teamscore: ",lol.child("teamScore").val());     
-      console.log("team: ",winningteam)
-    });
-
-  });
-return "nice"
+exports.winningteam = functions.database.ref('stations/{stationId}/Teams/{teamId}/teamScore')
+  .onWrite((change, context) => {
+    var winningteam="";
+    var winningscore=0;
+    admin.database().ref("stations").child(context.params.stationId).child("Teams").once('value', function(teams){
+        teams.forEach(function(team){
+          //console.log("team: ",team.val());
+          console.log("teamscore",team.child("teamScore").val());
+          if (team.child("teamScore").val()>winningscore){
+            winningscore=team.child("teamScore").val();
+            winningteam=team.key;
+          }
+        });
+        console.log("winningscore: ",winningscore);
+        console.log("winningteam: ",winningteam);
+        admin.database().ref("stations").child(context.params.stationId).child("Teams").child("winnerTeam").set(winningteam);
+        return "done";
+      });
+  return "nice"
 })
 
 exports.stationDiesChrono = functions.https.onRequest((req, res) => {
