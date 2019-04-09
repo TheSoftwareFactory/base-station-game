@@ -114,8 +114,8 @@ exports.stationDies = functions.database.ref('/stations/{stationId}/timeToLive')
     }
   });
 
-exports.winningteam = functions.database.ref('stations/{stationId}/Teams/{teamId}/teamScore')
-  .onWrite((change, context) => {
+exports.winningteam_update = functions.database.ref('stations/{stationId}/Teams/{teamId}/teamScore')
+  .onUpdate((change, context) => {
     var winningteam="";
     var winningscore=0;
     admin.database().ref("stations").child(context.params.stationId).child("Teams").once('value').then(function(teams){
@@ -129,7 +129,31 @@ exports.winningteam = functions.database.ref('stations/{stationId}/Teams/{teamId
         });
         console.log("winningscore: ",winningscore);
         console.log("winningteam: ",winningteam);
-        admin.database().ref("stations").child(context.params.stationId).child("Teams").child("winnerTeam").set(winningteam);
+        admin.database().ref("stations").child(context.params.stationId).child("winnerTeam").set(winningteam);
+        return "geil"     
+      }).catch(function(error){
+        console.log(error)
+        res.send(error)
+      });
+    return "nice"
+  })
+
+  exports.winningteam_create = functions.database.ref('stations/{stationId}/Teams/{teamId}/teamScore')
+  .onCreate((change, context) => {
+    var winningteam="";
+    var winningscore=0;
+    admin.database().ref("stations").child(context.params.stationId).child("Teams").once('value').then(function(teams){
+        teams.forEach(function(team){
+          //console.log("team: ",team.val());
+          console.log("teamscore",team.child("teamScore").val());
+          if (team.child("teamScore").val()>winningscore){
+            winningscore=team.child("teamScore").val();
+            winningteam=team.key;
+          }
+        });
+        console.log("winningscore: ",winningscore);
+        console.log("winningteam: ",winningteam);
+        admin.database().ref("stations").child(context.params.stationId).child("winnerTeam").set(winningteam);
         return "geil"     
       }).catch(function(error){
         console.log(error)
@@ -158,8 +182,8 @@ exports.stationDiesChrono = functions.https.onRequest((req, res) => {
 
 
       // when Teams empty -> stop doing anything
-      admin.database().ref("stations").child(childSnapshot.key).child("Teams").child("winnerTeam").once('value', function(snap){
-        console.log("winningref:",snap.ref);
+      admin.database().ref("stations").child(childSnapshot.key).child("winnerTeam").once('value', function(snap){
+        console.log("winningref:",snap.ref.toString());
         //console.log("winningteam:",snap.val());
         winningteam=snap.val();     
         console.log("winningteam start: ",winningteam)    
@@ -234,9 +258,12 @@ exports.stationDiesChrono = functions.https.onRequest((req, res) => {
 
 
 exports.updateTeamScores = functions.database.ref('stations/{stationId}/Teams/{teamId}/Players')
-  .onWrite((change, context) => {
+  .onWrite((added, context) => {
+    if (added.after.exists()){
+
+    
     // Grab the current value of what was written to the Realtime Database.
-    const newValue = change.after;
+    const newValue = added.after;
     console.log('current value', newValue.val());
     var station_id = context.params.stationId;
     var team_id = context.params.teamId;
@@ -252,6 +279,7 @@ exports.updateTeamScores = functions.database.ref('stations/{stationId}/Teams/{t
     console.log("teamscore: ",teamscore)
     admin.database().ref('stations').child(station_id).child("Teams").child(team_id).child("teamScore").set(teamscore);
     return "nice";
+  }
   });
 
 // exports.levelUp = functions.database.ref('Users/{userId}/exp')
