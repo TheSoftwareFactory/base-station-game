@@ -45,6 +45,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         login();
+        try {
+            Thread.sleep(700);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         load_or_create_user();
         setContentView(R.layout.activity_main);
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -81,15 +86,24 @@ public class MainActivity extends AppCompatActivity {
                     if (dataSnapshot.hasChild("email")) {  //user already exists
                         user = dataSnapshot.getValue(User.class);
                     } else {  //create new user
-                        // Make the user choice his team
-                        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme).create();
-                        alertDialog.setTitle("Choose you team!");
                         final EditText et = new EditText(MainActivity.this);
-                        alertDialog.setMessage("Type the name of your team");
-                        alertDialog.setView(et);
-                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
+                        final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
+                                .setView(et)
+                                .setTitle("WELCOME! Choose you team!")
+                                .setMessage("Type the name of your team")
+                                .setPositiveButton("ok", null) //Set to null. We override the onclick
+                                .create();
+
+                        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+                            @Override
+                            public void onShow(DialogInterface dialogInterface) {
+
+                                Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                                button.setOnClickListener(new View.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(View view) {
                                         String userinput = et.getText().toString().trim();
                                         if (!userinput.isEmpty()) {
                                             user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), firebaseUser.getDisplayName(), 0, 15, userinput);
@@ -116,7 +130,9 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     }
                                 });
-                        alertDialog.show();
+                            }
+                        });
+                        dialog.show();
                     }
                 }
 

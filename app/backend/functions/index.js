@@ -43,8 +43,6 @@ exports.addStation = functions.https.onRequest((req, res) => {
   // Grab the text parameter.
   var original = req.query.text;
   var a = original.split(",");
-  console.log(a);
-  console.log(a[0]);
   // Push the new message into the Realtime Database using the Firebase Admin SDK.
   //UTC Date
   var dt = new Date();
