@@ -254,15 +254,10 @@ exports.levelUp = functions.database.ref('Users/{userId}/exp')
       admin.database().ref('Users').child(user_id).child("level").once(
         'value', (snapshot) => {
           var level = snapshot.val();
-          var change = false;
-          while (exp >= 4000) {
-            change = true;
-            exp -= 4000;
-            level += 1;
-          }
-          if (change) {
-            admin.database().ref('Users').child(user_id).child("level").set(level);
-            admin.database().ref('Users').child(user_id).child("exp").set(exp);
+          const res = levelUp(level, exp);
+          if (res[2]) {
+            admin.database().ref('Users').child(user_id).child("level").set(res[0]);
+            admin.database().ref('Users').child(user_id).child("exp").set(res[1]);
           }
         }
       );
@@ -270,10 +265,36 @@ exports.levelUp = functions.database.ref('Users/{userId}/exp')
     }
 );
 
-exports.scoreToExp = functions.database.ref('Users/{userId}/PlayedStations')
-  .onCreate((change, context) => {
-    const userId = context.params.userId;
-    const newStation = change.after;
-    
+const levelUp = (level, exp) => {
+  var changed = false;
+  while (exp >= 4000) {
+    changed = true;
+    exp -= 4000;
+    level += 1;
   }
-);
+  return [level, exp, changed];
+}
+
+const scoreToExp = (change, context) => {
+  const userId = context.params.userId;
+  const newStation = change.val();
+  newStation.child("score").once(
+    'value', (snapshot) => {
+      var score = snapshot.val();
+      admin.database().ref('Users').child(userId).once(
+        'value', (snapshot) => {
+          user = snapshot.val();
+          level = user.level;
+          exp = user.score;
+          
+        }
+      );
+    }
+  )
+};
+
+exports.playedStationsScoreToExp = functions.database.ref('Users/{userId}/PlayedStations')
+  .onCreate(scoreToExp);
+
+exports.playedStationsScoreToExp = functions.database.ref('Users/{userId}/ConqueredStations')
+  .onCreate(scoreToExp);
