@@ -120,11 +120,11 @@ public class SecondActivity extends AppCompatActivity {
         //Adding base stations with Simple Fast Point Overlay
 
         lbs = new ArrayList<>();
-        for (int i = 0; i < 0; i++) {
+        /*for (int i = 0; i < 0; i++) {
             lbs.add(new BaseStation("Station " + i,
                     startKumpulaLatitude + ((Math.random()*2-1) * 0.0054),
-                    startKumpulaLongitude + ((Math.random()*2-1) * 0.004)));
-        }
+                    startKumpulaLongitude + ((Math.random()*2-1) * 0.004),null));
+        }*/
 
         // create label style
 
@@ -242,7 +242,13 @@ public class SecondActivity extends AppCompatActivity {
                     BaseStation clicckedbasestation = lbs.get(point);
                     Location.distanceBetween(actualPosition.getLatitude(), actualPosition.getLongitude(), points.get(point).getLatitude() ,  points.get(point).getLongitude(), dist);
                     if(dist[0] < MAX_DISTANCE) {
-                        alertDialog.setMessage("Do you want to conquer this station (ID:"+clicckedbasestation.getID()+")?");
+                        String winningTeam = clicckedbasestation.getWinningTeam();
+                        if(winningTeam == null) {
+                            alertDialog.setMessage("Do you want to play the minigame of this station? Nobody did it before you! Hurry up!");
+                        }
+                        else{
+                            alertDialog.setMessage("Do you want to play the minigame of this station? The winning team right now is "+winningTeam+"!");
+                        }
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {

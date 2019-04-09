@@ -43,29 +43,18 @@ exports.addStation = functions.https.onRequest((req, res) => {
   // Grab the text parameter.
   var original = req.query.text;
   var a = original.split(",");
-  console.log(a);
-  console.log(a[0]);
   // Push the new message into the Realtime Database using the Firebase Admin SDK.
   //UTC Date
   var dt = new Date();
   dt.setHours(dt.getHours() + a[3]);
   dt = new Date(dt)
-  return admin.database().ref('/stations').push({ "name": a[0], "latitude": parseFloat(a[1]), "longitude": parseFloat(a[2]), "timeToLive": dt.toISOString() }).then((snapshot) => {
-    // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
-    return res.redirect(302, snapshot.ref.toString());
-  });
-});
-
-exports.killStation = functions.https.onRequest((req, res) => {
-  // Grab the text parameter.
-  var original = req.query.text;
-  console.log(original);
-  // Push the new message into the Realtime Database using the Firebase Admin SDK.
-  console.log(admin.database());
-  return admin.database().ref('/stations/-LbJCKbLcIC-2BIbG1KJ/timeToLive').set(0).then((snapshot) => {
-    // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
-    return res.redirect(302, snapshot.ref.toString());
-  });
+  admin.database().ref('/stations').push({ "name": a[0], "latitude": parseFloat(a[1]), "longitude": parseFloat(a[2]), "timeToLive": dt.toISOString() })
+  .then(snapshot => {
+    return res.redirect(snapshot.ref.toString());
+  }).catch(error => {
+    console.log("error",error)
+    res.status(500).send(error)
+  })
 });
 
 exports.stationDies = functions.database.ref('/stations/{stationId}/timeToLive')
@@ -83,7 +72,7 @@ exports.stationDies = functions.database.ref('/stations/{stationId}/timeToLive')
 
       //get snapshot of stations key
       var starCountRef = admin.database().ref('stations');
-      starCountRef.on('value', function (snapshot) {
+      starCountRef.once('value').then(function (snapshot) {
         //get all stations as snapshot
         snapshot.forEach((childSnapshot) => {
           console.log(childSnapshot.val());
@@ -117,59 +106,72 @@ exports.stationDies = functions.database.ref('/stations/{stationId}/timeToLive')
         });
         //todo: delete station
         //admin.database().ref('stations').remove(id);
-
+      return res.send("durchgelaufen")
+      }).catch(function(error){
+        console.log(error)
+        res.send(error)
       });
     }
-
-    return "nice";
   });
 
-exports.winningteam = functions.https.onRequest((req, res) => {
-  var winningteam="";
-  var winningscore=0;
-  admin.database().ref("stations/-LbgosOgWMAFLQNOVw1z/Teams").once('value', function(snap){
-  snap.forEach(function(lol){
-    if (lol.child("teamScore").val()>winningscore){
-      winningscore=lol.child("teamScore").val();
-      winningteam=lol.key;
-    }
-      console.log("teamscore: ",lol.child("teamScore").val());     
-      console.log("team: ",winningteam)
-    });
+exports.winningteam = functions.database.ref('stations/{stationId}/Teams/{teamId}/teamScore')
+  .onWrite((change, context) => {
+    var winningteam="";
+    var winningscore=0;
+    admin.database().ref("stations").child(context.params.stationId).child("Teams").once('value').then(function(teams){
+        teams.forEach(function(team){
+          //console.log("team: ",team.val());
+          console.log("teamscore",team.child("teamScore").val());
+          if (team.child("teamScore").val()>winningscore){
+            winningscore=team.child("teamScore").val();
+            winningteam=team.key;
+          }
+        });
+        console.log("winningscore: ",winningscore);
+        console.log("winningteam: ",winningteam);
+        admin.database().ref("stations").child(context.params.stationId).child("Teams").child("winnerTeam").set(winningteam);
+        return "geil"     
+      }).catch(function(error){
+        console.log(error)
+        res.send(error)
+      });
+    return "nice"
+  })
 
-  });
-return "nice"
-})
+//var List = require("collections/list");
 
 exports.stationDiesChrono = functions.https.onRequest((req, res) => {
   //StationId is going to die
   //get snapshot of stations key
+  var deadStations="";
   var starCountRef = admin.database().ref('stations');
-  starCountRef.on('value', function (snapshot) {
+  starCountRef.once('value').then(function (snapshot) {
     //get all stations as snapshot
     snapshot.forEach(function (childSnapshot) {
 
-
+      
       var winningteam="";
       var winningscore=0;
-      admin.database().ref("stations/-LbgosOgWMAFLQNOVw1z/Teams").once('value', function(snap){
-      snap.forEach(function(lol){
-        if (lol.child("teamScore").val()>winningscore){
-          winningscore=lol.child("teamScore").val();
-          winningteam=lol.key;
-        }         
-        });       
-      });
-      console.log("winningteam: ",winningteam)
+      var stationkey=childSnapshot.key;
+      console.log("station key: ",childSnapshot.key);
+      console.log("station val: ",childSnapshot.val());
 
 
+      // when Teams empty -> stop doing anything
+      admin.database().ref("stations").child(childSnapshot.key).child("Teams").child("winnerTeam").once('value', function(snap){
+        console.log("winningref:",snap.ref);
+        //console.log("winningteam:",snap.val());
+        winningteam=snap.val();     
+        console.log("winningteam start: ",winningteam)    
+      })
+      
       //Check for right condition
       //console.log(childSnapshot.val()['name'],"<------- station");
       //console.log(childSnapshot.val(),"<------- station");
       //console.log(childSnapshot.child('timeToLive').val())
       //console.log(new Date());
       if (new Date(childSnapshot.child("timeToLive").val()) > new Date()) {
-        //console.log("station dies");
+        console.log("station dies");
         //get the conquerer list of each station
         //console.log("teamübersicht",childSnapshot.child("Teams").val());
       
@@ -179,9 +181,9 @@ exports.stationDiesChrono = functions.https.onRequest((req, res) => {
           /*console.log("team snapshot, team:",teamSnapshot.val());
             
           //console.log("teamscore: ",lol.child("teamScore").val()); 
-          console.log("interessante infos:")    
-          console.log("winningteam: ",winningteam)
-          console.log("currentteam: ",teamname) */
+          console.log("interessante infos:")    */
+          //console.log("winningteam: ",winningteam)
+          console.log("currentteam: ",teamname) 
           if(teamname===winningteam){
 
             //console.log(val);
@@ -216,11 +218,16 @@ exports.stationDiesChrono = functions.https.onRequest((req, res) => {
             })
           }
         });
+        deadStations=deadStations+stationkey.toString();
       }
+      //todo: delete station
+      //admin.database().ref('stations').remove(id);
     });
-    //todo: delete station
-    //admin.database().ref('stations').remove(id);
-  
+    
+  return res.send(deadStations)
+  }).catch(function(error){
+    console.log("error: ",error)
+    res.send(error)
   });
   return "nice"
 });
@@ -247,23 +254,48 @@ exports.updateTeamScores = functions.database.ref('stations/{stationId}/Teams/{t
     return "nice";
   });
 
-exports.levelUp = functions.database.ref('Users/{userId}/exp')
-    .onUpdate((change, context) => {
-      var exp = change.after.val();
-      const user_id = context.params.userId;
-      admin.database().ref('Users').child(user_id).child("level").once(
-        'value', (snapshot) => {
-          var level = snapshot.val();
-          const res = levelUp(level, exp);
-          if (res[2]) {
-            admin.database().ref('Users').child(user_id).child("level").set(res[0]);
-            admin.database().ref('Users').child(user_id).child("exp").set(res[1]);
-          }
-        }
-      );
-      return "nice";
-    }
-);
+// exports.levelUp = functions.database.ref('Users/{userId}/exp')
+//     .onUpdate((change, context) => {
+//       var exp = change.after.val();
+//       const user_id = context.params.userId;
+//       admin.database().ref('Users').child(user_id).child("level").once(
+//         'value', (snapshot) => {
+//           var level = snapshot.val();
+//           const res = levelUp(level, exp);
+//           if (res[2]) {
+//             admin.database().ref('Users').child(user_id).child("level").set(res[0]);
+//             admin.database().ref('Users').child(user_id).child("exp").set(res[1]);
+//           }
+//         }
+//       );
+//       return "nice";
+//     }
+// );
+
+// exports.levelUp = functions.database.ref('Users/{userId}/exp')
+//     .onUpdate((change, context) => {
+//       var exp = change.after.val();
+//       console.log("" + typeof exp + " " + exp);
+//       const user_id = context.params.userId;
+//       admin.database().ref('Users').child(user_id).child("level").once(
+//         'value', (snapshot) => {
+//           var level = snapshot.val()
+//           console.log("" + typeof level + " " + level);
+//           var change = false;
+//           while (exp >= 4000) {
+//             change = true;
+//             exp -= 4000;
+//             level += 1;
+//           }
+//           if (change) {
+//             admin.database().ref('Users').child(user_id).child("level").set(level);
+//             admin.database().ref('Users').child(user_id).child("exp").set(exp);
+//           }
+//         }
+//       );
+//       res.send("successfull");
+//     }
+//   );
 
 const levelUp = (level, exp) => {
   var changed = false;
@@ -285,8 +317,11 @@ const scoreToExp = (change, context) => {
         'value', (snapshot) => {
           user = snapshot.val();
           level = user.level;
-          exp = user.score;
-          
+          exp = user.exp;
+          exp += score;
+          const res = levelUp(level, exp);
+          snapshot.ref.child("level").set(res[0]);
+          snapshot.ref.child("exp").set(res[1]);
         }
       );
     }
@@ -296,5 +331,9 @@ const scoreToExp = (change, context) => {
 exports.playedStationsScoreToExp = functions.database.ref('Users/{userId}/PlayedStations')
   .onCreate(scoreToExp);
 
-exports.playedStationsScoreToExp = functions.database.ref('Users/{userId}/ConqueredStations')
-  .onCreate(scoreToExp);
+// exports.playedStationsScoreToExp = functions.database.ref('Users/{userId}/ConqueredStations')
+//   .onCreate(scoreToExp);
+
+exports.dummy = functions.https.onRequest((req, res) => {
+  return res.send("Hello");
+})
