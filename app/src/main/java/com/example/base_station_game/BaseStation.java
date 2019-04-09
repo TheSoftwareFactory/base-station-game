@@ -6,12 +6,13 @@ public class BaseStation implements Serializable {
     private String id;
     private Double latitude;
     private Double longitude;
+    private String winningTeam;
 
-    public BaseStation(String name, Double latitude, Double longitude) {
-
+    public BaseStation(String name, Double latitude, Double longitude, String winningTeam) {
         this.name = name;
         this.latitude = latitude;
         this.longitude= longitude;
+        this.winningTeam = winningTeam;
     }
 
     public BaseStation() {
@@ -52,4 +53,5 @@ public class BaseStation implements Serializable {
     public void setId(String id){
         this.id=id;
     }
+    public String getWinningTeam() { return this.winningTeam; }
 }

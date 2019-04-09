@@ -99,20 +99,24 @@ public class DatabaseService extends IntentService {
                     String name = null;
                     Double longitude = null;
                     Double latitude = null;
-                    Integer timeToLive = null;
-                    HashMap red = null;
-                    HashMap blue = null;
+                    String winnerTeam = null;
 
                     HashMap value= (HashMap) ds.getValue();
                     name = (String) value.get("name");
                     longitude = (Double) value.get("longitude");
                     latitude =  (Double) value.get("latitude");
-                    BaseStation station = new BaseStation(name, latitude, longitude);
+                    if(value.containsKey("Teams")) {
+                        HashMap Teams = (HashMap) value.get("Teams");
+                        if(Teams.containsKey("winnerTeam")) {
+                            winnerTeam = (String) Teams.get("winnerTeam");
+                        }
+                    }
+                    BaseStation station = new BaseStation(name, latitude, longitude, winnerTeam);
                     station.setId(ds.getKey());
                     stations.add(station);                                 //add station object to list of station
                     sendStation(station, false);
 
-                    Log.d("EXTRACTED", value.toString() + " ---> " + name + " " + longitude + " " + latitude + " " + timeToLive);
+                    Log.d("EXTRACTED", value.toString() + " ---> " + name + " " + longitude + " " + latitude);
                 } catch (Exception e) {
                     Log.e("DATABASE SERVICE", "update_stations -> onChildAdded : probably some shit in the database" + e.toString());
                 }
