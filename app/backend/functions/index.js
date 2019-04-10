@@ -339,7 +339,7 @@ const scoreToExp = (change, context) => {
   const userId = context.params.userId;
   const score = change.val();
   console.log(score);
-  admin.database().ref('Users').child(userId).once(
+  return admin.database().ref('Users').child(userId).once(
     'value', (snapshot) => {
       level = snapshot.child("level").val();
       exp = snapshot.child("exp").val();
