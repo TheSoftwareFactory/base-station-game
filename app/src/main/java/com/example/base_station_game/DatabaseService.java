@@ -82,10 +82,11 @@ public class DatabaseService extends IntentService {
         Toast.makeText(this, "ServiceActivity done", Toast.LENGTH_SHORT).show();
     }
 
-    private void sendStation(BaseStation station, boolean delete) {
+    private void sendStation(BaseStation station, int OP_CODE) {
+        // OP_CODE : 0 new ; 1 deleted; 2 changed
         Intent intent = new Intent("my-integer");
         intent.putExtra("station", station);
-        intent.putExtra("delete", delete);
+        intent.putExtra("OP_CODE", OP_CODE);
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
@@ -101,20 +102,18 @@ public class DatabaseService extends IntentService {
                     Double latitude = null;
                     String winnerTeam = null;
 
-                    HashMap value= (HashMap) ds.getValue();
+                    HashMap value = (HashMap) ds.getValue();
                     name = (String) value.get("name");
+                    // Maybe add try/catch for  databasejava.lang.ClassCastException
                     longitude = (Double) value.get("longitude");
-                    latitude =  (Double) value.get("latitude");
-                    if(value.containsKey("Teams")) {
-                        HashMap Teams = (HashMap) value.get("Teams");
-                        if(Teams.containsKey("winnerTeam")) {
-                            winnerTeam = (String) Teams.get("winnerTeam");
-                        }
+                    latitude = (Double) value.get("latitude");
+                    if (value.containsKey("winnerTeam")) {
+                        winnerTeam = (String) value.get("winnerTeam");
                     }
                     BaseStation station = new BaseStation(name, latitude, longitude, winnerTeam);
                     station.setId(ds.getKey());
                     stations.add(station);                                 //add station object to list of station
-                    sendStation(station, false);
+                    sendStation(station, 0);
 
                     Log.d("EXTRACTED", value.toString() + " ---> " + name + " " + longitude + " " + latitude);
                 } catch (Exception e) {
@@ -123,14 +122,38 @@ public class DatabaseService extends IntentService {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
+            public void onChildChanged(DataSnapshot ds, String prevChildKey) {
+                try {
+                    Log.d("Logging datasnapshot", ds.toString());
+                    String name = null;
+                    Double longitude = null;
+                    Double latitude = null;
+                    String winnerTeam = null;
+
+                    HashMap value = (HashMap) ds.getValue();
+                    name = (String) value.get("name");
+                    longitude = (Double) value.get("longitude");
+                    latitude = (Double) value.get("latitude");
+                    if (value.containsKey("winnerTeam")) {
+                        winnerTeam = (String) value.get("winnerTeam");
+                    }
+                    BaseStation station = new BaseStation(name, latitude, longitude, winnerTeam);
+                    station.setId(ds.getKey());
+                    stations.add(station);                                 //add station object to list of station
+                    sendStation(station, 2);
+
+                    Log.d("EXTRACTED", value.toString() + " ---> " + name + " " + longitude + " " + latitude);
+                } catch (Exception e) {
+                    Log.e("DATABASE SERVICE", "update_stations -> onChildChanged : probably some shit in the database" + e.toString());
+                }
             }
+
 
             @Override
             public void onChildRemoved(DataSnapshot ds) {
                 BaseStation station = ds.getValue(BaseStation.class);  //get station object
                 stations.remove(station);                                //remove station object to list of station
-                sendStation(station, true);
+                sendStation(station, 1);
             }
 
             @Override

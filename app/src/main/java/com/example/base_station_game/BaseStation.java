@@ -21,7 +21,12 @@ public class BaseStation implements Serializable {
 
     @Override
     public String toString(){
-        return (" This is Station '" + name + "' with the ID: " +id+ " at the coordinates: Latitude: +"+latitude+ " and Longitude: "+ longitude);
+        if(winningTeam != null) {
+            return (" This is Station '" + name + "' with the ID: " + id + " at the coordinates: Latitude: +" + latitude + " and Longitude: " + longitude + "winningTeam->" +winningTeam);
+        }
+        else{
+            return (" This is Station '" + name + "' with the ID: " + id + " at the coordinates: Latitude: +" + latitude + " and Longitude: " + longitude);
+        }
     }
 
 
