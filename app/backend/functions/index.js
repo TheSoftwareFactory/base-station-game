@@ -337,23 +337,20 @@ const levelUp = (level, exp) => {
 
 const scoreToExp = (change, context) => {
   const userId = context.params.userId;
-  const newStation = change;
-  newStation.child("score").once(
+  const score = change.val();
+  console.log(score);
+  admin.database().ref('Users').child(userId).once(
     'value', (snapshot) => {
-      var score = snapshot.val();
-      admin.database().ref('Users').child(userId).once(
-        'value', (snapshot) => {
-          user = snapshot.val();
-          level = user.level;
-          exp = user.exp;
-          exp += score;
-          const res = levelUp(level, exp);
-          admin.database().ref('Users').child(user_id).child("level").set(res[0]);
-          admin.database().ref('Users').child(user_id).child("exp").set(res[1]);
-        }
-      );
+      level = snapshot.child("level").val();
+      exp = snapshot.child("exp").val();
+      exp += score;
+      const res = levelUp(level, exp);
+      snapshot.child("level").set(res[0]);
+      snapshot.child("exp").set(res[1]);
+      // admin.database().ref('Users').child(user_id).child("level").set(res[0]);
+      // admin.database().ref('Users').child(user_id).child("exp").set(res[1]);
     }
-  )
+  );
 };
 
 exports.playedStationsScoreToExp = functions.database.ref('Users/{userId}/PlayedStations')
