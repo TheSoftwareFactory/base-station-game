@@ -1,6 +1,7 @@
 package com.example.base_station_game;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -70,10 +71,11 @@ public class SecondActivity extends AppCompatActivity {
     private User user;
     private LocationManager locationManager;
     private LocationListener listener;
-    private GeoPoint actualPosition = new GeoPoint(0,0);
+    private GeoPoint actualPosition = new GeoPoint(0, 0);
+    SimpleFastPointOverlay sfpo;
     Polygon p = null;
 
-    int MAX_DISTANCE = 200;
+    static int MAX_DISTANCE = 200;
 
     //creating fake station list
     double startKumpulaLatitude = 60.205637;
@@ -94,7 +96,7 @@ public class SecondActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.user = (User)getIntent().getSerializableExtra("user");
+        this.user = (User) getIntent().getSerializableExtra("user");
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         //handle permissions first, before map is created. not depicted here
@@ -149,7 +151,7 @@ public class SecondActivity extends AppCompatActivity {
 
         listener = new LocationListener() {
             public void onLocationChanged(Location location) {
-                Log.d(LOG_TAG, "New location --> "+ location.getLatitude() +" "+ location.getLongitude());
+                Log.d(LOG_TAG, "New location --> " + location.getLatitude() + " " + location.getLongitude());
                 actualPosition = new GeoPoint(location);
                 if (marker == null) {
                     //Not dynamic
@@ -197,12 +199,11 @@ public class SecondActivity extends AppCompatActivity {
 
     public void localize(View view) {
         //check weather gps is enabled
-        if (actualPosition != null && actualPosition.getLatitude() != 0 && actualPosition.getLongitude() != 0){
+        if (actualPosition != null && actualPosition.getLatitude() != 0 && actualPosition.getLongitude() != 0) {
             map.getController().animateTo(actualPosition, (double) 18, 1500L);
             map.invalidate();
-        }
-        else{
-            Toast.makeText(this,"Waiting for location...",Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Waiting for location...", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -229,33 +230,31 @@ public class SecondActivity extends AppCompatActivity {
 
             // create the overlay with the theme
             final SimpleFastPointOverlay sfpo = new SimpleFastPointOverlay(pt, opt);
-
             // onClick callback
 
             // CREATE THE FUNCTION OUTISDE
             sfpo.setOnClickListener(new SimpleFastPointOverlay.OnClickListener() {
                 @Override
                 public void onClick(SimpleFastPointOverlay.PointAdapter points, Integer point) {
-                    AlertDialog alertDialog = new AlertDialog.Builder(SecondActivity.this,R.style.AlertDialogTheme).create();
+                    AlertDialog alertDialog = new AlertDialog.Builder(SecondActivity.this, R.style.AlertDialogTheme).create();
                     alertDialog.setTitle(((LabelledGeoPoint) points.get(point)).getLabel());
-                    float [] dist = new float[1];
+                    float[] dist = new float[1];
                     BaseStation clicckedbasestation = lbs.get(point);
-                    Location.distanceBetween(actualPosition.getLatitude(), actualPosition.getLongitude(), points.get(point).getLatitude() ,  points.get(point).getLongitude(), dist);
-                    if(dist[0] < MAX_DISTANCE) {
+                    Location.distanceBetween(actualPosition.getLatitude(), actualPosition.getLongitude(), points.get(point).getLatitude(), points.get(point).getLongitude(), dist);
+                    if (dist[0] < MAX_DISTANCE) {
                         String winningTeam = clicckedbasestation.getWinningTeam();
-                        if(winningTeam == null) {
+                        if (winningTeam == null) {
                             alertDialog.setMessage("Do you want to play the minigame of this station? Nobody did it before you! Hurry up!");
-                        }
-                        else{
-                            alertDialog.setMessage("Do you want to play the minigame of this station? The winning team right now is "+winningTeam+"!");
+                        } else {
+                            alertDialog.setMessage("Do you want to play the minigame of this station? The winning team right now is " + winningTeam + "!");
                         }
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         Intent intent = new Intent(SecondActivity.this, MinigameActivity.class);
                                         intent.putExtra("user", user);
-                                        intent.putExtra("station",  clicckedbasestation);
-                                        startActivityForResult(intent,1);
+                                        intent.putExtra("station", clicckedbasestation);
+                                        startActivityForResult(intent, 1);
                                         dialog.dismiss();
                                     }
                                 });
@@ -266,8 +265,7 @@ public class SecondActivity extends AppCompatActivity {
                                     }
                                 });
                         alertDialog.show();
-                    }
-                    else{
+                    } else {
                         alertDialog.setMessage("You cant conquer this station, get closer!");
                         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                                 new DialogInterface.OnClickListener() {
@@ -281,6 +279,8 @@ public class SecondActivity extends AppCompatActivity {
             });
 
             // add overlay
+            map.getOverlays().remove(this.sfpo);
+            this.sfpo = sfpo;
             map.getOverlays().add(sfpo);
 
 
@@ -313,10 +313,10 @@ public class SecondActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
         Intent intent = new Intent(this, DatabaseService.class);
-        intent.putExtra("user",user);
+        intent.putExtra("user", user);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
@@ -329,25 +329,24 @@ public class SecondActivity extends AppCompatActivity {
 
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        AlertDialog alertDialog = new AlertDialog.Builder(SecondActivity.this,R.style.AlertDialogTheme).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(SecondActivity.this, R.style.AlertDialogTheme).create();
         alertDialog.setTitle("Result:");
-        if (requestCode == 1 && resultCode == 1) {
-            long score = data.getLongExtra("score", 0);
-            if (score == 0){
-                alertDialog.setMessage("You lost! :(");
-            }
-            else{
-                alertDialog.setMessage("You won! You gain "+score+" exp! :)");
-            }
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
+        if (resultCode != Activity.RESULT_OK) {
+            alertDialog.setMessage("You lost! :(");
+        } else {
+            Long score = data.getLongExtra("score", 0);
+            alertDialog.setMessage("You won! You gain " + score.toString() + " exp! :)");
+            updateStationsOnMap();
         }
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
+
 
     public void onResume() {
         super.onResume();
@@ -373,9 +372,9 @@ public class SecondActivity extends AppCompatActivity {
         }
         locationManager.removeUpdates(listener);
 
-            // Unregister since the activity is not visible
-            LocalBroadcastManager.getInstance(this)
-                    .unregisterReceiver(mMessageReceiver);
+        // Unregister since the activity is not visible
+        LocalBroadcastManager.getInstance(this)
+                .unregisterReceiver(mMessageReceiver);
 
     }
 
@@ -386,16 +385,24 @@ public class SecondActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             // Extract data included in the Intent
             BaseStation station = (BaseStation) intent.getSerializableExtra("station");
-            boolean delete = (boolean) intent.getBooleanExtra("delete",true);
+            int OP_CODE = (int) intent.getIntExtra("OP_CODE", 0);
             Log.d("Message received!!!!!", " New station -------->" + station);
-            if (station != null){
-                if (delete){
-                    lbs.remove(station);
+            if (station != null) {
+                switch(OP_CODE) {
+                    case 0:
+                        lbs.add(station);
+                        break;
+                    case 1:
+                        lbs.remove(station);
+                        break;
+                    case 2:
+                        // It works because uquals check only ID, TODO: write it better
+                        lbs.remove(station);
+                        lbs.add(station);
+                        break;
+
                 }
-                else{
-                    lbs.add(station);
-                }
-                //text.setText(stations.toString());
+                // UPDATE ONLY ONE STATION, NOT ALL OF THEM
                 updateStationsOnMap();
             }
         }
@@ -411,6 +418,7 @@ public class SecondActivity extends AppCompatActivity {
             mService = binder.getService();
             mBound = true;
         }
+
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
             mBound = false;
