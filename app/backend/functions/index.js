@@ -337,7 +337,7 @@ const levelUp = (level, exp) => {
 
 const scoreToExp = (change, context) => {
   const userId = context.params.userId;
-  const newStation = change.val();
+  const newStation = change;
   newStation.child("score").once(
     'value', (snapshot) => {
       var score = snapshot.val();
@@ -348,8 +348,8 @@ const scoreToExp = (change, context) => {
           exp = user.exp;
           exp += score;
           const res = levelUp(level, exp);
-          snapshot.ref.child("level").set(res[0]);
-          snapshot.ref.child("exp").set(res[1]);
+          admin.database().ref('Users').child(user_id).child("level").set(res[0]);
+          admin.database().ref('Users').child(user_id).child("exp").set(res[1]);
         }
       );
     }
