@@ -45,12 +45,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         login();
-        try {
-            Thread.sleep(700);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        load_or_create_user();
+        //load_or_create_user();
         setContentView(R.layout.activity_main);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         //mDatabase.child("stations").setValue("");
@@ -71,11 +66,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == RC_SIGN_IN) {
+            // Make sure the request was successful
+            //if (resultCode == RESULT_OK) {
+                // The user picked a contact.
+                // The Intent's data Uri identifies which contact was selected.
+
+                // Do something with the contact here (bigger example below)
+            //}
+            load_or_create_user();
+        }
+    }
+
     private void logout() {
         FirebaseAuth.getInstance().signOut();
     }
 
     private void load_or_create_user() {
+        /*try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             mDatabase = FirebaseDatabase.getInstance().getReference();
             FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -83,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
             ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.hasChild("email")) {  //user already exists
+                    if (dataSnapshot.hasChild("team")) {  //user already exists
                         user = dataSnapshot.getValue(User.class);
                     } else {  //create new user
                         final EditText et = new EditText(MainActivity.this);

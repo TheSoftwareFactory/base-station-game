@@ -11,6 +11,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Handler;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -146,7 +147,7 @@ public class MinigameActivity extends AppCompatActivity {
                 }
                 // Everything went GOOD
 
-                Long score = Long.valueOf(ThreadLocalRandom.current().nextLong(10,1000));
+                Long score = Long.valueOf(ThreadLocalRandom.current().nextLong(10, 1000));
                 data.putExtra("score", score);
                 conquered(station, score);
                 setResult(Activity.RESULT_OK, data);
@@ -158,35 +159,76 @@ public class MinigameActivity extends AppCompatActivity {
 
     // function for minigame activity: pushes score to base station tag in database
     public void conquered(BaseStation station, Long score) {
-        // Undertand how to append
-
         try {
-            //Update stations/teams/user.getTeam/ -> append user.getUID(),(score)
-            mDatabase.child("stations").child(station.getID()).child("Teams").child(user.getTeam()).child("Players").child(user.getUID()).setValue(score);
+            DatabaseReference ref = mDatabase.child("Users").child(user.getUID()).child("PlayedStations");
+            ref.addValueEventListener(new ValueEventListener() {
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.d("PRINT",dataSnapshot.toString());
 
-            // Update users/users.UID/conqueredstations -> append station.getID() (score)
-            mDatabase.child("Users").child(user.getUID()).child("PlayedStations").child(station.getID()).setValue(score);
+                    if (dataSnapshot.hasChild(station.getID())) {
+                        if ( (Long) dataSnapshot.child(station.getID()).getValue() < score ) {
+                            //Update stations/teams/user.getTeam/ -> append user.getUID(),(score)
+                            mDatabase.child("stations").
+                                    child(station.getID()).
+                                    child("Teams").
+                                    child(user.getTeam()).
+                                    child("Players").
+                                    child(user.getUID()).
+                                    setValue(score);
 
-            // Update users/users.UID/exp -> add score
-            // DatabaseReference ref = mDatabase.child("Users").child(user.getUID()).child("exp");
+                            // Update users/users.UID/conqueredstations -> append station.getID() (score)
+                            mDatabase.child("Users").
+                                    child(user.getUID()).
+                                    child("PlayedStations").
+                                    child(station.getID()).
+                                    setValue(score);
 
-            // // Attach a listener to read the data at our posts reference
-            // ref.addValueEventListener(new ValueEventListener() {
-            //     @Override
-            //     public void onDataChange(DataSnapshot ds) {
-            //         Long oldvalue = (Long) ds.getValue();
-            //         Long newvalue = score + oldvalue;
-            //         mDatabase.child("Users").child(user.getUID()).child("exp").setValue(newvalue);
-            //         user.setExp(newvalue.longValue());
-            //     }
+                            // Update users/users.UID/exp -> add score
+                            // DatabaseReference ref = mDatabase.child("Users").child(user.getUID()).child("exp");
 
-            //     @Override
-            //     public void onCancelled(DatabaseError databaseError) {
-            //         Log.e("TAG", "The read failed: " + databaseError.getCode());
-            //         setResult(Activity.RESULT_CANCELED, MinigameActivity.data);
-            //         finish();
-            //     }
-            // });
+                            // // Attach a listener to read the data at our posts reference
+                            // ref.addValueEventListener(new ValueEventListener() {
+                            //     @Override
+                            //     public void onDataChange(DataSnapshot ds) {
+                            //         Long oldvalue = (Long) ds.getValue();
+                            //         Long newvalue = score + oldvalue;
+                            //         mDatabase.child("Users").child(user.getUID()).child("exp").setValue(newvalue);
+                            //         user.setExp(newvalue.longValue()); <--- TODO : WORK ON THIS
+                            //     }
+
+                            //     @Override
+                            //     public void onCancelled(DatabaseError databaseError) {
+                            //         Log.e("TAG", "The read failed: " + databaseError.getCode());
+                            //         setResult(Activity.RESULT_CANCELED, MinigameActivity.data);
+                            //         finish();
+                            //     }
+                            // });
+                        }
+                    }
+                    else
+                    {
+                        mDatabase.child("stations").
+                                child(station.getID()).
+                                child("Teams").
+                                child(user.getTeam()).
+                                child("Players").
+                                child(user.getUID()).
+                                setValue(score);
+
+                        // Update users/users.UID/conqueredstations -> append station.getID() (score)
+                        mDatabase.child("Users").
+                                child(user.getUID()).
+                                child("PlayedStations").
+                                child(station.getID()).
+                                setValue(score);
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
         } catch (Exception e) {
             Log.e("IN CONQUERED", "Probably some shit in the database" + e.toString());
             setResult(Activity.RESULT_CANCELED, this.data);
