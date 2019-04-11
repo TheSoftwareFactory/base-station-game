@@ -324,37 +324,53 @@ exports.updateTeamScores = functions.database.ref('stations/{stationId}/Teams/{t
 //       res.send("successfull");
 //     }
 //   );
+const LEVEL_UP_LIMIT = () => 100;
 
 const levelUp = (level, exp) => {
   var changed = false;
-  while (exp >= 4000) {
+  while (exp >= LEVEL_UP_LIMIT()) {
     changed = true;
-    exp -= 4000;
+    exp -= LEVEL_UP_LIMIT();
     level += 1;
   }
   return [level, exp, changed];
-}
+};
 
 const scoreToExp = (change, context) => {
   const userId = context.params.userId;
-  const score = change.val();
-  console.log(score);
-  return admin.database().ref('Users').child(userId).once(
-    'value', (snapshot) => {
-      level = snapshot.child("level").val();
-      exp = snapshot.child("exp").val();
-      exp += score;
-      const res = levelUp(level, exp);
-      snapshot.child("level").set(res[0]);
-      snapshot.child("exp").set(res[1]);
-      // admin.database().ref('Users').child(user_id).child("level").set(res[0]);
-      // admin.database().ref('Users').child(user_id).child("exp").set(res[1]);
+  var score = 0;
+  if (change.before.exists()) {
+    // Not a new station
+    if (change.after.exists()) {
+      // The station was modified
+      score = change.after.val() - change.before.val();
     }
-  );
+    // We don't care if the station was deleted.
+  } else {
+    //New station
+    score = change.after.val();
+  }
+  if (score > 0) {
+    return admin.database().ref('Users').child(userId).once(
+      'value', (snapshot) => {
+        level = snapshot.child("level").val();
+        exp = snapshot.child("exp").val();
+        exp += score;
+        const res = levelUp(level, exp);
+        if (res[2]) {
+          admin.database().ref('Users').child(userId).child("level").set(res[0]);
+        }
+        admin.database().ref('Users').child(userId).child("exp").set(res[1]);
+      }
+    );
+  } else {
+    console.log("Didn't add experience to " + userId + " because the score was " + score + ".");
+    return true;
+  }
 };
 
-exports.playedStationsScoreToExp = functions.database.ref('Users/{userId}/PlayedStations')
-  .onCreate(scoreToExp);
+exports.playedStationsScoreToExp = functions.database.ref('Users/{userId}/PlayedStations/{stationId}')
+  .onWrite(scoreToExp);
 
 // exports.playedStationsScoreToExp = functions.database.ref('Users/{userId}/ConqueredStations')
 //   .onCreate(scoreToExp);
