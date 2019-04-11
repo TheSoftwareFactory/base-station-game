@@ -160,7 +160,11 @@ public class MinigameActivity extends AppCompatActivity {
     // function for minigame activity: pushes score to base station tag in database
     public void conquered(BaseStation station, Long score) {
         try {
-            DatabaseReference ref = mDatabase.child("Users").child(user.getUID()).child("PlayedStations");
+            DatabaseReference ref = mDatabase.
+                    child("Users").
+                    child(user.getUID()).
+                    child("PlayedStations");
+
             ref.addValueEventListener(new ValueEventListener() {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Log.d("PRINT",dataSnapshot.toString());

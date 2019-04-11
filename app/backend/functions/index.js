@@ -429,9 +429,7 @@ exports.stationDiesChronoDebug2 = functions.https.onRequest((req, res) => {
                     return true;
                   });              
                 });
-                c=admin.database().ref('Users').child(key).child("exp").once('value').then(lol =>{
-                        console.log("exp after",lol.val(),"from user",key);
-                      });
+               
                 b=admin.database().ref('Users').child(key).child("ConqueredStations").once('value').then(conquerer => {
                   return admin.database().ref('Users').child(key).child("ConqueredStations").child(childSnapshot.val()['name']).set(val).then(rr=>{
                     return true;
@@ -439,7 +437,7 @@ exports.stationDiesChronoDebug2 = functions.https.onRequest((req, res) => {
                 });
                 final_promises.push(a)
                 final_promises.push(b)
-                final_promises.push(c)
+                
               }
               console.log("final promises",final_promises)
               return Promise.all(final_promises)
