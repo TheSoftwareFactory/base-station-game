@@ -324,16 +324,17 @@ exports.updateTeamScores = functions.database.ref('stations/{stationId}/Teams/{t
 //       res.send("successfull");
 //     }
 //   );
+const LEVEL_UP_LIMIT = () => 100;
 
 const levelUp = (level, exp) => {
   var changed = false;
-  while (exp >= 100) {
+  while (exp >= LEVEL_UP_LIMIT()) {
     changed = true;
-    exp -= 100;
+    exp -= LEVEL_UP_LIMIT();
     level += 1;
   }
   return [level, exp, changed];
-}
+};
 
 const scoreToExp = (change, context) => {
   const userId = context.params.userId;
