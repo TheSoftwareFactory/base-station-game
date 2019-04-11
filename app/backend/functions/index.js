@@ -327,9 +327,9 @@ exports.updateTeamScores = functions.database.ref('stations/{stationId}/Teams/{t
 
 const levelUp = (level, exp) => {
   var changed = false;
-  while (exp >= 4000) {
+  while (exp >= 100) {
     changed = true;
-    exp -= 4000;
+    exp -= 100;
     level += 1;
   }
   return [level, exp, changed];
@@ -356,12 +356,15 @@ const scoreToExp = (change, context) => {
         exp = snapshot.child("exp").val();
         exp += score;
         const res = levelUp(level, exp);
-        snapshot.child("level").set(res[0]);
-        snapshot.child("exp").set(res[1]);
+        if (res[2]) {
+          admin.database().ref('Users').child(userId).child("level").set(res[0]);
+        }
+        admin.database().ref('Users').child(userId).child("exp").set(res[1]);
       }
     );
   } else {
     console.log("Didn't add experience to " + userId + " because the score was " + score + ".");
+    return true;
   }
 };
 
