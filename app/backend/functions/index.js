@@ -378,3 +378,92 @@ exports.playedStationsScoreToExp = functions.database.ref('Users/{userId}/Played
 exports.dummy = functions.https.onRequest((req, res) => {
   return res.send("Hello");
 })
+
+exports.stationDiesChronoDebug2 = functions.https.onRequest((req, res) => {
+  //StationId is going to die
+  //get snapshot of stations key
+  var deadStations=[];
+  const promises=[];
+  
+  var starCountRef = admin.database().ref('stations');
+  starCountRef.once('value').then( snapshot => {
+    //get all stations as snapshot
+    snapshot.forEach(function (childSnapshot) {
+      console.log("im foreach")
+      var winningteam="";
+      var winningscore=0;
+      var stationkey=childSnapshot.key;
+      console.log("station key: ",childSnapshot.key);
+
+      p = admin.database().ref("stations").child(childSnapshot.key).child("winnerTeam").once('value').then(snap=>{
+        winningteam=snap.val(); 
+
+        console.log("this is station: ",stationkey,"and my winner team is",winningteam)       
+        //Check for right condition
+        //console.log(childSnapshot.val()['name'],"<------- station");  
+        //console.log("timetolive",childSnapshot.child('timeToLive').val())
+        //console.log("new date",new Date());
+
+        if (new Date(childSnapshot.child("timeToLive").val()) < new Date()) {
+          console.log("station dies",stationkey);
+          deadStations.push(stationkey)
+
+          const inner_promises=[];
+          childSnapshot.child("Teams").child(winningteam).child("Players").forEach(function (userScore) {
+            console.log("player score",userScore.val())
+            console.log("player id",userScore.key)
+
+            var key = userScore.key;
+            var val = userScore.val();
+            
+            const final_promises=[];
+            inside=admin.database().ref('Users').child(key).once("value", xd => {
+              if (xd.exists()) {
+                var userData = xd.val();
+                console.log("user iteration", userData);
+
+                a=admin.database().ref('Users').child(key).child("exp").once('value').then(conquerer=> {
+                  console.log("previousexp",conquerer.val(),"of user ",key);
+                 
+                  return admin.database().ref('Users').child(key).child("exp").set(conquerer.val() + 500).then(gf=>{
+                    return true;
+                  });              
+                });
+                c=admin.database().ref('Users').child(key).child("exp").once('value').then(lol =>{
+                        console.log("exp after",lol.val(),"from user",key);
+                      });
+                b=admin.database().ref('Users').child(key).child("ConqueredStations").once('value').then(conquerer => {
+                  return admin.database().ref('Users').child(key).child("ConqueredStations").child(childSnapshot.val()['name']).set(val).then(rr=>{
+                    return true;
+                  });              
+                });
+                final_promises.push(a)
+                final_promises.push(b)
+                final_promises.push(c)
+              }
+              console.log("final promises",final_promises)
+              return Promise.all(final_promises)
+            }).then(eded=>{
+               return inner_promises.push(inside) 
+            })
+                      
+          })    
+          return Promise.all(inner_promises);             
+        }
+          else {
+            console.log("im else teile")
+            return true}         
+      })
+      promises.push(p);      
+    })
+    return Promise.all(promises)
+  }).then(kek =>{
+    console.log("durch")
+    return res.send(deadStations.toString()+" sind gestorben")
+  })
+  .catch(error=>{
+    console.log("error: ",error)
+    res.send(error)
+  });
+})
+
