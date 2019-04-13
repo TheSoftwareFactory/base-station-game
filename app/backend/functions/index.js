@@ -9,7 +9,7 @@ exports.deleteStation = functions.https.onRequest((req, res) => {
   const original = req.query.text;
   return admin.database().ref('/stations').child(original).remove().then((snapshot) => {
     // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
-    return res.redirect(302, snapshot.ref.toString());
+    return res.send(302, "station with id: "+original+" successfully deleted");
   });
 });
 
@@ -17,7 +17,7 @@ exports.deleteAllStations = functions.https.onRequest((req, res) => {
 
   return admin.database().ref('/stations').remove().then((snapshot) => {
     // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
-    return res.redirect(302, snapshot.ref.toString());
+    return res.send(302, "deleted all stations successfully");
   });
 });
 
@@ -30,21 +30,20 @@ exports.addStation = functions.https.onRequest((req, res) => {
   var dt = new Date();
   dt.setHours(dt.getHours() + a[3]);
   dt = new Date(dt)
-  admin.database().ref('/stations').push({ "name": a[0], "latitude": parseFloat(a[1]), "longitude": parseFloat(a[2]), "timeToLive": dt.toISOString() })
+  return admin.database().ref('/stations').push({ "name": a[0], "latitude": parseFloat(a[1]), "longitude": parseFloat(a[2]), "timeToLive": dt.toISOString() })
   .then(snapshot => {
-    return res.redirect(snapshot.ref.toString());
+    return res.send("station added with the id: "+snapshot.key);
   }).catch(error => {
-    console.log("error",error)
     res.status(500).send(error)
   })
 });
 
-
-exports.winningteam_update = functions.database.ref('stations/{stationId}/Teams/{teamId}/teamScore')
-  .onUpdate((change, context) => {
-    var winningteam="";
-    var winningscore=0;
-    return admin.database().ref("stations").child(context.params.stationId).child("Teams").once('value').then(function(teams){
+  exports.winningteam= functions.database.ref('stations/{stationId}/Teams/{teamId}/teamScore')
+  .onWrite((added, context) => {
+    if (added.after.exists()){
+      var winningteam="";
+      var winningscore=0;
+      return admin.database().ref("stations").child(context.params.stationId).child("Teams").once('value').then(function(teams){
         teams.forEach(function(team){
           //console.log("team: ",team.val());
           console.log("teamscore",team.child("teamScore").val());
@@ -55,36 +54,11 @@ exports.winningteam_update = functions.database.ref('stations/{stationId}/Teams/
         });
         console.log("winningscore: ",winningscore);
         console.log("winningteam: ",winningteam);
-        admin.database().ref("stations").child(context.params.stationId).child("winnerTeam").set(winningteam);
-        return "geil"     
+        return admin.database().ref("stations").child(context.params.stationId).child("winnerTeam").set(winningteam);   
       }).catch(function(error){
         console.log(error)
-        res.send(error)
       });
-   
-  })
-
-  exports.winningteam_create = functions.database.ref('stations/{stationId}/Teams/{teamId}/teamScore')
-  .onCreate((change, context) => {
-    var winningteam="";
-    var winningscore=0;
-    return admin.database().ref("stations").child(context.params.stationId).child("Teams").once('value').then(function(teams){
-        teams.forEach(function(team){
-          //console.log("team: ",team.val());
-          console.log("teamscore",team.child("teamScore").val());
-          if (team.child("teamScore").val()>winningscore){
-            winningscore=team.child("teamScore").val();
-            winningteam=team.key;
-          }
-        });
-        console.log("winningscore: ",winningscore);
-        console.log("winningteam: ",winningteam);
-        admin.database().ref("stations").child(context.params.stationId).child("winnerTeam").set(winningteam);
-        return "geil"     
-      }).catch(function(error){
-        console.log(error)
-        res.send(error)
-      });
+    }
   })
 
 

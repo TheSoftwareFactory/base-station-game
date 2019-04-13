@@ -1,0 +1,31 @@
+{
+  "rules": {
+    "Users": {
+      "$uid": {
+        ".read": "auth.uid == $uid",
+        ".write": "auth.uid == $uid",
+        ".indexOn": [
+          "username"
+        ]
+      }
+    },
+    "stations": {
+      "$stationid": {
+        "Teams": {
+          "$teamid": {
+            "Players": {
+              "$userid": {
+                ".write": "(newData.parent().parent().parent().parent().parent().parent().child(Users).child(auth.uid).child(team).val() == $teamid && $userid == auth.id)"
+              }
+            }
+          }
+        }
+      },
+      ".read": "true",
+      "timeToLive": {
+        ".validate": "true",
+        ".read": "false"
+      }
+    }
+  }
+}

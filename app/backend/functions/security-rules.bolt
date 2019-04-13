@@ -1,0 +1,21 @@
+function isUser (auth, userKey) {
+  return auth.uid == userKey;
+}
+
+path /Users/{uid} {
+  read() { isUser(auth, uid)}
+  write() { isUser(auth, uid)}
+  index() { ["username"] }
+}
+
+path /stations/{stationid}/Teams/{teamid}/Players/{userid} {
+  write() { root.child(Users).child(auth.uid).child(team).val() == teamid &&  userid==auth.id}
+}
+
+path /stations {
+  read() { true}
+  write() {false}
+}
+path /stations/timeToLive {
+	read() {false}
+}
