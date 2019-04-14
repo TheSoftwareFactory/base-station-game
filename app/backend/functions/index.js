@@ -39,21 +39,21 @@ exports.addStation = functions.https.onRequest((req, res) => {
 });
 
   exports.winningteam= functions.database.ref('stations/{stationId}/Teams/{teamId}/teamScore')
-  .onWrite((added, context) => {
-    if (added.after.exists()){
+  .onWrite((change, context) => {
+    if (change.after.exists()){
       var winningteam="";
       var winningscore=0;
       return admin.database().ref("stations").child(context.params.stationId).child("Teams").once('value').then(function(teams){
         teams.forEach(function(team){
           //console.log("team: ",team.val());
-          console.log("teamscore",team.child("teamScore").val());
+          //console.log("teamscore",team.child("teamScore").val());
           if (team.child("teamScore").val()>winningscore){
             winningscore=team.child("teamScore").val();
             winningteam=team.key;
           }
         });
-        console.log("winningscore: ",winningscore);
-        console.log("winningteam: ",winningteam);
+        //console.log("winningscore: ",winningscore);
+        //console.log("winningteam: ",winningteam);
         return admin.database().ref("stations").child(context.params.stationId).child("winnerTeam").set(winningteam);   
       }).catch(function(error){
         console.log(error)
@@ -69,19 +69,19 @@ exports.updateTeamScores = functions.database.ref('stations/{stationId}/Teams/{t
     
     // Grab the current value of what was written to the Realtime Database.
     const newValue = added.after;
-    console.log('current value', newValue.val());
+    //console.log('current value', newValue.val());
     var station_id = context.params.stationId;
     var team_id = context.params.teamId;
-    console.log("station id: ", station_id);
-    console.log("team id: ", team_id);
-    console.log("erste conquerer: ",newValue.val());
+    //console.log("station id: ", station_id);
+    //console.log("team id: ", team_id);
+    //console.log("erste conquerer: ",newValue.val());
     var teamscore = 0;
     newValue.forEach(function(snapshot){
       
       console.log(snapshot.val());
       teamscore = teamscore + snapshot.val();
     });
-    console.log("teamscore: ",teamscore)
+    //console.log("teamscore: ",teamscore)
     return admin.database().ref('stations').child(station_id).child("Teams").child(team_id).child("teamScore").set(teamscore);    
   }
   });

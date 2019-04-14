@@ -2,12 +2,6 @@ function isUser (auth, userKey) {
   return auth.uid == userKey;
 }
 
-path /Users/{uid} {
-  read() { isUser(auth, uid)}
-  write() { isUser(auth, uid)}
-  index() { ["username"] }
-}
-
 path /stations/{stationid}/Teams/{teamid}/Players/{userid} {
   write() { root.child(Users).child(auth.uid).child(team).val() == teamid &&  userid==auth.id}
 }
@@ -18,4 +12,25 @@ path /stations {
 }
 path /stations/timeToLive {
 	read() {false}
+}
+
+path /Users/{uid} {
+  read() { isUser(auth, uid)}
+  index() { ["username"] }
+}
+
+path /Users/{uid}/email {
+  write() { isUser(auth, uid)}
+}
+path /Users/{uid}/username {
+  write() { isUser(auth, uid)}
+}
+path /Users/{uid}/uid {
+  write() { isUser(auth, uid)}
+}
+path /Users/{uid}/team {
+  write() { isUser(auth, uid)}
+}
+path /Users/{uid}/PlayedStations {
+  write() { isUser(auth, uid)}
 }

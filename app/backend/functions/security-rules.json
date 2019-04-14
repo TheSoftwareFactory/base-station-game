@@ -1,14 +1,5 @@
 {
   "rules": {
-    "Users": {
-      "$uid": {
-        ".read": "auth.uid == $uid",
-        ".write": "auth.uid == $uid",
-        ".indexOn": [
-          "username"
-        ]
-      }
-    },
     "stations": {
       "$stationid": {
         "Teams": {
@@ -25,6 +16,29 @@
       "timeToLive": {
         ".validate": "true",
         ".read": "false"
+      }
+    },
+    "Users": {
+      "$uid": {
+        ".read": "auth.uid == $uid",
+        ".indexOn": [
+          "username"
+        ],
+        "email": {
+          ".write": "auth.uid == $uid"
+        },
+        "username": {
+          ".write": "auth.uid == $uid"
+        },
+        "uid": {
+          ".write": "auth.uid == $uid"
+        },
+        "team": {
+          ".write": "auth.uid == $uid"
+        },
+        "PlayedStations": {
+          ".write": "auth.uid == $uid"
+        }
       }
     }
   }

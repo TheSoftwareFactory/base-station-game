@@ -121,8 +121,14 @@ public class MainActivity extends AppCompatActivity {
                                     public void onClick(View view) {
                                         String userinput = et.getText().toString().trim();
                                         if (!userinput.isEmpty()) {
-                                            user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), firebaseUser.getDisplayName(), 0, 15, userinput);
-                                            mDatabase.child("Users").child(user.getUID()).setValue(user);
+                                            user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), firebaseUser.getDisplayName(),  userinput);
+                                            mDatabase.child("Users").child(user.getUID()).child("username").setValue(user.getUsername());
+                                            mDatabase.child("Users").child(user.getUID()).child("email").setValue(user.getEmail());
+                                            mDatabase.child("Users").child(user.getUID()).child("uid").setValue(user.getUID());
+                                            mDatabase.child("Users").child(user.getUID()).child("team").setValue(user.getTeam());
+
+
+
                                             // Check if the team already exits
                                             DatabaseReference refTeam = mDatabase.child("Teams"); //check at reference of user if it already exists
                                             refTeam.addListenerForSingleValueEvent(new ValueEventListener() {
