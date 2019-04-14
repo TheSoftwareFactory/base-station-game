@@ -258,3 +258,11 @@ exports.stationDiesChrono = functions.https.onRequest((req, res) => {
   });
 })
 
+exports.createUser = functions.database.ref('Users/{userId}')
+  .onCreate((added, context) => {
+    console.log("triggert")
+    a=admin.database().ref('Users').child(context.params.userId).child('exp').set(0);
+    b=admin.database().ref('Users').child(context.params.userId).child('level').set(1);
+    c=admin.database().ref('Users').child(context.params.userId).child('exp').set(0);
+    return Promise.all([a,b,c])
+  })
