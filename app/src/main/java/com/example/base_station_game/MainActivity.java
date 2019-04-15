@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     public User user;
 
-
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         login();
@@ -72,10 +71,10 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             // Make sure the request was successful
             //if (resultCode == RESULT_OK) {
-                // The user picked a contact.
-                // The Intent's data Uri identifies which contact was selected.
+            // The user picked a contact.
+            // The Intent's data Uri identifies which contact was selected.
 
-                // Do something with the contact here (bigger example below)
+            // Do something with the contact here (bigger example below)
             //}
             load_or_create_user();
         }
@@ -86,11 +85,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void load_or_create_user() {
-        /*try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             mDatabase = FirebaseDatabase.getInstance().getReference();
             FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -139,8 +133,7 @@ public class MainActivity extends AppCompatActivity {
                                                 }
                                             });
                                             dialog.dismiss();
-                                        }
-                                        else{
+                                        } else {
                                             et.setError("Please insert the name of your team.");
                                         }
                                     }

@@ -77,7 +77,8 @@ public class MinigameActivity extends AppCompatActivity {
 
         listener = new LocationListener() {
             public void onLocationChanged(Location location) {
-
+                actualPosition.setLatitude(location.getLatitude());
+                actualPosition.setLongitude(location.getLongitude());
             }
 
             public void onStatusChanged(String s, int i, Bundle bundle) {
@@ -167,10 +168,8 @@ public class MinigameActivity extends AppCompatActivity {
 
             ref.addValueEventListener(new ValueEventListener() {
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Log.d("PRINT",dataSnapshot.toString());
-
                     if (dataSnapshot.hasChild(station.getID())) {
-                        if ( (Long) dataSnapshot.child(station.getID()).getValue() < score ) {
+                        if ((Long) dataSnapshot.child(station.getID()).getValue() < score) {
                             //Update stations/teams/user.getTeam/ -> append user.getUID(),(score)
                             mDatabase.child("stations").
                                     child(station.getID()).
@@ -208,9 +207,7 @@ public class MinigameActivity extends AppCompatActivity {
                             //     }
                             // });
                         }
-                    }
-                    else
-                    {
+                    } else {
                         mDatabase.child("stations").
                                 child(station.getID()).
                                 child("Teams").
@@ -227,6 +224,7 @@ public class MinigameActivity extends AppCompatActivity {
                                 setValue(score);
                     }
                 }
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -238,5 +236,17 @@ public class MinigameActivity extends AppCompatActivity {
             setResult(Activity.RESULT_CANCELED, this.data);
             finish();
         }
+    }
+
+
+    protected void onResume() {
+        super.onResume();
+        locationManager.requestLocationUpdates("gps", 2000, 0, listener);
+    }
+
+    protected void onPause() {
+        super.onPause();
+        locationManager.removeUpdates(listener);
+
     }
 }
