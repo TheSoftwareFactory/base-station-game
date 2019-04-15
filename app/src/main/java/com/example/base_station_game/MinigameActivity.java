@@ -227,7 +227,8 @@ public class MinigameActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    setResult(Activity.RESULT_CANCELED, data);
+                    finish();
                 }
             });
 

@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.hasChild("team")) {  //user already exists
                         user = dataSnapshot.getValue(User.class);
+                        user.beUpdated();
                     } else {  //create new user
                         final EditText et = new EditText(MainActivity.this);
                         final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
                                         String userinput = et.getText().toString().trim();
                                         if (!userinput.isEmpty()) {
                                             user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), firebaseUser.getDisplayName(),  userinput);
+                                            user.beUpdated();
                                             mDatabase.child("Users").child(user.getUID()).child("username").setValue(user.getUsername());
                                             mDatabase.child("Users").child(user.getUID()).child("email").setValue(user.getEmail());
                                             mDatabase.child("Users").child(user.getUID()).child("uid").setValue(user.getUID());

@@ -20,6 +20,7 @@ public class UserProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
         User user = (User) getIntent().getSerializableExtra("user");
+        user.beUpdated();
         username = (TextView) findViewById(R.id.textValueView3);
         email = (TextView) findViewById(R.id.textValueView4);
         exp = (TextView) findViewById(R.id.textValueView5);
