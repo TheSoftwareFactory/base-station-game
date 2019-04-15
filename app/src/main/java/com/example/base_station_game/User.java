@@ -17,12 +17,12 @@ public class User implements Serializable {
     public User(){
 
     }
-    public User(String uid,String email,String username,int level,long exp, String team){
+    public User(String uid,String email,String username,String team){
         this.username=username;
         this.uid=uid;
         this.email=email;
-        this.level=level;
-        this.exp=exp;
+        this.level=1;
+        this.exp=0;
         this.team=team;
         //conqueredStations=new ArrayList();
     }

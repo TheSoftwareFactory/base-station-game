@@ -174,7 +174,7 @@ public class ServiceActivity extends AppCompatActivity {
                     user = dataSnapshot.getValue(User.class);
                 }
                 else{  //create new user
-                    user = new User(firebaseUser.getUid(),firebaseUser.getEmail(),firebaseUser.getDisplayName(),0,15,""+0);
+                    user = new User(firebaseUser.getUid(),firebaseUser.getEmail(),firebaseUser.getDisplayName(),""+0);
                     mDatabase.child("Users").child(user.getUID()).setValue(user);
                 }
             }

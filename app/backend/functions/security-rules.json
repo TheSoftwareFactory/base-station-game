@@ -1,0 +1,45 @@
+{
+  "rules": {
+    "stations": {
+      "$stationid": {
+        "Teams": {
+          "$teamid": {
+            "Players": {
+              "$userid": {
+                ".write": "(newData.parent().parent().parent().parent().parent().parent().child(Users).child(auth.uid).child(team).val() == $teamid && $userid == auth.id)"
+              }
+            }
+          }
+        }
+      },
+      ".read": "true",
+      "timeToLive": {
+        ".validate": "true",
+        ".read": "false"
+      }
+    },
+    "Users": {
+      "$uid": {
+        ".read": "auth.uid == $uid",
+        ".indexOn": [
+          "username"
+        ],
+        "email": {
+          ".write": "auth.uid == $uid"
+        },
+        "username": {
+          ".write": "auth.uid == $uid"
+        },
+        "uid": {
+          ".write": "auth.uid == $uid"
+        },
+        "team": {
+          ".write": "auth.uid == $uid"
+        },
+        "PlayedStations": {
+          ".write": "auth.uid == $uid"
+        }
+      }
+    }
+  }
+}
