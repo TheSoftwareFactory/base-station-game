@@ -168,24 +168,26 @@ public class MinigameActivity extends AppCompatActivity {
             ref.addValueEventListener(new ValueEventListener() {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Log.d("PRINT",dataSnapshot.toString());
-                    //Update stations/teams/user.getTeam/ -> append user.getUID(),(score)
-                    mDatabase.child("stations").
-                            child(station.getID()).
-                            child("Teams").
-                            child(user.getTeam()).
-                            child("Players").
-                            child(user.getUID()).
-                            setValue(score);
 
-                    // Update users/users.UID/conqueredstations -> append station.getID() (score)
-                    mDatabase.child("Users").
-                            child(user.getUID()).
-                            child("PlayedStations").
-                            child(station.getID()).
-                            child("Score").
-                            setValue(score);
+                    if (!dataSnapshot.hasChild(station.getID()) || (Long) dataSnapshot.child(station.getID()).getValue() < score) {
+                            //Update stations/teams/user.getTeam/ -> append user.getUID(),(score)
+                            mDatabase.child("stations").
+                                    child(station.getID()).
+                                    child("Teams").
+                                    child(user.getTeam()).
+                                    child("Players").
+                                    child(user.getUID()).
+                                    setValue(score);
+
+                            // Update users/users.UID/conqueredstations -> append station.getID() (score)
+                            mDatabase.child("Users").
+                                    child(user.getUID()).
+                                    child("PlayedStations").
+                                    child(station.getID()).
+                                    setValue(score);
+                    }
+                    ref.removeEventListener(this);
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
