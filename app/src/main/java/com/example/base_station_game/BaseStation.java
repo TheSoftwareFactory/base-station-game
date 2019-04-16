@@ -58,5 +58,6 @@ public class BaseStation implements Serializable {
     public void setId(String id){
         this.id=id;
     }
+    public void setWinningTeam(String winningTeam){  this.winningTeam = winningTeam;  }
     public String getWinningTeam() { return this.winningTeam; }
 }

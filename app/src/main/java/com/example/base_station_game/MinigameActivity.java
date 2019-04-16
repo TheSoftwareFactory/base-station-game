@@ -16,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -50,6 +51,7 @@ public class MinigameActivity extends AppCompatActivity {
     private User user;
     private BaseStation station;
     private DatabaseReference mDatabase;
+    private long score =0;
 
     private LocationManager locationManager;
     private LocationListener listener;
@@ -148,7 +150,7 @@ public class MinigameActivity extends AppCompatActivity {
                 }
                 // Everything went GOOD
 
-                Long score = Long.valueOf(ThreadLocalRandom.current().nextLong(10, 1000));
+                //Long score = Long.valueOf(ThreadLocalRandom.current().nextLong(10, 1000));
                 data.putExtra("score", score);
                 conquered(station, score);
                 setResult(Activity.RESULT_OK, data);
@@ -239,6 +241,9 @@ public class MinigameActivity extends AppCompatActivity {
         }
     }
 
+    public void onClick(View v) {
+            score++;
+    }
 
     protected void onResume() {
         super.onResume();

@@ -244,9 +244,14 @@ public class SecondActivity extends AppCompatActivity {
                     if (dist[0] < MAX_DISTANCE) {
                         String winningTeam = clicckedbasestation.getWinningTeam();
                         if (winningTeam == null) {
-                            alertDialog.setMessage("Do you want to play the minigame of this station? Nobody did it before you! Hurry up!");
+                            alertDialog.setMessage("Nobody played the minigame of this station before you! Hurry up! Do you want to play the minigame of this station?");
                         } else {
-                            alertDialog.setMessage("Do you want to play the minigame of this station? The winning team right now is " + winningTeam + "!");
+                            if(winningTeam.equals(user.getTeam())) {
+                                alertDialog.setMessage("The winning team right now is YOUR TEAM (" + winningTeam + ")! Do you want to play the minigame of this station in order to increase the score of your team?");
+                            }
+                            else{
+                                alertDialog.setMessage("The winning team right now is an other TEAM (" + winningTeam + ")! Do you want to play the minigame of this station in order to defeat opponents?");
+                            }
                         }
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                                 new DialogInterface.OnClickListener() {
@@ -391,19 +396,23 @@ public class SecondActivity extends AppCompatActivity {
                 switch(OP_CODE) {
                     case 0:
                         lbs.add(station);
+                        updateStationsOnMap();
                         break;
                     case 1:
                         lbs.remove(station);
+                        updateStationsOnMap();
                         break;
                     case 2:
                         // It works because uquals check only ID, TODO: write it better
                         lbs.remove(station);
                         lbs.add(station);
+                        BaseStation bs = lbs.get(lbs.indexOf(station));
+                        bs.setWinningTeam(station.getWinningTeam());
                         break;
 
                 }
                 // UPDATE ONLY ONE STATION, NOT ALL OF THEM
-                updateStationsOnMap();
+
             }
         }
     };
