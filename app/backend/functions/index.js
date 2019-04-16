@@ -174,7 +174,15 @@ const scoreToExp = (change, context) => {
 };
 
 exports.playedStationsScoreToExp = functions.database.ref('Users/{userId}/PlayedStations/{stationId}')
-  .onWrite(scoreToExp);
+  .onWrite((change, context) => {
+    if (change.after.exists()){
+      console.log("after exists");
+      return scoreToExp(change,context);
+    }
+  else{
+    return false
+    }
+  })
 
 // exports.playedStationsScoreToExp = functions.database.ref('Users/{userId}/ConqueredStations')
 //   .onCreate(scoreToExp);
@@ -263,6 +271,5 @@ exports.createUser = functions.database.ref('Users/{userId}')
     console.log("triggert")
     a=admin.database().ref('Users').child(context.params.userId).child('exp').set(0);
     b=admin.database().ref('Users').child(context.params.userId).child('level').set(1);
-    c=admin.database().ref('Users').child(context.params.userId).child('exp').set(0);
-    return Promise.all([a,b,c])
+    return Promise.all([a,b])
   })
