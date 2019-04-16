@@ -168,65 +168,24 @@ public class MinigameActivity extends AppCompatActivity {
             ref.addValueEventListener(new ValueEventListener() {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Log.d("PRINT",dataSnapshot.toString());
+                    //Update stations/teams/user.getTeam/ -> append user.getUID(),(score)
+                    mDatabase.child("stations").
+                            child(station.getID()).
+                            child("Teams").
+                            child(user.getTeam()).
+                            child("Players").
+                            child(user.getUID()).
+                            setValue(score);
 
-                    if (dataSnapshot.hasChild(station.getID())) {
-                        if ( (Long) dataSnapshot.child(station.getID()).getValue() < score ) {
-                            //Update stations/teams/user.getTeam/ -> append user.getUID(),(score)
-                            mDatabase.child("stations").
-                                    child(station.getID()).
-                                    child("Teams").
-                                    child(user.getTeam()).
-                                    child("Players").
-                                    child(user.getUID()).
-                                    setValue(score);
-
-                            // Update users/users.UID/conqueredstations -> append station.getID() (score)
-                            mDatabase.child("Users").
-                                    child(user.getUID()).
-                                    child("PlayedStations").
-                                    child(station.getID()).
-                                    setValue(score);
-
-                            // Update users/users.UID/exp -> add score
-                            // DatabaseReference ref = mDatabase.child("Users").child(user.getUID()).child("exp");
-
-                            // // Attach a listener to read the data at our posts reference
-                            // ref.addValueEventListener(new ValueEventListener() {
-                            //     @Override
-                            //     public void onDataChange(DataSnapshot ds) {
-                            //         Long oldvalue = (Long) ds.getValue();
-                            //         Long newvalue = score + oldvalue;
-                            //         mDatabase.child("Users").child(user.getUID()).child("exp").setValue(newvalue);
-                            //         user.setExp(newvalue.longValue()); <--- TODO : WORK ON THIS
-                            //     }
-
-                            //     @Override
-                            //     public void onCancelled(DatabaseError databaseError) {
-                            //         Log.e("TAG", "The read failed: " + databaseError.getCode());
-                            //         setResult(Activity.RESULT_CANCELED, MinigameActivity.data);
-                            //         finish();
-                            //     }
-                            // });
-                        }
-                    }
-                    else
-                    {
-                        mDatabase.child("stations").
-                                child(station.getID()).
-                                child("Teams").
-                                child(user.getTeam()).
-                                child("Players").
-                                child(user.getUID()).
-                                setValue(score);
-
-                        // Update users/users.UID/conqueredstations -> append station.getID() (score)
-                        mDatabase.child("Users").
-                                child(user.getUID()).
-                                child("PlayedStations").
-                                child(station.getID()).
-                                setValue(score);
-                    }
+                    // Update users/users.UID/conqueredstations -> append station.getID() (score)
+                    mDatabase.child("Users").
+                            child(user.getUID()).
+                            child("PlayedStations").
+                            child(station.getID()).
+                            child("Score").
+                            setValue(score);
                 }
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
