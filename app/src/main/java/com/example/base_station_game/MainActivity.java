@@ -105,27 +105,8 @@ public class MainActivity extends AppCompatActivity {
                         user = dataSnapshot.getValue(User.class);
                         user.beUpdated();
                     } else {  //create new user
-                        final EditText et = new EditText(MainActivity.this);
-                        final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
-                                .setView(et)
-                                .setTitle("WELCOME! Choose you team!")
-                                .setMessage("Type the name of your team")
-                                .setPositiveButton("ok", null) //Set to null. We override the onclick
-                                .create();
 
-                        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-
-                            @Override
-                            public void onShow(DialogInterface dialogInterface) {
-
-                                Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
-                                button.setOnClickListener(new View.OnClickListener() {
-
-                                    @Override
-                                    public void onClick(View view) {
-                                        String userinput = et.getText().toString().trim();
-                                        if (!userinput.isEmpty()) {
-                                            user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), firebaseUser.getDisplayName(),  userinput);
+                                            user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), firebaseUser.getDisplayName(),  firebaseUser.);
                                             user.beUpdated();
                                             mDatabase.child("Users").child(user.getUID()).child("username").setValue(user.getUsername());
                                             mDatabase.child("Users").child(user.getUID()).child("email").setValue(user.getEmail());
@@ -133,31 +114,6 @@ public class MainActivity extends AppCompatActivity {
                                             mDatabase.child("Users").child(user.getUID()).child("team").setValue(user.getTeam());
 
 
-
-                                            // Check if the team already exits
-                                            DatabaseReference refTeam = mDatabase.child("Teams"); //check at reference of user if it already exists
-                                            refTeam.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                                    if (!dataSnapshot.hasChild(userinput)) {  //user already exists
-                                                        mDatabase.child("Teams").child(userinput).setValue(0);
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onCancelled(DatabaseError databaseError) {
-
-                                                }
-                                            });
-                                            dialog.dismiss();
-                                        } else {
-                                            et.setError("Please insert the name of your team.");
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                        dialog.show();
                     }
                 }
 
@@ -168,6 +124,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+
+    // -> merge together login and load create user
     public void login(View v) {
         email = (TextView) findViewById(R.id.email);
         username = (TextView) findViewById(R.id.username);
@@ -178,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d("TAG", "signInWithEmail:onComplete:" + task.isSuccessful());
-
+                        load_or_create_user();
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
