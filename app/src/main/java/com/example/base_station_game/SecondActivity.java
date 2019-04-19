@@ -20,6 +20,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -193,6 +194,25 @@ public class SecondActivity extends AppCompatActivity {
             return;
         }
         locationManager.requestLocationUpdates("gps", 3000, 0, listener);
+
+
+        //make new thread
+        //notify of conquered stations
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference ref = mDatabase.child("Users").child(user.getUID()).child("ConqueredStations"); //check at reference of user if it already exists
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                AlertDialog station_conquered_alert = new AlertDialog.Builder(SecondActivity.this, R.style.AlertDialogTheme).create();
+                station_conquered_alert.setTitle("Station Conquered!");
+                station_conquered_alert.setMessage("Your team "+ user.getTeam()+" conquered Station "+dataSnapshot.getKey()+ ", where you reached "+dataSnapshot.getValue()+" points");
+                station_conquered_alert.show();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+
 
     }
 

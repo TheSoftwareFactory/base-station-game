@@ -273,3 +273,30 @@ exports.createUser = functions.database.ref('Users/{userId}')
     b=admin.database().ref('Users').child(context.params.userId).child('level').set(1);
     return Promise.all([a,b])
   })
+
+exports.sendNotification = functions.database.ref("Users/{uid}/ConqueredStations/{stationname}")
+.onWrite((event,context) => {
+  const uuid = context.params.uid;
+  const stationname = context.params.stationname;
+
+  console.log('User to send notification', uuid);
+  var ref = admin.database().ref('Users');
+  return ref.once('value').then( snapshot => {
+    var token=snapshot.child(uuid).child('token').val();
+    var stationname=event.after.key;
+    var score = event.after.val();
+    console.log("send message to ",uuid,"with token ",token);
+   
+    console.log("new score: ",score);
+    console.log("new stationname: ",stationname);
+
+    const payload = {
+      notification: {
+          title: 'You have been invited to a trip.',
+          body: 'Tap here to check it out!'
+      }
+    };
+    return admin.messaging().sendToDevice(token, payload)
+  })
+})
+//And this is it for building notifications to multiple devices from or to one.

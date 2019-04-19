@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -74,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
        password_field = (TextView) findViewById(R.id.password);
        String password=password_field.getText().toString();
 
+
+
        if ( password.equals("") || email.equals("") || team.equals("") || username.equals(""))
        {
            Toast.makeText(MainActivity.this, "Please fill all fields!",
@@ -98,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
                                        Toast.makeText(MainActivity.this, username + " registered!",
                                                    Toast.LENGTH_SHORT).show();
                                        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                                       String token = firebaseUser.getIdToken(false).getResult().getToken();
 
                                        user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), username, team);
                                        user.beUpdated();
@@ -105,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
                                        mDatabase.child("Users").child(user.getUID()).child("email").setValue(user.getEmail());
                                        mDatabase.child("Users").child(user.getUID()).child("uid").setValue(user.getUID());
                                        mDatabase.child("Users").child(user.getUID()).child("team").setValue(user.getTeam());
+                                       mDatabase.child("Users").child(user.getUID()).child("token").setValue(token);
                                        mDatabase.child("usernames").child(username).setValue(user.getUID());
                                    } else {
                                        Toast.makeText(MainActivity.this, "Registering failed.",
