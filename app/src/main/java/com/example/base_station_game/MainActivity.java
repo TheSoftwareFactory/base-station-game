@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
    public void logout(View v){
+       Toast.makeText(MainActivity.this, user.getUsername()+" logged out.",
+               Toast.LENGTH_SHORT).show();
        FirebaseAuth.getInstance().signOut();
        user=null;
    }
@@ -79,25 +81,46 @@ public class MainActivity extends AppCompatActivity {
        }
        else {
 
-           FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
-                   .addOnCompleteListener(MainActivity.this, task -> {
-                       if (task.isSuccessful()) {
-                           Toast.makeText(MainActivity.this, username + " registered!",
-                                   Toast.LENGTH_SHORT).show();
-                           mDatabase = FirebaseDatabase.getInstance().getReference();
-                           FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+           mDatabase = FirebaseDatabase.getInstance().getReference();
+           DatabaseReference ref = mDatabase.child("usernames").child(username); //check at reference of user if it already exists
+           ref.addListenerForSingleValueEvent(new ValueEventListener() {
+               @Override
+               public void onDataChange(DataSnapshot dataSnapshot) {
+                   if (dataSnapshot.exists()) {
+                       Toast.makeText(MainActivity.this, "Username already in use.",
+                               Toast.LENGTH_SHORT).show();
 
-                           user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), username, team);
-                           user.beUpdated();
-                           mDatabase.child("Users").child(user.getUID()).child("username").setValue(user.getUsername());
-                           mDatabase.child("Users").child(user.getUID()).child("email").setValue(user.getEmail());
-                           mDatabase.child("Users").child(user.getUID()).child("uid").setValue(user.getUID());
-                           mDatabase.child("Users").child(user.getUID()).child("team").setValue(user.getTeam());
-                       } else {
-                           Toast.makeText(MainActivity.this, "Registering failed.",
-                                   Toast.LENGTH_SHORT).show();
-                       }
-                   });
+                   }
+                   else {
+                       FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+                               .addOnCompleteListener(MainActivity.this, task -> {
+                                   if (task.isSuccessful()) {
+                                       Toast.makeText(MainActivity.this, username + " registered!",
+                                                   Toast.LENGTH_SHORT).show();
+                                       FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+                                       user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), username, team);
+                                       user.beUpdated();
+                                       mDatabase.child("Users").child(user.getUID()).child("username").setValue(user.getUsername());
+                                       mDatabase.child("Users").child(user.getUID()).child("email").setValue(user.getEmail());
+                                       mDatabase.child("Users").child(user.getUID()).child("uid").setValue(user.getUID());
+                                       mDatabase.child("Users").child(user.getUID()).child("team").setValue(user.getTeam());
+                                       mDatabase.child("usernames").child(username).setValue(user.getUID());
+                                   } else {
+                                       Toast.makeText(MainActivity.this, "Registering failed.",
+                                               Toast.LENGTH_SHORT).show();
+                                   }
+                               });
+
+                   }
+               }
+
+               @Override
+               public void onCancelled(DatabaseError databaseError) {
+               }
+           });
+
+
        }
    }
 
