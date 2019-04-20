@@ -18,8 +18,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".UserProfile"></activity>
-        <activity android:name=".Settings" ></activity>
+        <service
+            android:name=".MyFirebaseMessagingService"
+
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+
+
+
+        <activity android:name=".UserProfile" />
+        <activity android:name=".Settings" />
         <activity
             android:name=".ServiceActivity"
             android:label="@string/title_activity_service"

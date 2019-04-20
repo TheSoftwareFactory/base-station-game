@@ -34,6 +34,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
 
@@ -101,16 +103,28 @@ public class MainActivity extends AppCompatActivity {
                                        Toast.makeText(MainActivity.this, username + " registered!",
                                                    Toast.LENGTH_SHORT).show();
                                        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                                       String token = firebaseUser.getIdToken(false).getResult().getToken();
+                                       FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                           @Override
+                                           public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                               if(task.isSuccessful()){
+                                                   String token = task.getResult().getToken();
+                                                   user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), username, team);
+                                                   user.beUpdated();
+                                                   mDatabase.child("Users").child(user.getUID()).child("username").setValue(user.getUsername());
+                                                   mDatabase.child("Users").child(user.getUID()).child("email").setValue(user.getEmail());
+                                                   mDatabase.child("Users").child(user.getUID()).child("uid").setValue(user.getUID());
+                                                   mDatabase.child("Users").child(user.getUID()).child("team").setValue(user.getTeam());
+                                                   mDatabase.child("Users").child(user.getUID()).child("token").setValue(token);
+                                                   mDatabase.child("usernames").child(username).setValue(user.getUID());
+                                               }
+                                               else
+                                               {
+                                                   Log.d("token error","token couldnt get generated");
+                                               }
+                                           }
+                                       });
 
-                                       user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), username, team);
-                                       user.beUpdated();
-                                       mDatabase.child("Users").child(user.getUID()).child("username").setValue(user.getUsername());
-                                       mDatabase.child("Users").child(user.getUID()).child("email").setValue(user.getEmail());
-                                       mDatabase.child("Users").child(user.getUID()).child("uid").setValue(user.getUID());
-                                       mDatabase.child("Users").child(user.getUID()).child("team").setValue(user.getTeam());
-                                       mDatabase.child("Users").child(user.getUID()).child("token").setValue(token);
-                                       mDatabase.child("usernames").child(username).setValue(user.getUID());
+
                                    } else {
                                        Toast.makeText(MainActivity.this, "Registering failed.",
                                                Toast.LENGTH_SHORT).show();

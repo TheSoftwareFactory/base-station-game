@@ -292,8 +292,8 @@ exports.sendNotification = functions.database.ref("Users/{uid}/ConqueredStations
 
     const payload = {
       notification: {
-          title: 'You have been invited to a trip.',
-          body: 'Tap here to check it out!'
+          title: 'Your Team conquered Station '+stationname+' successfully!',
+          body: 'You helped your team with a score of '+score+'!'
       }
     };
     return admin.messaging().sendToDevice(token, payload)
