@@ -61,10 +61,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
    public void logout(View v){
-       Toast.makeText(MainActivity.this, user.getUsername()+" logged out.",
-               Toast.LENGTH_SHORT).show();
-       FirebaseAuth.getInstance().signOut();
-       user=null;
+        if (FirebaseAuth.getInstance().getCurrentUser()!=null) {
+            Toast.makeText(MainActivity.this, user.getUsername() + " logged out.",
+                    Toast.LENGTH_SHORT).show();
+            FirebaseAuth.getInstance().signOut();
+            user = null;
+        }
    }
 
    public void register(View v) {
