@@ -45,7 +45,7 @@
         <activity android:name=".SamplingDebugActivity" />
         <activity android:name=".Engine_Activity" />
         <activity
-            android:name=".SecondActivity"
+            android:name=".MapActivity"
             android:label="Map Activity"
             android:parentActivityName=".MainActivity">
             <meta-data

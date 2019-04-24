@@ -82,7 +82,11 @@ public class User implements Serializable {
     public void beUpdated() {
         DatabaseReference mDatabase;
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child("Users").child(this.getUID()).addChildEventListener(new ChildEventListener() {
+        mDatabase.child("Users").child(this.getUID()).addChildEventListener(this.getChildEventLister());
+    }
+
+    public ChildEventListener getChildEventLister(){
+        return new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
@@ -114,6 +118,6 @@ public class User implements Serializable {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
     }
 }

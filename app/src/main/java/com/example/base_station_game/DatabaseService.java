@@ -91,6 +91,10 @@ public class DatabaseService extends IntentService {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+    public void update_user(){
+
+    }
+
     public void update_stations() {
         mDatabase.child("stations").addChildEventListener(new ChildEventListener() {
             @Override

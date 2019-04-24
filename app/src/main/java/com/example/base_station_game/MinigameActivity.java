@@ -121,7 +121,7 @@ public class MinigameActivity extends AppCompatActivity {
 
                                 float[] dist = new float[1];
                                 Location.distanceBetween(actualPosition.getLatitude(), actualPosition.getLongitude(), station.getLatitude(), station.getLongitude(), dist);
-                                if (dist[0] > SecondActivity.MAX_DISTANCE) {
+                                if (dist[0] > MapActivity.MAX_DISTANCE) {
                                     try {
                                         throw new OutOfRangeException("Distance " + dist[0]);
                                     } catch (OutOfRangeException e) {

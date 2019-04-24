@@ -19,24 +19,15 @@ import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -47,12 +38,8 @@ import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.MapController;
 import org.osmdroid.config.Configuration;
-import org.osmdroid.views.overlay.ItemizedIconOverlay;
-import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
 import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlay;
@@ -60,11 +47,9 @@ import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlayOptions;
 import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
-public class SecondActivity extends AppCompatActivity {
+public class MapActivity extends AppCompatActivity {
 
     DatabaseService mService;
     boolean mBound = false;
@@ -92,7 +77,7 @@ public class SecondActivity extends AppCompatActivity {
     Paint selectedPointStyle = new Paint();
 
     private static final String LOG_TAG =
-            SecondActivity.class.getSimpleName();
+            MapActivity.class.getSimpleName();
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -203,7 +188,7 @@ public class SecondActivity extends AppCompatActivity {
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                AlertDialog station_conquered_alert = new AlertDialog.Builder(SecondActivity.this, R.style.AlertDialogTheme).create();
+                AlertDialog station_conquered_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
                 station_conquered_alert.setTitle("Station Conquered!");
                 station_conquered_alert.setMessage("Your team "+ user.getTeam()+" conquered Station "+dataSnapshot.getKey()+ ", where you reached "+dataSnapshot.getValue()+" points");
                 station_conquered_alert.show();
@@ -256,7 +241,7 @@ public class SecondActivity extends AppCompatActivity {
             sfpo.setOnClickListener(new SimpleFastPointOverlay.OnClickListener() {
                 @Override
                 public void onClick(SimpleFastPointOverlay.PointAdapter points, Integer point) {
-                    AlertDialog alertDialog = new AlertDialog.Builder(SecondActivity.this, R.style.AlertDialogTheme).create();
+                    AlertDialog alertDialog = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
                     alertDialog.setTitle(((LabelledGeoPoint) points.get(point)).getLabel());
                     float[] dist = new float[1];
                     BaseStation clicckedbasestation = lbs.get(point);
@@ -276,7 +261,7 @@ public class SecondActivity extends AppCompatActivity {
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
-                                        Intent intent = new Intent(SecondActivity.this, MinigameActivity.class);
+                                        Intent intent = new Intent(MapActivity.this, MinigameActivity.class);
                                         intent.putExtra("user", user);
                                         intent.putExtra("station", clicckedbasestation);
                                         startActivityForResult(intent, 1);
@@ -354,7 +339,7 @@ public class SecondActivity extends AppCompatActivity {
 
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        AlertDialog alertDialog = new AlertDialog.Builder(SecondActivity.this, R.style.AlertDialogTheme).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
         alertDialog.setTitle("Result:");
         if (resultCode != Activity.RESULT_OK) {
             alertDialog.setMessage("You lost! :(");
