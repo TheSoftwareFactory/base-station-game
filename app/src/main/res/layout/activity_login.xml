@@ -41,14 +41,6 @@
         android:text="Settings" />
 
     <EditText
-        android:id="@+id/username"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="username" />
-
-    <EditText
         android:id="@+id/password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -64,14 +56,6 @@
         android:inputType="textPersonName"
         android:text="email@ede.de" />
 
-    <EditText
-        android:id="@+id/team"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="team" />
-
     <Button
         android:id="@+id/login"
         android:layout_width="match_parent"
@@ -85,12 +69,5 @@
         android:layout_height="wrap_content"
         android:onClick="register"
         android:text="register" />
-
-    <Button
-        android:id="@+id/logout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="logout"
-        android:text="logout" />
 
 </LinearLayout>

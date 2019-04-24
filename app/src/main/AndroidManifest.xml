@@ -18,9 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".RegisterActivity"></activity>
+
         <service
             android:name=".MyFirebaseMessagingService"
-
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -28,10 +29,10 @@
             </intent-filter>
         </service>
 
-
-
-        <activity android:name=".UserProfile" />
-        <activity android:name=".Settings" />
+        <activity android:name=".UserProfile"
+            android:parentActivityName=".MapActivity"/>
+        <activity android:name=".Settings"
+            android:parentActivityName=".MapActivity"/>
         <activity
             android:name=".ServiceActivity"
             android:label="@string/title_activity_service"
@@ -47,12 +48,12 @@
         <activity
             android:name=".MapActivity"
             android:label="Map Activity"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".LoginActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.base_station_game.MainActivity" />
+                android:value="com.example.base_station_game.LoginActivity" />
         </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

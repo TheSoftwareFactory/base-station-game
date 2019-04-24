@@ -181,24 +181,6 @@ public class MapActivity extends AppCompatActivity {
         locationManager.requestLocationUpdates("gps", 3000, 0, listener);
 
 
-        //make new thread
-        //notify of conquered stations
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference ref = mDatabase.child("Users").child(user.getUID()).child("ConqueredStations"); //check at reference of user if it already exists
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                AlertDialog station_conquered_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
-                station_conquered_alert.setTitle("Station Conquered!");
-                station_conquered_alert.setMessage("Your team "+ user.getTeam()+" conquered Station "+dataSnapshot.getKey()+ ", where you reached "+dataSnapshot.getValue()+" points");
-                station_conquered_alert.show();
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-
-
     }
 
 

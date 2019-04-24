@@ -24,9 +24,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
-public class MainActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = LoginActivity.class.getSimpleName();
     private static final int RC_SIGN_IN = 123;
     private DatabaseReference mDatabase;
     public User user;
@@ -38,94 +38,25 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
         mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
    public void logout(View v){
         if (FirebaseAuth.getInstance().getCurrentUser()!=null) {
-            Toast.makeText(MainActivity.this, user.getUsername() + " logged out.",
+            Toast.makeText(LoginActivity.this, user.getUsername() + " logged out.",
                     Toast.LENGTH_SHORT).show();
             FirebaseAuth.getInstance().signOut();
             user = null;
         }
    }
 
-   public void register(View v) {
-       email_field = (TextView) findViewById(R.id.email);
-       String email=email_field.getText().toString();
-       team_field = (TextView) findViewById(R.id.team);
-       String team=team_field.getText().toString();
-       username_field = (TextView) findViewById(R.id.username);
-       String username=username_field.getText().toString();
-       password_field = (TextView) findViewById(R.id.password);
-       String password=password_field.getText().toString();
+    public void register(View v) {
+        Intent intent = new Intent(this, RegisterActivity.class);
+        intent.putExtra("user", user);
+        startActivity(intent);
+    }
 
-
-
-       if ( password.equals("") || email.equals("") || team.equals("") || username.equals(""))
-       {
-           Toast.makeText(MainActivity.this, "Please fill all fields!",
-                   Toast.LENGTH_SHORT).show();
-       }
-       else {
-
-           mDatabase = FirebaseDatabase.getInstance().getReference();
-           DatabaseReference ref = mDatabase.child("usernames").child(username); //check at reference of user if it already exists
-           ref.addListenerForSingleValueEvent(new ValueEventListener() {
-               @Override
-               public void onDataChange(DataSnapshot dataSnapshot) {
-                   if (dataSnapshot.exists()) {
-                       Toast.makeText(MainActivity.this, "Username already in use.",
-                               Toast.LENGTH_SHORT).show();
-
-                   }
-                   else {
-                       FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
-                               .addOnCompleteListener(MainActivity.this, task -> {
-                                   if (task.isSuccessful()) {
-                                       Toast.makeText(MainActivity.this, username + " registered!",
-                                                   Toast.LENGTH_SHORT).show();
-                                       FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                                       FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                                           @Override
-                                           public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                                               if(task.isSuccessful()){
-                                                   String token = task.getResult().getToken();
-                                                   user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), username, team);
-                                                   user.beUpdated();
-                                                   mDatabase.child("Users").child(user.getUID()).child("username").setValue(user.getUsername());
-                                                   mDatabase.child("Users").child(user.getUID()).child("email").setValue(user.getEmail());
-                                                   mDatabase.child("Users").child(user.getUID()).child("uid").setValue(user.getUID());
-                                                   mDatabase.child("Users").child(user.getUID()).child("team").setValue(user.getTeam());
-                                                   mDatabase.child("Users").child(user.getUID()).child("token").setValue(token);
-                                                   mDatabase.child("usernames").child(username).setValue(user.getUID());
-                                               }
-                                               else
-                                               {
-                                                   Log.d("token error","token couldnt get generated");
-                                               }
-                                           }
-                                       });
-
-
-                                   } else {
-                                       Toast.makeText(MainActivity.this, "Registering failed.",
-                                               Toast.LENGTH_SHORT).show();
-                                   }
-                               });
-
-                   }
-               }
-
-               @Override
-               public void onCancelled(DatabaseError databaseError) {
-               }
-           });
-
-
-       }
-   }
 
     public void login(View v) {
         email_field = (TextView) findViewById(R.id.email);
@@ -135,12 +66,12 @@ public class MainActivity extends AppCompatActivity {
 
         if ( password.equals("") || email.equals(""))
         {
-            Toast.makeText(MainActivity.this, "Please enter both Email and Password",
+            Toast.makeText(LoginActivity.this, "Please enter both Email and Password",
                     Toast.LENGTH_SHORT).show();
         }
         else {
             FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                    .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
@@ -154,8 +85,10 @@ public class MainActivity extends AppCompatActivity {
                                         user = dataSnapshot.getValue(User.class);
                                         user.beUpdated();
                                         ref.removeEventListener(this);
-                                        Toast.makeText(MainActivity.this, user.getUsername() + " signed in.",
+                                        Toast.makeText(LoginActivity.this, user.getUsername() + " signed in.",
                                                 Toast.LENGTH_SHORT).show();
+                                        startMap();
+
                                     }
 
                                     @Override
@@ -165,18 +98,24 @@ public class MainActivity extends AppCompatActivity {
 
                             } else {
                                 Log.w("TAG", "signInWithEmail", task.getException());
-                                Toast.makeText(MainActivity.this, "Authentication failed.",
+                                Toast.makeText(LoginActivity.this, "Authentication failed.",
                                         Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
         }
+
     }
 
+    public void startMap(){
+        Intent intent = new Intent(this, MapActivity.class);
+        intent.putExtra("user", user);
+        startActivity(intent);
+    }
 
     public void onClick(View v) {
         if (user == null) {
-            Toast.makeText(MainActivity.this, "Please log in before continuing.",
+            Toast.makeText(LoginActivity.this, "Please log in before continuing.",
                     Toast.LENGTH_SHORT).show();
         } else {
             switch (v.getId()) {
