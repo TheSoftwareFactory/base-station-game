@@ -182,7 +182,7 @@ public class MapActivity extends AppCompatActivity {
         }
         locationManager.requestLocationUpdates("gps", 3000, 0, listener);
 
-
+/*
         //make new thread
         //notify of conquered stations
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -200,7 +200,7 @@ public class MapActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-
+*/
         SpeedDialView speedDialView = findViewById(R.id.speedDial);
         speedDialView.addActionItem(
                 new SpeedDialActionItem.Builder(R.id.user_profile_ID, R.drawable.ic_accessibility_black_24dp)
