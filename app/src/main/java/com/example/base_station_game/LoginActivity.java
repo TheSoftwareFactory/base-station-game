@@ -26,14 +26,11 @@ import com.google.firebase.iid.InstanceIdResult;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = LoginActivity.class.getSimpleName();
-    private static final int RC_SIGN_IN = 123;
     private DatabaseReference mDatabase;
     public User user;
     private TextView email_field;
-    private TextView username_field;
     private TextView password_field;
-    private TextView team_field;
+
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -235,7 +235,7 @@ public class MapActivity extends AppCompatActivity {
                         return true; // false will close it without animation
                     case R.id.settings_ID:
                         Toast.makeText(MapActivity.this, "cliccked on settings", Toast.LENGTH_LONG).show();
-                        Intent intent1 = new Intent(MapActivity.this, SettingsActivity.class);
+                        Intent intent1 = new Intent(MapActivity.this, setting.class);
                         intent1.putExtra("user", user);
                         startActivity(intent1);
                         return true; // false will close it without animation
