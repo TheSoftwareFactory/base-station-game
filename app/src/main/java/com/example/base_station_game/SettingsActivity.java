@@ -3,7 +3,7 @@ package com.example.base_station_game;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class Settings extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

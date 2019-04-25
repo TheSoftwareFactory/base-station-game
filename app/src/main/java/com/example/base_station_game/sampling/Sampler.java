@@ -202,8 +202,8 @@ public class Sampler {
         return cpuStatus;
     }
 //
-//    private static Settings constructSettings(Context context){
-//        Settings settings = new Settings();
+//    private static SettingsActivity constructSettings(Context context){
+//        SettingsActivity settings = new SettingsActivity();
 //        settings.setBluetoothEnabled(SamplingLibrary.getBluetoothEnabled());
 //        settings.setPowersaverEnabled(PowerUtils.isPowerSaving(context));
 //        settings.setRotationEnabled(SamplingLibrary.getRotationEnabled(context));

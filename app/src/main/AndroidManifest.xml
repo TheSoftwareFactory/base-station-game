@@ -31,7 +31,7 @@
 
 
         <activity android:name=".UserProfile" />
-        <activity android:name=".Settings" />
+        <activity android:name=".SettingsActivity" />
         <activity
             android:name=".ServiceActivity"
             android:label="@string/title_activity_service"
