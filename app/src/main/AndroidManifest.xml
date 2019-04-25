@@ -18,10 +18,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".setting"
-            android:parentActivityName=".LoginActivity"></activity>
-        <activity android:name=".RegisterActivity"
-            android:parentActivityName=".LoginActivity"/>
+        <service
+            android:name=".MyFirebaseInstanceIDService"
+            android:enabled="true"
+            android:exported="true"></service>
+
+        <activity
+            android:name=".setting"
+            android:parentActivityName=".LoginActivity" />
+        <activity
+            android:name=".RegisterActivity"
+            android:parentActivityName=".LoginActivity" />
 
         <service
             android:name=".MyFirebaseMessagingService"
@@ -49,8 +56,7 @@
         <activity android:name=".Engine_Activity" />
         <activity
             android:name=".MapActivity"
-            android:label="Map Activity">
-        </activity>
+            android:label="Map Activity"></activity>
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

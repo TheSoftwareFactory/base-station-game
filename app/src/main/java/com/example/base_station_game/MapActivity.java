@@ -51,6 +51,8 @@ import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.base_station_game.R.id.settings_ID;
+
 public class MapActivity extends AppCompatActivity {
 
     DatabaseService mService;
@@ -207,8 +209,9 @@ public class MapActivity extends AppCompatActivity {
                         .create()
         );
         speedDialView.addActionItem(
-                new SpeedDialActionItem.Builder(R.id.settings_ID, R.drawable.ic_settings_black_24dp)
+                new SpeedDialActionItem.Builder(settings_ID, R.drawable.ic_settings_black_24dp)
                         .create());
+
 
         speedDialView.setOnChangeListener(new SpeedDialView.OnChangeListener() {
             @Override
@@ -233,7 +236,7 @@ public class MapActivity extends AppCompatActivity {
                         intent.putExtra("user", user);
                         startActivity(intent);
                         return true; // false will close it without animation
-                    case R.id.settings_ID:
+                    case settings_ID:
                         Toast.makeText(MapActivity.this, "cliccked on settings", Toast.LENGTH_LONG).show();
                         Intent intent1 = new Intent(MapActivity.this, setting.class);
                         intent1.putExtra("user", user);

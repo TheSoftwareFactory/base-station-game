@@ -72,6 +72,23 @@ public class LoginActivity extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         user = dataSnapshot.getValue(User.class);
+
+                                        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                                if(task.isSuccessful()){
+                                                    if (!dataSnapshot.child("token").getValue().toString().equals(task.getResult().getToken())){
+                                                        mDatabase.child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("token").setValue(task.getResult().getToken());
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    Log.d("token error refresh login","token couldnt get generated");
+                                                }
+                                            }
+                                        });
+
+
                                         user.beUpdated();
                                         ref.removeEventListener(this);
                                         Toast.makeText(LoginActivity.this, user.getUsername() + " signed in.",
