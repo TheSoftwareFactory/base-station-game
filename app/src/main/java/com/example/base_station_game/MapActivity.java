@@ -33,6 +33,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.leinardi.android.speeddial.SpeedDialActionItem;
+import com.leinardi.android.speeddial.SpeedDialView;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -180,7 +182,70 @@ public class MapActivity extends AppCompatActivity {
         }
         locationManager.requestLocationUpdates("gps", 3000, 0, listener);
 
+/*
+        //make new thread
+        //notify of conquered stations
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference ref = mDatabase.child("Users").child(user.getUID()).child("ConqueredStations"); //check at reference of user if it already exists
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                AlertDialog station_conquered_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
+                station_conquered_alert.setTitle("Station Conquered!");
+                station_conquered_alert.setMessage("Your team " + user.getTeam() + " conquered Station " + dataSnapshot.getKey() + ", where you reached " + dataSnapshot.getValue() + " points");
+                station_conquered_alert.show();
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+*/
+        SpeedDialView speedDialView = findViewById(R.id.speedDial);
+        speedDialView.addActionItem(
+                new SpeedDialActionItem.Builder(R.id.user_profile_ID, R.drawable.ic_accessibility_black_24dp)
+                        .create()
+        );
+        speedDialView.addActionItem(
+                new SpeedDialActionItem.Builder(R.id.settings_ID, R.drawable.ic_settings_black_24dp)
+                        .create());
+
+        speedDialView.setOnChangeListener(new SpeedDialView.OnChangeListener() {
+            @Override
+            public boolean onMainActionSelected() {
+                Toast.makeText(MapActivity.this, "Main action clicked!", Toast.LENGTH_LONG).show();
+                return false; // True to keep the Speed Dial open
+            }
+
+            @Override
+            public void onToggleChanged(boolean isOpen) {
+                Toast.makeText(MapActivity.this, "Speed dial toggle state changed. Open = " + isOpen, Toast.LENGTH_LONG).show();
+            }
+        });
+
+        speedDialView.setOnActionSelectedListener(new SpeedDialView.OnActionSelectedListener() {
+            @Override
+            public boolean onActionSelected(SpeedDialActionItem actionItem) {
+                switch (actionItem.getId()) {
+                    case R.id.user_profile_ID:
+                        Toast.makeText(MapActivity.this, "cliccked on userprofile", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(MapActivity.this, UserProfile.class);
+                        intent.putExtra("user", user);
+                        startActivity(intent);
+                        return true; // false will close it without animation
+                    case R.id.settings_ID:
+                        Toast.makeText(MapActivity.this, "cliccked on settings", Toast.LENGTH_LONG).show();
+                        Intent intent1 = new Intent(MapActivity.this, SettingsActivity.class);
+                        intent1.putExtra("user", user);
+                        startActivity(intent1);
+                        return true; // false will close it without animation
+                    default:
+                        break;
+                }
+
+                return true; // To keep the Speed Dial open
+            }
+        });
     }
 
 
@@ -233,10 +298,9 @@ public class MapActivity extends AppCompatActivity {
                         if (winningTeam == null) {
                             alertDialog.setMessage("Nobody played the minigame of this station before you! Hurry up! Do you want to play the minigame of this station?");
                         } else {
-                            if(winningTeam.equals(user.getTeam())) {
+                            if (winningTeam.equals(user.getTeam())) {
                                 alertDialog.setMessage("The winning team right now is YOUR TEAM (" + winningTeam + ")! Do you want to play the minigame of this station in order to increase the score of your team?");
-                            }
-                            else{
+                            } else {
                                 alertDialog.setMessage("The winning team right now is an other TEAM (" + winningTeam + ")! Do you want to play the minigame of this station in order to defeat opponents?");
                             }
                         }
@@ -380,7 +444,7 @@ public class MapActivity extends AppCompatActivity {
             int OP_CODE = (int) intent.getIntExtra("OP_CODE", 0);
             Log.d("Message received!!!!!", " New station -------->" + station);
             if (station != null) {
-                switch(OP_CODE) {
+                switch (OP_CODE) {
                     case 0:
                         lbs.add(station);
                         updateStationsOnMap();
