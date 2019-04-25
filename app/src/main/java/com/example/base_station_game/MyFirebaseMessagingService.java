@@ -2,15 +2,26 @@
 package com.example.base_station_game;
 
 import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.util.ArrayList;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "MyFirebaseMsgService";
+
+
+    public MyFirebaseMessagingService() {
+        super();
+    }
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -18,8 +29,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Log.d(TAG, "From: " + remoteMessage.getFrom());
 
 
-       Intent intent = new Intent("station conquered");
-       intent.putExtra("value1",remoteMessage.getNotification().getBody());
+       Intent intent = new Intent("conquer");
+       intent.putExtra("message",remoteMessage.getNotification().getBody());
        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
 

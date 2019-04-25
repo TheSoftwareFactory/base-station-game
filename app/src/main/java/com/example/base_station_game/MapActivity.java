@@ -56,8 +56,8 @@ import static com.example.base_station_game.R.id.settings_ID;
 public class MapActivity extends AppCompatActivity {
 
     DatabaseService mService;
-    boolean mBound = false;
     private DatabaseReference mDatabase;
+    boolean mBound = false;
     private User user;
     private LocationManager locationManager;
     private LocationListener listener;
@@ -375,7 +375,6 @@ public class MapActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         Intent intent = new Intent(this, DatabaseService.class);
-        intent.putExtra("user", user);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
@@ -417,6 +416,11 @@ public class MapActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mMessageReceiver,
                         new IntentFilter("my-integer"));
+
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(mMessageReceiver2,
+                        new IntentFilter("conquer"));
+
     }
 
     public void onPause() {
@@ -434,6 +438,8 @@ public class MapActivity extends AppCompatActivity {
         // Unregister since the activity is not visible
         LocalBroadcastManager.getInstance(this)
                 .unregisterReceiver(mMessageReceiver);
+        LocalBroadcastManager.getInstance(this)
+                .unregisterReceiver(mMessageReceiver2);
 
     }
 
@@ -471,6 +477,18 @@ public class MapActivity extends AppCompatActivity {
         }
     };
 
+    private BroadcastReceiver mMessageReceiver2 = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String message = intent.getStringExtra("message");
+            AlertDialog station_conquered_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
+            station_conquered_alert.setTitle("Station Conquered!");
+            station_conquered_alert.setMessage(message);
+            station_conquered_alert.show();
+        }
+    };
+
     // Defines callbacks for ServiceActivity binding, passed to bindService()
     private ServiceConnection connection = new ServiceConnection() {
         @Override
@@ -487,4 +505,5 @@ public class MapActivity extends AppCompatActivity {
             mBound = false;
         }
     };
+
 }

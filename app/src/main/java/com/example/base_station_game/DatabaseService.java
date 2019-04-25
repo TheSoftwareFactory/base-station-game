@@ -36,7 +36,7 @@ public class DatabaseService extends IntentService {
 
     private DatabaseReference mDatabase;
     private ArrayList stations;
-    private static final int RC_SIGN_IN = 123;
+
     public User user;
 
     public DatabaseService() {
@@ -55,15 +55,8 @@ public class DatabaseService extends IntentService {
         }
     }
 
-    public ArrayList getStations() {
-        return stations;
-    }
-
     @Override
     protected void onHandleIntent(Intent intent) {
-        // Normally we would do some work here, like download a file.
-        // For our sample, we just sleep for 5 seconds.
-        user = (User) intent.getSerializableExtra("user");
 
     }
 
@@ -89,10 +82,6 @@ public class DatabaseService extends IntentService {
         intent.putExtra("OP_CODE", OP_CODE);
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
-    public void update_user(){
-
     }
 
     public void update_stations() {
