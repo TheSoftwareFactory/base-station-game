@@ -42,14 +42,6 @@ public class LoginActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
-   public void logout(View v){
-        if (FirebaseAuth.getInstance().getCurrentUser()!=null) {
-            Toast.makeText(LoginActivity.this, user.getUsername() + " logged out.",
-                    Toast.LENGTH_SHORT).show();
-            FirebaseAuth.getInstance().signOut();
-            user = null;
-        }
-   }
 
     public void register(View v) {
         Intent intent = new Intent(this, RegisterActivity.class);
@@ -144,7 +136,7 @@ public class LoginActivity extends AppCompatActivity {
                     break;
                 }
                 case R.id.settings: {
-                    Intent intent = new Intent(this, Settings.class);
+                    Intent intent = new Intent(this, setting.class);
                     intent.putExtra("user", user);
                     startActivity(intent);
                     break;
