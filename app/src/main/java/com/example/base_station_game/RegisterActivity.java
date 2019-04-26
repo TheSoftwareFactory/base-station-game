@@ -21,14 +21,17 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
+import studio.carbonylgroup.textfieldboxes.ExtendedEditText;
+
 public class RegisterActivity extends AppCompatActivity {
 
     private DatabaseReference mDatabase;
     public User user;
-    private TextView email_field;
-    private TextView username_field;
-    private TextView password_field;
-    private TextView team_field;
+    private ExtendedEditText username_field;
+    private ExtendedEditText email_field;
+    private ExtendedEditText team_field;
+    private ExtendedEditText password_field;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,13 +42,13 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     public void register(View v) {
-        email_field = (TextView) findViewById(R.id.email);
+        email_field = findViewById(R.id.email_text);
         String email=email_field.getText().toString();
-        team_field = (TextView) findViewById(R.id.team);
+        team_field = findViewById(R.id.team_text);
         String team=team_field.getText().toString();
-        username_field = (TextView) findViewById(R.id.username);
+        username_field = findViewById(R.id.username_text);
         String username=username_field.getText().toString();
-        password_field = (TextView) findViewById(R.id.password);
+        password_field =  findViewById(R.id.password_text);
         String password=password_field.getText().toString();
 
 
