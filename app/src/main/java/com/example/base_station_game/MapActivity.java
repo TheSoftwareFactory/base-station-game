@@ -374,15 +374,14 @@ public class MapActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+
         Intent intent = new Intent(this, DatabaseService.class);
-        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        startService(intent);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        unbindService(connection);
-        mBound = false;
     }
 
 
@@ -443,7 +442,6 @@ public class MapActivity extends AppCompatActivity {
 
     }
 
-    //binding:
     // Handling the received stations from the database
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -488,22 +486,4 @@ public class MapActivity extends AppCompatActivity {
             station_conquered_alert.show();
         }
     };
-
-    // Defines callbacks for ServiceActivity binding, passed to bindService()
-    private ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            DatabaseService.LocalBinder binder = (DatabaseService.LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
-
 }

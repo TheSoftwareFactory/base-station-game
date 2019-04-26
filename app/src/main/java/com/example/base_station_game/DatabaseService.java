@@ -1,6 +1,7 @@
 package com.example.base_station_game;
 
 import android.app.IntentService;
+import android.app.Service;
 import android.content.Intent;
 import android.content.Context;
 import android.os.Binder;
@@ -30,7 +31,7 @@ import java.util.Random;
 import static android.app.Activity.RESULT_OK;
 
 
-public class DatabaseService extends IntentService {
+public class DatabaseService extends Service {
 
     private final IBinder binder = new LocalBinder();
 
@@ -40,7 +41,7 @@ public class DatabaseService extends IntentService {
     public User user;
 
     public DatabaseService() {
-        super("DatabaseService");
+        super();
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         stations = new ArrayList();
@@ -53,11 +54,6 @@ public class DatabaseService extends IntentService {
             // Return this instance of LocalService so clients can call public methods
             return DatabaseService.this;
         }
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
