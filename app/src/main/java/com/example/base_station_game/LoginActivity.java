@@ -24,12 +24,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
+import studio.carbonylgroup.textfieldboxes.ExtendedEditText;
+import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
+
 public class LoginActivity extends AppCompatActivity {
 
     private DatabaseReference mDatabase;
     public User user;
-    private TextView email_field;
-    private TextView password_field;
+    private ExtendedEditText email_field;
+    private ExtendedEditText password_field;
 
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,9 +51,9 @@ public class LoginActivity extends AppCompatActivity {
 
 
     public void login(View v) {
-        email_field = (TextView) findViewById(R.id.email);
-        String email = email_field.getText().toString();
-        password_field = (TextView) findViewById(R.id.password);
+        email_field = findViewById(R.id.email_text);
+        String email = email_field.getText().toString()         ;
+        password_field = findViewById(R.id.password_text);
         String password = password_field.getText().toString();
 
         if ( password.equals("") || email.equals(""))
@@ -119,45 +122,4 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void onClick(View v) {
-        if (user == null) {
-            Toast.makeText(LoginActivity.this, "Please log in before continuing.",
-                    Toast.LENGTH_SHORT).show();
-        } else {
-            switch (v.getId()) {
-                case R.id.buttonMAP: {
-                    Intent intent = new Intent(this, MapActivity.class);
-                    intent.putExtra("user", user);
-                    startActivity(intent);
-                    break;
-                }
-                case R.id.sample_debug: {
-                    Intent intent = new Intent(this, SamplingDebugActivity.class);
-                    intent.putExtra("user", user);
-                    startActivity(intent);
-                    break;
-                }
-                case R.id.google_engine: {
-                    Intent intent = new Intent(this, Engine_Activity.class);
-                    intent.putExtra("user", user);
-                    startActivity(intent);
-                    break;
-                }
-                case R.id.user_profile: {
-                    Intent intent = new Intent(this, UserProfile.class);
-                    intent.putExtra("user", user);
-                    startActivity(intent);
-                    break;
-                }
-                case R.id.settings: {
-                    Intent intent = new Intent(this, setting.class);
-                    intent.putExtra("user", user);
-                    startActivity(intent);
-                    break;
-                }
-                default:
-                    throw new RuntimeException("Unknown button ID");
-            }
-        }
-    }
 }

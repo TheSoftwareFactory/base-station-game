@@ -57,7 +57,6 @@ public class DatabaseService extends Service {
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "ServiceActivity starting", Toast.LENGTH_SHORT).show();
         return super.onStartCommand(intent, flags, startId);
     }
 
