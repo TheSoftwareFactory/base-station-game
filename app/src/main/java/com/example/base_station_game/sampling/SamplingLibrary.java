@@ -1983,7 +1983,7 @@ public final class SamplingLibrary {
     public static int isDeveloperModeOn(Context context) {
         ContentResolver res = context.getContentResolver();
         int adb = Settings.Secure.getInt(res, Settings.Secure.ADB_ENABLED, 0);
-        // In API level 17, this is Settings.Global.ADB_ENABLED.
+        // In API level 17, this is SettingsActivity.Global.ADB_ENABLED.
         return adb;
     }
 
@@ -2042,7 +2042,7 @@ public final class SamplingLibrary {
 //
 //        // API levels greater or equal than 9
 //        if (sdkLevel >= Build.VERSION_CODES.GINGERBREAD) {
-//            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+//            intent.setAction(SettingsActivity.ACTION_APPLICATION_DETAILS_SETTINGS);
 //            Uri uri = Uri.fromParts("package", packageName, null);
 //            intent.setData(uri);
 //        } else {
@@ -2622,8 +2622,8 @@ public final class SamplingLibrary {
 //    public static boolean getRotationEnabled(Context context){
 //        try {
 //            ContentResolver cr = context.getContentResolver();
-//            String setting = Settings.System.ACCELEROMETER_ROTATION;
-//            return android.provider.Settings.System.getInt(cr, setting, 0) == 1;
+//            String setting = SettingsActivity.System.ACCELEROMETER_ROTATION;
+//            return android.provider.SettingsActivity.System.getInt(cr, setting, 0) == 1;
 //        } catch (Throwable th){
 //            Logger.d(TAG, "Error while checking auto-rotation " + th);
 //        }

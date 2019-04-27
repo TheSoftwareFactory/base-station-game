@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
+
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -19,8 +20,21 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <service
-            android:name=".MyFirebaseMessagingService"
+            android:name=".MyFirebaseInstanceIDService"
+            android:enabled="true"
+            android:exported="true"></service>
 
+        <activity
+            android:name=".setting"
+            android:parentActivityName=".LoginActivity"
+
+            android:theme="@android:style/Theme.NoTitleBar"/>
+        <activity
+            android:name=".RegisterActivity"
+            android:parentActivityName=".LoginActivity" />
+
+        <service
+            android:name=".MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -28,10 +42,9 @@
             </intent-filter>
         </service>
 
-
-
-        <activity android:name=".UserProfile" />
-        <activity android:name=".Settings" />
+        <activity
+            android:name=".UserProfile"
+            android:parentActivityName=".MapActivity" />
         <activity
             android:name=".ServiceActivity"
             android:label="@string/title_activity_service"
@@ -47,12 +60,9 @@
         <activity
             android:name=".MapActivity"
             android:label="Map Activity"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.base_station_game.MainActivity" />
-        </activity>
-        <activity android:name=".MainActivity">
+            ></activity>
+
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

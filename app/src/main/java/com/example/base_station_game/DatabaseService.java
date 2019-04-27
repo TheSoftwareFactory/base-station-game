@@ -1,6 +1,7 @@
 package com.example.base_station_game;
 
 import android.app.IntentService;
+import android.app.Service;
 import android.content.Intent;
 import android.content.Context;
 import android.os.Binder;
@@ -30,17 +31,17 @@ import java.util.Random;
 import static android.app.Activity.RESULT_OK;
 
 
-public class DatabaseService extends IntentService {
+public class DatabaseService extends Service {
 
     private final IBinder binder = new LocalBinder();
 
     private DatabaseReference mDatabase;
     private ArrayList stations;
-    private static final int RC_SIGN_IN = 123;
+
     public User user;
 
     public DatabaseService() {
-        super("DatabaseService");
+        super();
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         stations = new ArrayList();
@@ -55,20 +56,7 @@ public class DatabaseService extends IntentService {
         }
     }
 
-    public ArrayList getStations() {
-        return stations;
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        // Normally we would do some work here, like download a file.
-        // For our sample, we just sleep for 5 seconds.
-        user = (User) intent.getSerializableExtra("user");
-
-    }
-
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "ServiceActivity starting", Toast.LENGTH_SHORT).show();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -89,10 +77,6 @@ public class DatabaseService extends IntentService {
         intent.putExtra("OP_CODE", OP_CODE);
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
-    public void update_user(){
-
     }
 
     public void update_stations() {
