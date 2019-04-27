@@ -16,6 +16,8 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -25,6 +27,9 @@ import android.view.View;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
@@ -52,9 +57,12 @@ public class MapActivity extends AppCompatActivity {
     DatabaseService mService;
     private DatabaseReference mDatabase;
     boolean mBound = false;
+    private int level;
+    private long exp;
     private User user;
     private LocationManager locationManager;
     private LocationListener listener;
+    private ChildEventListener childListener;
     private GeoPoint actualPosition = new GeoPoint(0, 0);
     SimpleFastPointOverlay sfpo;
     Polygon p = null;
@@ -83,6 +91,40 @@ public class MapActivity extends AppCompatActivity {
         this.user = (User) getIntent().getSerializableExtra("user");
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        childListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot ds, String prevChildKey) {
+                Log.e("DS", ds.toString());
+                if(ds.getKey().equals("level")){
+                    level = ((Long) ds.getValue()).intValue();
+                }
+                if(ds.getKey().equals("exp")){
+                    exp = (long) ds.getValue();
+                }
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        mDatabase.child("Users").child(user.getUID()).addChildEventListener(childListener);
         //handle permissions first, before map is created. not depicted here
 
         //load/initialize the osmdroid configuration, this can be done
