@@ -49,9 +49,6 @@ import static com.example.base_station_game.R.id.settings_ID;
 
 public class MapActivity extends AppCompatActivity {
 
-    DatabaseService mService;
-    private DatabaseReference mDatabase;
-    boolean mBound = false;
     private User user;
     private LocationManager locationManager;
     private LocationListener listener;
@@ -81,9 +78,6 @@ public class MapActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         this.user = (User) getIntent().getSerializableExtra("user");
-
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        //handle permissions first, before map is created. not depicted here
 
         //load/initialize the osmdroid configuration, this can be done
         Context ctx = getApplicationContext();
@@ -178,25 +172,6 @@ public class MapActivity extends AppCompatActivity {
         }
         locationManager.requestLocationUpdates("gps", 3000, 0, listener);
 
-/*
-        //make new thread
-        //notify of conquered stations
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference ref = mDatabase.child("Users").child(user.getUID()).child("ConqueredStations"); //check at reference of user if it already exists
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                AlertDialog station_conquered_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
-                station_conquered_alert.setTitle("Station Conquered!");
-                station_conquered_alert.setMessage("Your team " + user.getTeam() + " conquered Station " + dataSnapshot.getKey() + ", where you reached " + dataSnapshot.getValue() + " points");
-                station_conquered_alert.show();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-*/
         SpeedDialView speedDialView = findViewById(R.id.speedDial);
         speedDialView.addActionItem(
                 new SpeedDialActionItem.Builder(R.id.user_profile_ID, R.drawable.ic_accessibility_black_24dp)
@@ -407,11 +382,11 @@ public class MapActivity extends AppCompatActivity {
         //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
         map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
         LocalBroadcastManager.getInstance(this)
-                .registerReceiver(mMessageReceiver,
+                .registerReceiver(DatabaseReceiver,
                         new IntentFilter("my-integer"));
 
         LocalBroadcastManager.getInstance(this)
-                .registerReceiver(mMessageReceiver2,
+                .registerReceiver(ConquerReceiver,
                         new IntentFilter("conquer"));
 
     }
@@ -430,14 +405,14 @@ public class MapActivity extends AppCompatActivity {
 
         // Unregister since the activity is not visible
         LocalBroadcastManager.getInstance(this)
-                .unregisterReceiver(mMessageReceiver);
+                .unregisterReceiver(DatabaseReceiver);
         LocalBroadcastManager.getInstance(this)
-                .unregisterReceiver(mMessageReceiver2);
+                .unregisterReceiver(ConquerReceiver);
 
     }
 
     // Handling the received stations from the database
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver DatabaseReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Extract data included in the Intent
@@ -469,7 +444,7 @@ public class MapActivity extends AppCompatActivity {
         }
     };
 
-    private BroadcastReceiver mMessageReceiver2 = new BroadcastReceiver() {
+    private BroadcastReceiver ConquerReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 

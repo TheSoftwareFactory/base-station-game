@@ -20,7 +20,7 @@ public class UserProfile extends AppCompatActivity {
     TextView email = null;
     TextView exp = null;
     TextView level = null;
-    TextView id = null;
+    TextView team = null;
     private DatabaseReference mDatabase;
     User user;
 
@@ -35,8 +35,8 @@ public class UserProfile extends AppCompatActivity {
         super.onStart();
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference ref = mDatabase.child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()); //check at reference of user if it already exists
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference ref = mDatabase.child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 user = dataSnapshot.getValue(User.class);
@@ -48,12 +48,12 @@ public class UserProfile extends AppCompatActivity {
             }
         });
 
-        username = (TextView) findViewById(R.id.textValueView3);
-        email = (TextView) findViewById(R.id.textValueView4);
-        exp = (TextView) findViewById(R.id.textValueView5);
-        level = (TextView) findViewById(R.id.textValueView6);
-        id = (TextView) findViewById(R.id.textValueView7);
-        updateUI();
+        username = findViewById(R.id.username);
+        email = findViewById(R.id.email);
+        exp = findViewById(R.id.exp);
+        level = findViewById(R.id.level);
+        team = findViewById(R.id.team);
+
 
     }
 
@@ -62,6 +62,6 @@ public class UserProfile extends AppCompatActivity {
         email.setText(user.getEmail());
         exp.setText("" + user.getExp());
         level.setText("" + user.getLevel());
-        id.setText(user.getUID());
+        team.setText("" + user.getTeam());
     }
 }
