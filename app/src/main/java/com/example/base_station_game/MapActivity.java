@@ -154,9 +154,22 @@ public class MapActivity extends AppCompatActivity {
             new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    long lvl = (long) dataSnapshot.child("level").getValue();
+                    System.out.println("Initing level and exp");
+                    Object lvlobj = dataSnapshot.child("level").getValue();
+                    if (lvlobj == null) {
+                        System.out.println("level was null!");
+                        long i = 1;
+                        lvlobj = i;
+                    }
+                    int lvl = ((Long) lvlobj).intValue();
                     level.setText(""+lvl);
-                    int exp = ((Long) dataSnapshot.child("exp").getValue()).intValue();
+                    Object expobj = dataSnapshot.child("exp").getValue();
+                    if (expobj == null) {
+                        System.out.println("exp was null!");
+                        long i = 0;
+                        expobj = i;
+                    }
+                    int exp = ((Long) expobj).intValue();
                     if (Build.VERSION.SDK_INT >= 24) {
                         expBar.setProgress(exp, true);
                     } else {
