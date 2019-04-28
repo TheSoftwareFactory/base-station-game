@@ -25,6 +25,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.util.Log;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
@@ -46,6 +48,7 @@ import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
 import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlay;
 import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlayOptions;
 import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,8 +60,8 @@ public class MapActivity extends AppCompatActivity {
     DatabaseService mService;
     private DatabaseReference mDatabase;
     boolean mBound = false;
-    private int level;
-    private long exp;
+    private ProgressBar expBar;
+    private TextView level;
     private User user;
     private LocationManager locationManager;
     private LocationListener listener;
@@ -101,10 +104,16 @@ public class MapActivity extends AppCompatActivity {
             public void onChildChanged(DataSnapshot ds, String prevChildKey) {
                 Log.e("DS", ds.toString());
                 if(ds.getKey().equals("level")){
-                    level = ((Long) ds.getValue()).intValue();
+                    int lvl = ((Long) ds.getValue()).intValue();
+                    level.setText(""+lvl);
                 }
                 if(ds.getKey().equals("exp")){
-                    exp = (long) ds.getValue();
+                    long exp = (long) ds.getValue();
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        expBar.setProgress((int) exp, true);
+                    } else {
+                        expBar.setProgress((int) exp);
+                    }
                 }
 
             }
@@ -138,6 +147,14 @@ public class MapActivity extends AppCompatActivity {
 
         //inflate and create the map
         setContentView(R.layout.activity_map);
+        level = findViewById(R.id.level);
+        expBar = findViewById(R.id.expBar);
+        level.setText(""+user.getLevel());
+        if (Build.VERSION.SDK_INT >= 24) {
+            expBar.setProgress((int) user.getExp(), true);
+        } else {
+            expBar.setProgress((int) user.getExp());
+        }
 
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
