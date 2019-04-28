@@ -29,11 +29,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
 
@@ -103,7 +105,7 @@ public class MapActivity extends AppCompatActivity {
             public void onChildChanged(DataSnapshot ds, String prevChildKey) {
                 Log.e("DS", ds.toString());
                 if(ds.getKey().equals("level")){
-                    int lvl = ((Long) ds.getValue()).intValue();
+                    long lvl = (long) ds.getValue();
                     level.setText(""+lvl);
                 }
                 if(ds.getKey().equals("exp")){
@@ -132,7 +134,7 @@ public class MapActivity extends AppCompatActivity {
 
             }
         };
-        mDatabase.child("Users").child(user.getUID()).addChildEventListener(childListener);
+        mDatabase.child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addChildEventListener(childListener);
         //handle permissions first, before map is created. not depicted here
 
         //load/initialize the osmdroid configuration, this can be done
@@ -148,12 +150,26 @@ public class MapActivity extends AppCompatActivity {
         setContentView(R.layout.activity_map);
         level = findViewById(R.id.level);
         expBar = findViewById(R.id.expBar);
-        level.setText(""+user.getLevel());
-        if (Build.VERSION.SDK_INT >= 24) {
-            expBar.setProgress((int) user.getExp(), true);
-        } else {
-            expBar.setProgress((int) user.getExp());
-        }
+        mDatabase.child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addListenerForSingleValueEvent(
+            new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    long lvl = (long) dataSnapshot.child("level").getValue();
+                    level.setText(""+lvl);
+                    int exp = ((Long) dataSnapshot.child("exp").getValue()).intValue();
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        expBar.setProgress(exp, true);
+                    } else {
+                        expBar.setProgress(exp);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            }
+        );
 
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
