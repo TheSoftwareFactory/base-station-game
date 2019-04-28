@@ -2,10 +2,12 @@ package com.example.base_station_game;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.os.Build;
 import android.os.DeadObjectException;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,6 +22,7 @@ public class UserProfile extends AppCompatActivity {
     TextView username = null;
     TextView email = null;
     TextView exp = null;
+    ProgressBar expBar = null;
     TextView level = null;
     TextView team = null;
     TextView players = null;
@@ -61,6 +64,7 @@ public class UserProfile extends AppCompatActivity {
         username = findViewById(R.id.username);
         email = findViewById(R.id.email);
         exp = findViewById(R.id.exp);
+        expBar = findViewById(R.id.expBar);
         level = findViewById(R.id.level);
         team = findViewById(R.id.team);
         players = findViewById(R.id.players);
@@ -85,11 +89,16 @@ public class UserProfile extends AppCompatActivity {
     }
 
     private void updateUI(){
-        Double max_exp=100.0;
+        Double max_exp=4000.0;
         username.setText(user.getUsername());
         email.setText("Mail Address:  "+user.getEmail());
         Double exp_percentage= user.getExp()/max_exp*100;
-        exp.setText("Experience:  " + user.getExp()+"/100  ("+exp_percentage.intValue()+"%)");
+        exp.setText("Experience:  " + user.getExp()+"/4000  ("+exp_percentage.intValue()+"%)");
+        if (Build.VERSION.SDK_INT >= 24) {
+            expBar.setProgress((int) user.getExp(), true);
+        } else {
+            expBar.setProgress((int) user.getExp());
+        }
         level.setText("Level " + user.getLevel());
         team.setText("" + user.getTeam());
     }
