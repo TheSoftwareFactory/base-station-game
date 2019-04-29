@@ -61,6 +61,7 @@ public class RegisterActivity extends AppCompatActivity {
         else {
 
             mDatabase = FirebaseDatabase.getInstance().getReference();
+            // If you use . - or other symbols this fail
             DatabaseReference ref = mDatabase.child("usernames").child(username); //check at reference of user if it already exists
             ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override

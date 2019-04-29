@@ -154,9 +154,22 @@ public class MapActivity extends AppCompatActivity {
             new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    long lvl = (long) dataSnapshot.child("level").getValue();
+                    System.out.println("Initing level and exp");
+                    Object lvlobj = dataSnapshot.child("level").getValue();
+                    if (lvlobj == null) {
+                        System.out.println("level was null!");
+                        long i = 1;
+                        lvlobj = i;
+                    }
+                    int lvl = ((Long) lvlobj).intValue();
                     level.setText(""+lvl);
-                    int exp = ((Long) dataSnapshot.child("exp").getValue()).intValue();
+                    Object expobj = dataSnapshot.child("exp").getValue();
+                    if (expobj == null) {
+                        System.out.println("exp was null!");
+                        long i = 0;
+                        expobj = i;
+                    }
+                    int exp = ((Long) expobj).intValue();
                     if (Build.VERSION.SDK_INT >= 24) {
                         expBar.setProgress(exp, true);
                     } else {
@@ -260,18 +273,21 @@ public class MapActivity extends AppCompatActivity {
         speedDialView.addActionItem(
                 new SpeedDialActionItem.Builder(settings_ID, R.drawable.ic_settings_black_24dp)
                         .create());
+        speedDialView.addActionItem(
+                new SpeedDialActionItem.Builder(R.id.news_activity, R.drawable.ic_people_black_24dp)
+                        .create());
 
 
         speedDialView.setOnChangeListener(new SpeedDialView.OnChangeListener() {
             @Override
             public boolean onMainActionSelected() {
-                Toast.makeText(MapActivity.this, "Main action clicked!", Toast.LENGTH_LONG).show();
+                //Toast.makeText(MapActivity.this, "Main action clicked!", Toast.LENGTH_LONG).show();
                 return false; // True to keep the Speed Dial open
             }
 
             @Override
             public void onToggleChanged(boolean isOpen) {
-                Toast.makeText(MapActivity.this, "Speed dial toggle state changed. Open = " + isOpen, Toast.LENGTH_LONG).show();
+                //Toast.makeText(MapActivity.this, "Speed dial toggle state changed. Open = " + isOpen, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -280,16 +296,22 @@ public class MapActivity extends AppCompatActivity {
             public boolean onActionSelected(SpeedDialActionItem actionItem) {
                 switch (actionItem.getId()) {
                     case R.id.user_profile_ID:
-                        Toast.makeText(MapActivity.this, "cliccked on userprofile", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(MapActivity.this, "cliccked on userprofile", Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(MapActivity.this, UserProfile.class);
                         intent.putExtra("user", user);
                         startActivity(intent);
                         return true; // false will close it without animation
                     case settings_ID:
-                        Toast.makeText(MapActivity.this, "cliccked on settings", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(MapActivity.this, "cliccked on settings", Toast.LENGTH_LONG).show();
                         Intent intent1 = new Intent(MapActivity.this, setting.class);
                         intent1.putExtra("user", user);
                         startActivity(intent1);
+                        return true; // false will close it without animation
+                    case R.id.news_activity:
+                        //Toast.makeText(MapActivity.this, "cliccked on settings", Toast.LENGTH_LONG).show();
+                        Intent intent2 = new Intent(MapActivity.this, NewsActivity.class);
+                        intent2.putExtra("user", user);
+                        startActivity(intent2);
                         return true; // false will close it without animation
                     default:
                         break;

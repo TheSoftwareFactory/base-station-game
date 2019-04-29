@@ -2,4 +2,5 @@
 <resources>
     <item name="settings_ID" type="id" />
     <item name="user_profile_ID" type="id" />
+    <item name="news_activity" type="id" />
 </resources>
