@@ -535,4 +535,41 @@ public class MapActivity extends AppCompatActivity {
             station_conquered_alert.show();
         }
     };
+
+    @Override
+    public void onBackPressed(){
+        AlertDialog back_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
+        back_alert.setTitle("Do you really want to log out?");
+        back_alert.setButton(AlertDialog.BUTTON_NEUTRAL, "No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        back_alert.setButton(AlertDialog.BUTTON_NEUTRAL, "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        logout();
+                    }
+                });
+        back_alert.show();
+    }
+
+    public void logout(){
+        if (FirebaseAuth.getInstance().getCurrentUser()!=null) {
+            Toast.makeText(MapActivity.this, "Logged out successfully!",
+                    Toast.LENGTH_SHORT).show();
+            FirebaseAuth.getInstance().signOut();
+
+
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        }
+        else
+        {
+            Log.d("User Error","No user logged in when logging out!");
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        }
+    }
 }

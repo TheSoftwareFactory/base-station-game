@@ -26,6 +26,8 @@ public class UserProfile extends AppCompatActivity {
     TextView level = null;
     TextView team = null;
     TextView players = null;
+    TextView conquered_stations = null;
+    long conquered_station_count;
     long player_count=0;
     boolean team_registered;
     private DatabaseReference mDatabase;
@@ -47,6 +49,7 @@ public class UserProfile extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 user = dataSnapshot.getValue(User.class);
+                conquered_station_count=dataSnapshot.child("ConqueredStations").getChildrenCount();
                 updateUI();
                 if (!team_registered){
                     registerTeam();
@@ -68,7 +71,7 @@ public class UserProfile extends AppCompatActivity {
         level = findViewById(R.id.level);
         team = findViewById(R.id.team);
         players = findViewById(R.id.players);
-
+        conquered_stations = findViewById(R.id.conqueredStations);
 
     }
 
@@ -101,5 +104,6 @@ public class UserProfile extends AppCompatActivity {
         }
         level.setText("Level " + user.getLevel());
         team.setText("" + user.getTeam());
+        conquered_stations.setText("Number of Conquered Stations:  "+conquered_station_count);
     }
 }
