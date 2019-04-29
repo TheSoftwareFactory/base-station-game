@@ -90,7 +90,9 @@ public class RegisterActivity extends AppCompatActivity {
                                                     mDatabase.child("Users").child(user.getUID()).child("uid").setValue(user.getUID());
                                                     mDatabase.child("Users").child(user.getUID()).child("team").setValue(user.getTeam());
                                                     mDatabase.child("Users").child(user.getUID()).child("token").setValue(token);
+
                                                     mDatabase.child("usernames").child(username).setValue(user.getUID());
+                                                    mDatabase.child("Teams").child(team).child(firebaseUser.getUid()).setValue(username);
                                                     startMap();
                                                 }
                                                 else
