@@ -560,21 +560,23 @@ public class MapActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        AlertDialog back_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
+        AlertDialog.Builder back_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme);
         back_alert.setTitle("Do you really want to log out?");
-        back_alert.setButton(AlertDialog.BUTTON_NEUTRAL, "No",
+
+
+        back_alert.setNegativeButton( "No",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
-        back_alert.setButton(AlertDialog.BUTTON_NEUTRAL, "Yes",
+        back_alert.setPositiveButton("Yes",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         logout();
                     }
                 });
-        back_alert.show();
+        back_alert.create().show();
     }
 
     public void logout(){
