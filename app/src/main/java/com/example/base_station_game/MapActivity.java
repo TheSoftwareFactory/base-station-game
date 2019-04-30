@@ -107,6 +107,9 @@ public class MapActivity extends AppCompatActivity {
                 if(ds.getKey().equals("level")){
                     long lvl = (long) ds.getValue();
                     level.setText(""+lvl);
+                    AlertDialog levelDialog = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
+                    levelDialog.setTitle("Level Up!");
+                    levelDialog.setMessage("You finally reached Level "+lvl);
                 }
                 if(ds.getKey().equals("exp")){
                     long exp = (long) ds.getValue();
