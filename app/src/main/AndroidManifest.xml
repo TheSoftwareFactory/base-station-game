@@ -27,8 +27,8 @@
 
         <activity
             android:name=".setting"
-            android:parentActivityName=".LoginActivity"
-            android:theme="@android:style/Theme.NoTitleBar" />
+            android:parentActivityName=".LoginActivity"/>
+        <!--android:theme="@android:style/Theme.NoTitleBar" -->
         <activity
             android:name=".RegisterActivity"
             android:parentActivityName=".LoginActivity" />
