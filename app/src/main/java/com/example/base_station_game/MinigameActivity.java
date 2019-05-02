@@ -28,13 +28,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.Polygon;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 class OutOfRangeException extends Exception {
     public OutOfRangeException(String message) {
@@ -207,7 +200,7 @@ public class MinigameActivity extends AppCompatActivity {
     }
 
     public void onClick(View v) {
-            score++;
+        score += 10;
     }
 
     protected void onResume() {

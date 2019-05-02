@@ -69,9 +69,10 @@ public class MapActivity extends AppCompatActivity {
     private LocationListener listener;
     private ChildEventListener childListener;
     private GeoPoint actualPosition = new GeoPoint(0, 0);
-    SimpleFastPointOverlay sfpo;
-    Polygon p = null;
+    private SimpleFastPointOverlay sfpo;
+    private Polygon p = null;
 
+    //Meters
     static int MAX_DISTANCE = 200;
 
     //creating fake station list
@@ -80,12 +81,12 @@ public class MapActivity extends AppCompatActivity {
 
     List<BaseStation> lbs = null;
 
-    MapView map = null;
-    Marker marker = null;
+    private MapView map = null;
+    private Marker marker = null;
 
-    Paint textStyle = new Paint();
-    Paint pointStyle = new Paint();
-    Paint selectedPointStyle = new Paint();
+    private Paint textStyle = new Paint();
+    private Paint pointStyle = new Paint();
+    private Paint selectedPointStyle = new Paint();
 
     private static final String LOG_TAG =
             MapActivity.class.getSimpleName();
@@ -415,7 +416,7 @@ public class MapActivity extends AppCompatActivity {
             map.getOverlays().remove(this.sfpo);
             this.sfpo = sfpo;
             map.getOverlays().add(sfpo);
-
+            map.invalidate();
 
         /*
         //Adding base stations with Overlay Items
@@ -540,6 +541,7 @@ public class MapActivity extends AppCompatActivity {
                         lbs.add(station);
                         BaseStation bs = lbs.get(lbs.indexOf(station));
                         bs.setWinningTeam(station.getWinningTeam());
+                        updateStationsOnMap();
                         break;
 
                 }
