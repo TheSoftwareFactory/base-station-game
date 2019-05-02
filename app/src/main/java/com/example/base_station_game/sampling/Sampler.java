@@ -10,12 +10,14 @@ import android.telephony.TelephonyManager;
 import com.example.base_station_game.sampling.models.SystemLoadPoint;
 import com.example.base_station_game.sampling.storage.SampleDB;
 import com.example.base_station_game.sampling.structs.BatteryDetails;
+import com.example.base_station_game.sampling.structs.CellDetails;
 import com.example.base_station_game.sampling.structs.CpuStatus;
 import com.example.base_station_game.sampling.structs.Sample;
 import com.example.base_station_game.sampling.utils.BatteryUtils;
 import com.example.base_station_game.sampling.utils.FsUtils;
 import com.example.base_station_game.sampling.utils.Util;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -130,15 +132,25 @@ public class Sampler {
             sample.setMemoryInactive(memoryInfo[3]);
         }
         TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-
-        List<CellInfo> towers = tm.getAllCellInfo();
+        CellDetails ci = getCellDetails(tm);
         SystemLoadPoint load2 = SamplingLibrary.getSystemLoad();
         sample.setCpuStatus(constructCpuStatus(load1, load2));
         return sample;
     }
 
-    private static CellDetails getCellDetails() {
-
+    private static CellDetails getCellDetails(TelephonyManager tm) {
+        List<CellInfo> cellInfo = new ArrayList<>();
+        List<String> strings = new ArrayList<>();
+        try {
+            cellInfo = tm.getAllCellInfo();
+        } catch (SecurityException se) {
+            System.out.println("Insufficient permissions for CellInfo");
+        }
+        for (CellInfo cell: cellInfo) {
+            System.out.println(cell.toString());
+            strings.add(cell.toString());
+        }
+        return new CellDetails(strings);
     }
 
     private static BatteryDetails getBatteryDetails(Context context, Intent intent){
