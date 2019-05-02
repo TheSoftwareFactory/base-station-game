@@ -1,4 +1,17 @@
 <resources>
     <string name="app_name">base-station-game</string>
     <string name="title_activity_service">ServiceActivity</string>
+    <string name="pw_wrong">Password is not correct</string>
+    <string name="enter">Please enter Email and Password</string>
+    <string name="corrupt">Userdata is corrupted, please contact an Admin</string>
+    <string name="user_missing">User does not exist</string>
+    <string name="all_fields">Please fill all fields!</string>
+    <string name="username_gone">The Username is already in use</string>
+    <string name="char_min">Min. 6 Characters</string>
+    <string name="acc_exists">Account already exists</string>
+    <string name="reg_fail">Registering failed</string>
+    <string name=""></string>
+
+
+
 </resources>

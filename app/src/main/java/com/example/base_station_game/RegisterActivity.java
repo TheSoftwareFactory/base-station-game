@@ -58,7 +58,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         if ( password.equals("") || email.equals("") || team.equals("") || username.equals(""))
         {
-            Toast.makeText(RegisterActivity.this, "Please fill all fields!",
+            Toast.makeText(RegisterActivity.this, R.string.all_fields,
                     Toast.LENGTH_SHORT).show();
         }
         else {
@@ -70,7 +70,7 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
-                        username_field.setError("Username already in use");
+                        username_field.setError(R.string.username_gone+"");
                         username_field.requestFocus();
                     }
                     else {
@@ -109,18 +109,18 @@ public class RegisterActivity extends AppCompatActivity {
                                         try {
                                             throw task.getException();
                                         } catch(FirebaseAuthWeakPasswordException e) {
-                                            password_field.setError("Min. 6 Characters");
+                                            password_field.setError(R.string.char_min+"");
                                             password_field.requestFocus();
                                         } catch(FirebaseAuthInvalidCredentialsException e) {
 
                                         } catch(FirebaseAuthUserCollisionException e) {
-                                            email_field.setError("Account already exists");
+                                            email_field.setError(R.string.acc_exists+"");
                                             email_field.requestFocus();
                                            // mTxtEmail.requestFocus();
                                         } catch(Exception e) {
-                                            Log.e("whatever", e.getMessage());
+                                            Log.e("Uncaught Error", e.getMessage());
                                         }
-                                        Toast.makeText(RegisterActivity.this, "Registering failed.",
+                                        Toast.makeText(RegisterActivity.this,R.string.reg_fail,
                                                 Toast.LENGTH_SHORT).show();
                                     }
                                 });
