@@ -12,30 +12,37 @@
         android:layout_width="105dp"
         android:layout_height="61dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="116dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="128dp"
+        android:layout_marginBottom="8dp"
         android:onClick="register"
         android:text="register"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/team"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/heading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:fontFamily="sans-serif-medium"
         android:text="Base Station Game"
         android:textAlignment="center"
         android:textColor="@android:color/holo_red_dark"
         android:textSize="36sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.416"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.042" />
 
 
     <studio.carbonylgroup.textfieldboxes.TextFieldBoxes
@@ -43,15 +50,18 @@
         android:layout_width="328dp"
         android:layout_height="56dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         app:hasClearButton="true"
         app:iconSignifier="@drawable/at"
         app:labelText="Email Address"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/heading"
+        app:layout_constraintVertical_bias="0.074"
         app:primaryColor="#9C27B0">
 
         <studio.carbonylgroup.textfieldboxes.ExtendedEditText
@@ -66,14 +76,17 @@
         android:layout_width="328dp"
         android:layout_height="56dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         app:hasClearButton="true"
         app:labelText="Username"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintHorizontal_bias="0.522"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/password"
+        app:layout_constraintVertical_bias="0.073"
         app:primaryColor="#9C27B0">
 
         <studio.carbonylgroup.textfieldboxes.ExtendedEditText
@@ -93,12 +106,12 @@
         android:layout_marginBottom="8dp"
         app:hasClearButton="true"
         app:labelText="Team"
-        app:layout_constraintBottom_toTopOf="@+id/register"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintHorizontal_bias="0.522"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/username"
-        app:layout_constraintVertical_bias="0.141"
+        app:layout_constraintVertical_bias="0.093"
         app:primaryColor="#9C27B0">
 
         <studio.carbonylgroup.textfieldboxes.ExtendedEditText
@@ -113,15 +126,18 @@
         android:layout_width="328dp"
         android:layout_height="54dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="40dp"
+        android:layout_marginBottom="8dp"
         app:hasClearButton="true"
         app:iconSignifier="@drawable/key"
         app:labelText="Password"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.942"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/email"
+        app:layout_constraintVertical_bias="0.051"
         app:primaryColor="#9C27B0">
 
         <studio.carbonylgroup.textfieldboxes.ExtendedEditText

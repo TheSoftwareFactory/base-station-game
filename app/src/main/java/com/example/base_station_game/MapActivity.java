@@ -107,6 +107,9 @@ public class MapActivity extends AppCompatActivity {
                 if(ds.getKey().equals("level")){
                     long lvl = (long) ds.getValue();
                     level.setText(""+lvl);
+                    AlertDialog levelDialog = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
+                    levelDialog.setTitle("Level Up!");
+                    levelDialog.setMessage("You finally reached Level "+lvl);
                 }
                 if(ds.getKey().equals("exp")){
                     long exp = (long) ds.getValue();
@@ -557,4 +560,43 @@ public class MapActivity extends AppCompatActivity {
             station_conquered_alert.show();
         }
     };
+
+    @Override
+    public void onBackPressed(){
+        AlertDialog.Builder back_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme);
+        back_alert.setTitle("Do you really want to log out?");
+
+
+        back_alert.setNegativeButton( "No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        back_alert.setPositiveButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        logout();
+                    }
+                });
+        back_alert.create().show();
+    }
+
+    public void logout(){
+        if (FirebaseAuth.getInstance().getCurrentUser()!=null) {
+            Toast.makeText(MapActivity.this, "Logged out successfully!",
+                    Toast.LENGTH_SHORT).show();
+            FirebaseAuth.getInstance().signOut();
+
+
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        }
+        else
+        {
+            Log.d("User Error","No user logged in when logging out!");
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        }
+    }
 }

@@ -17,6 +17,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -63,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if ( password.equals("") || email.equals(""))
         {
-            Toast.makeText(LoginActivity.this, "Please enter both Email and Password",
+            Toast.makeText(LoginActivity.this, "Please enter Email and Password",
                     Toast.LENGTH_SHORT).show();
         }
         else {
@@ -111,9 +115,21 @@ public class LoginActivity extends AppCompatActivity {
                                 });
 
                             } else {
-                                Log.w("TAG", "signInWithEmail", task.getException());
-                                Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
+
+                                try {
+                                    throw task.getException();
+                                } catch(FirebaseAuthInvalidCredentialsException e) {
+                                    password_field.setError("Password invalid");
+                                    password_field.requestFocus();
+
+                                }
+                                catch(FirebaseAuthInvalidUserException e) {
+                                    email_field.setError("User does not exist");
+                                    email_field.requestFocus();
+                                } catch(Exception e) {
+                                    Log.e("whatever", e.getMessage());
+                                }
+
                             }
                         }
                     });

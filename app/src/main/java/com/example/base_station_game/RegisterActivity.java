@@ -12,6 +12,9 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -67,9 +70,8 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
-                        Toast.makeText(RegisterActivity.this, "Username already in use.",
-                                Toast.LENGTH_SHORT).show();
-
+                        username_field.setError("Username already in use");
+                        username_field.requestFocus();
                     }
                     else {
                         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
@@ -90,7 +92,9 @@ public class RegisterActivity extends AppCompatActivity {
                                                     mDatabase.child("Users").child(user.getUID()).child("uid").setValue(user.getUID());
                                                     mDatabase.child("Users").child(user.getUID()).child("team").setValue(user.getTeam());
                                                     mDatabase.child("Users").child(user.getUID()).child("token").setValue(token);
+
                                                     mDatabase.child("usernames").child(username).setValue(user.getUID());
+                                                    mDatabase.child("Teams").child(team).child(firebaseUser.getUid()).setValue(username);
                                                     startMap();
                                                 }
                                                 else
@@ -102,6 +106,20 @@ public class RegisterActivity extends AppCompatActivity {
 
 
                                     } else {
+                                        try {
+                                            throw task.getException();
+                                        } catch(FirebaseAuthWeakPasswordException e) {
+                                            password_field.setError("Min. 6 Characters");
+                                            password_field.requestFocus();
+                                        } catch(FirebaseAuthInvalidCredentialsException e) {
+
+                                        } catch(FirebaseAuthUserCollisionException e) {
+                                            email_field.setError("Account already exists");
+                                            email_field.requestFocus();
+                                           // mTxtEmail.requestFocus();
+                                        } catch(Exception e) {
+                                            Log.e("whatever", e.getMessage());
+                                        }
                                         Toast.makeText(RegisterActivity.this, "Registering failed.",
                                                 Toast.LENGTH_SHORT).show();
                                     }
