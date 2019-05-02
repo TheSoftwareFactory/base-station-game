@@ -101,7 +101,7 @@ public class LoginActivity extends AppCompatActivity {
                                             }
                                         });
                                         ref.removeEventListener(this);
-                                        Toast.makeText(LoginActivity.this, user.getUsername() + R.string.sign_in,
+                                        Toast.makeText(LoginActivity.this, user.getUsername() + R.string.signed_in,
                                                 Toast.LENGTH_SHORT).show();
                                         startMap();
 

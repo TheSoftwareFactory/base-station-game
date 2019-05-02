@@ -109,8 +109,8 @@ public class MapActivity extends AppCompatActivity {
                     long lvl = (long) ds.getValue();
                     level.setText(""+lvl);
                     AlertDialog levelDialog = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
-                    levelDialog.setTitle("Level Up!");
-                    levelDialog.setMessage("You finally reached Level "+lvl);
+                    levelDialog.setTitle(R.string.level_up);
+                    levelDialog.setMessage(R.string.level_reach+""+lvl);
                 }
                 if(ds.getKey().equals("exp")){
                     long exp = (long) ds.getValue();
@@ -333,7 +333,7 @@ public class MapActivity extends AppCompatActivity {
             map.getController().animateTo(actualPosition, (double) 18, 1500L);
             map.invalidate();
         } else {
-            Toast.makeText(this, "Waiting for location...", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.wait_gps, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -374,12 +374,12 @@ public class MapActivity extends AppCompatActivity {
                     if (dist[0] < MAX_DISTANCE) {
                         String winningTeam = clicckedbasestation.getWinningTeam();
                         if (winningTeam == null) {
-                            alertDialog.setMessage("Nobody played the minigame of this station before you! Hurry up! Do you want to play the minigame of this station?");
+                            alertDialog.setMessage(R.string.station_tap+"");
                         } else {
                             if (winningTeam.equals(user.getTeam())) {
-                                alertDialog.setMessage("The winning team right now is YOUR TEAM (" + winningTeam + ")! Do you want to play the minigame of this station in order to increase the score of your team?");
+                                alertDialog.setMessage(R.string.station1 + winningTeam + R.string.station2);
                             } else {
-                                alertDialog.setMessage("The winning team right now is an other TEAM (" + winningTeam + ")! Do you want to play the minigame of this station in order to defeat opponents?");
+                                alertDialog.setMessage(R.string.station3 + winningTeam + R.string.station4);
                             }
                         }
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
@@ -392,7 +392,7 @@ public class MapActivity extends AppCompatActivity {
                                         dialog.dismiss();
                                     }
                                 });
-                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
+                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, R.string.cancel+"",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
@@ -400,7 +400,7 @@ public class MapActivity extends AppCompatActivity {
                                 });
                         alertDialog.show();
                     } else {
-                        alertDialog.setMessage("You cant conquer this station, get closer!");
+                        alertDialog.setMessage(R.string.too_far+"");
                         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
@@ -464,10 +464,10 @@ public class MapActivity extends AppCompatActivity {
         AlertDialog alertDialog = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
         alertDialog.setTitle("Result:");
         if (resultCode != Activity.RESULT_OK) {
-            alertDialog.setMessage("You lost! :(");
+            alertDialog.setMessage(R.string.lost+"");
         } else {
             Long score = data.getLongExtra("score", 0);
-            alertDialog.setMessage("You won! You gain " + score.toString() + " exp! :)");
+            alertDialog.setMessage(R.string.won+score.toString() + " exp! :)");
             updateStationsOnMap();
         }
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
@@ -557,7 +557,7 @@ public class MapActivity extends AppCompatActivity {
 
             String message = intent.getStringExtra("message");
             AlertDialog station_conquered_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
-            station_conquered_alert.setTitle("Station Conquered!");
+            station_conquered_alert.setTitle(R.string.conquered);
             station_conquered_alert.setMessage(message);
             station_conquered_alert.show();
         }
@@ -566,7 +566,7 @@ public class MapActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         AlertDialog.Builder back_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme);
-        back_alert.setTitle("Do you really want to log out?");
+        back_alert.setTitle(R.string.logout_question);
 
 
         back_alert.setNegativeButton( "No",
@@ -586,7 +586,7 @@ public class MapActivity extends AppCompatActivity {
 
     public void logout(){
         if (FirebaseAuth.getInstance().getCurrentUser()!=null) {
-            Toast.makeText(MapActivity.this, "Logged out successfully!",
+            Toast.makeText(MapActivity.this, R.string.logged_out,
                     Toast.LENGTH_SHORT).show();
             FirebaseAuth.getInstance().signOut();
 
