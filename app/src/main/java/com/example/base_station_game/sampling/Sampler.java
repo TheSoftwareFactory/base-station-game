@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.telephony.CellInfo;
+import android.telephony.TelephonyManager;
 
 import com.example.base_station_game.sampling.models.SystemLoadPoint;
 import com.example.base_station_game.sampling.storage.SampleDB;
@@ -14,6 +16,7 @@ import com.example.base_station_game.sampling.utils.BatteryUtils;
 import com.example.base_station_game.sampling.utils.FsUtils;
 import com.example.base_station_game.sampling.utils.Util;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -126,9 +129,16 @@ public class Sampler {
             sample.setMemoryActive(memoryInfo[2]);
             sample.setMemoryInactive(memoryInfo[3]);
         }
+        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+
+        List<CellInfo> towers = tm.getAllCellInfo();
         SystemLoadPoint load2 = SamplingLibrary.getSystemLoad();
         sample.setCpuStatus(constructCpuStatus(load1, load2));
         return sample;
+    }
+
+    private static CellDetails getCellDetails() {
+
     }
 
     private static BatteryDetails getBatteryDetails(Context context, Intent intent){
