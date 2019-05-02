@@ -47,6 +47,9 @@ public class DatabaseService extends Service {
 
     public User user;
 
+    private static final String LOG_TAG =
+            DatabaseService.class.getSimpleName();
+
     public DatabaseService() {
         super();
 
@@ -153,7 +156,7 @@ public class DatabaseService extends Service {
                             sendStation(station, 0);
                             addEventListenerForStation(key);
                         } catch (Exception e) {
-                            Log.e("DATABASE SERVICE", "update_stations -> onChildAdded : probably some shit in the database" + e.toString());
+                            Log.e(LOG_TAG, "update_stations -> onChildAdded : probably some shit in the database" + e.toString());
                         }
                     }
 
@@ -230,7 +233,7 @@ public class DatabaseService extends Service {
 
                         Log.d("DATASNAPSHOT", ds.toString());
                     } catch (Exception e) {
-                        Log.e("DATABASE SERVICE", "update_stations -> onChildAdded : probably some shit in the database" + e.toString());
+                        Log.e(LOG_TAG, "update_stations -> onChildAdded : probably some shit in the database" + e.toString());
                     }
                 }
 
