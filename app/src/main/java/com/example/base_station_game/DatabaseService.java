@@ -115,7 +115,7 @@ public class DatabaseService extends Service {
 
     private void sendStation(BaseStation station, int OP_CODE) {
         // OP_CODE : 0 new ; 1 deleted; 2 changed
-        Intent intent = new Intent("my-integer");
+        Intent intent = new Intent("new_station");
         intent.putExtra("station", station);
         intent.putExtra("OP_CODE", OP_CODE);
 

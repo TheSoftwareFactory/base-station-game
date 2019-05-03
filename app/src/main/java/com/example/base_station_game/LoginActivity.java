@@ -55,7 +55,6 @@ public class LoginActivity extends AppCompatActivity {
 
     public void register(View v) {
         Intent intent = new Intent(this, RegisterActivity.class);
-        intent.putExtra("user", user);
         startActivity(intent);
     }
 
@@ -96,7 +95,7 @@ public class LoginActivity extends AppCompatActivity {
                                                 }
                                                 else
                                                 {
-                                                    Log.d("token error refresh login","token couldnt get generated");
+                                                    Log.d("token error","token couldnt get generated");
                                                 }
                                             }
                                         });
@@ -119,12 +118,12 @@ public class LoginActivity extends AppCompatActivity {
                                 try {
                                     throw task.getException();
                                 } catch(FirebaseAuthInvalidCredentialsException e) {
-                                    password_field.setError(R.string.pw_wrong+"");
+                                    password_field.setError(getString(R.string.pw_wrong));
                                     password_field.requestFocus();
 
                                 }
                                 catch(FirebaseAuthInvalidUserException e) {
-                                    email_field.setError(R.string.user_missing+"");
+                                    email_field.setError(getString(R.string.user_missing));
                                     email_field.requestFocus();
                                 } catch(Exception e) {
                                     Log.e("Uncaught Error", e.getMessage());
@@ -139,7 +138,6 @@ public class LoginActivity extends AppCompatActivity {
 
     public void startMap(){
         Intent intent = new Intent(this, MapActivity.class);
-        intent.putExtra("user", user);
         startActivity(intent);
     }
 

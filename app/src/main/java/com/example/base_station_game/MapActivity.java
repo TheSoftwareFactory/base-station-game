@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -65,13 +66,13 @@ public class MapActivity extends AppCompatActivity {
     boolean mBound = false;
     private ProgressBar expBar;
     private TextView level;
-    private User user;
     private LocationManager locationManager;
     private LocationListener listener;
     private ChildEventListener childListener;
     private GeoPoint actualPosition = new GeoPoint(0, 0);
     private SimpleFastPointOverlay sfpo;
     private Polygon p = null;
+    private User user;
 
     //Meters
     static int MAX_DISTANCE = 200;
@@ -95,8 +96,6 @@ public class MapActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.user = (User) getIntent().getSerializableExtra("user");
-
         mDatabase = FirebaseDatabase.getInstance().getReference();
         childListener = new ChildEventListener() {
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -110,8 +109,8 @@ public class MapActivity extends AppCompatActivity {
                     long lvl = (long) ds.getValue();
                     level.setText(""+lvl);
                     AlertDialog levelDialog = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
-                    levelDialog.setTitle(R.string.level_up);
-                    levelDialog.setMessage(R.string.level_reach+""+lvl);
+                    levelDialog.setTitle(getString(R.string.level_up));
+                    levelDialog.setMessage(getString(R.string.level_reach)+lvl);
                 }
                 if(ds.getKey().equals("exp")){
                     long exp = (long) ds.getValue();
@@ -307,19 +306,16 @@ public class MapActivity extends AppCompatActivity {
                     case R.id.user_profile_ID:
                         //Toast.makeText(MapActivity.this, "cliccked on userprofile", Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(MapActivity.this, UserProfile.class);
-                        intent.putExtra("user", user);
                         startActivity(intent);
                         return true; // false will close it without animation
                     case settings_ID:
                         //Toast.makeText(MapActivity.this, "cliccked on settings", Toast.LENGTH_LONG).show();
                         Intent intent1 = new Intent(MapActivity.this, setting.class);
-                        intent1.putExtra("user", user);
                         startActivity(intent1);
                         return true; // false will close it without animation
                     case R.id.news_activity:
                         //Toast.makeText(MapActivity.this, "cliccked on settings", Toast.LENGTH_LONG).show();
                         Intent intent2 = new Intent(MapActivity.this, NewsActivity.class);
-                        intent2.putExtra("user", user);
                         startActivity(intent2);
                         return true; // false will close it without animation
                     default:
@@ -391,13 +387,12 @@ public class MapActivity extends AppCompatActivity {
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         Intent intent = new Intent(MapActivity.this, MinigameActivity.class);
-                                        intent.putExtra("user", user);
                                         intent.putExtra("station", clicckedbasestation);
                                         startActivityForResult(intent, 1);
                                         dialog.dismiss();
                                     }
                                 });
-                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, R.string.cancel+"",
+                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel),
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
@@ -405,7 +400,7 @@ public class MapActivity extends AppCompatActivity {
                                 });
                         alertDialog.show();
                     } else {
-                        alertDialog.setMessage(R.string.too_far+"");
+                        alertDialog.setMessage(getString(R.string.too_far));
                         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
@@ -454,6 +449,21 @@ public class MapActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference ref = mDatabase.child("Users").child(firebaseUser.getUid()); //check at reference of user if it already exists
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                user = dataSnapshot.getValue(User.class);
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(MapActivity.this, R.string.corrupt,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
 
         Intent intent = new Intent(this, DatabaseService.class);
         startService(intent);
@@ -469,10 +479,10 @@ public class MapActivity extends AppCompatActivity {
         AlertDialog alertDialog = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
         alertDialog.setTitle("Result:");
         if (resultCode != Activity.RESULT_OK) {
-            alertDialog.setMessage(R.string.lost+"");
+            alertDialog.setMessage(getString(R.string.lost));
         } else {
             Long score = data.getLongExtra("score", 0);
-            alertDialog.setMessage(R.string.won+score.toString() + " exp! :)");
+            alertDialog.setMessage(getString(R.string.won)+score.toString() + " exp! :)");
             updateStationsOnMap();
         }
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
@@ -494,7 +504,7 @@ public class MapActivity extends AppCompatActivity {
         map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(DatabaseReceiver,
-                        new IntentFilter("my-integer"));
+                        new IntentFilter("new_station"));
 
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(ConquerReceiver,
@@ -562,7 +572,7 @@ public class MapActivity extends AppCompatActivity {
 
             String message = intent.getStringExtra("message");
             AlertDialog station_conquered_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
-            station_conquered_alert.setTitle(R.string.conquered);
+            station_conquered_alert.setTitle(getString(R.string.conquered));
             station_conquered_alert.setMessage(message);
             station_conquered_alert.show();
         }
@@ -571,16 +581,16 @@ public class MapActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         AlertDialog.Builder back_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme);
-        back_alert.setTitle(R.string.logout_question);
+        back_alert.setTitle(getString(R.string.logout_question));
 
 
-        back_alert.setNegativeButton( "No",
+        back_alert.setNegativeButton( getString(R.string.no),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
-        back_alert.setPositiveButton("Yes",
+        back_alert.setPositiveButton(getString(R.string.yes),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         logout();
@@ -591,7 +601,7 @@ public class MapActivity extends AppCompatActivity {
 
     public void logout(){
         if (FirebaseAuth.getInstance().getCurrentUser()!=null) {
-            Toast.makeText(MapActivity.this, R.string.logged_out,
+            Toast.makeText(MapActivity.this, getString(R.string.logged_out),
                     Toast.LENGTH_SHORT).show();
             FirebaseAuth.getInstance().signOut();
 
