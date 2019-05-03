@@ -152,6 +152,7 @@ public class MapActivity extends AppCompatActivity {
 
         //inflate and create the map
         setContentView(R.layout.activity_map);
+        getSupportActionBar().hide();
         level = findViewById(R.id.level);
         expBar = findViewById(R.id.expBar);
         mDatabase.child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addListenerForSingleValueEvent(
