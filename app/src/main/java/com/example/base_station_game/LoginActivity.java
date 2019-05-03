@@ -68,7 +68,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if ( password.equals("") || email.equals(""))
         {
-            Toast.makeText(LoginActivity.this, "Please enter Email and Password",
+            Toast.makeText(LoginActivity.this, R.string.enter,
                     Toast.LENGTH_SHORT).show();
         }
         else {
@@ -100,11 +100,8 @@ public class LoginActivity extends AppCompatActivity {
                                                 }
                                             }
                                         });
-
-
-                                        user.beUpdated();
                                         ref.removeEventListener(this);
-                                        Toast.makeText(LoginActivity.this, user.getUsername() + " signed in.",
+                                        Toast.makeText(LoginActivity.this, user.getUsername() + R.string.signed_in,
                                                 Toast.LENGTH_SHORT).show();
                                         startMap();
 
@@ -112,6 +109,8 @@ public class LoginActivity extends AppCompatActivity {
 
                                     @Override
                                     public void onCancelled(DatabaseError databaseError) {
+                                        Toast.makeText(LoginActivity.this, R.string.corrupt,
+                                                Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
@@ -120,15 +119,15 @@ public class LoginActivity extends AppCompatActivity {
                                 try {
                                     throw task.getException();
                                 } catch(FirebaseAuthInvalidCredentialsException e) {
-                                    password_field.setError("Password invalid");
+                                    password_field.setError(R.string.pw_wrong+"");
                                     password_field.requestFocus();
 
                                 }
                                 catch(FirebaseAuthInvalidUserException e) {
-                                    email_field.setError("User does not exist");
+                                    email_field.setError(R.string.user_missing+"");
                                     email_field.requestFocus();
                                 } catch(Exception e) {
-                                    Log.e("whatever", e.getMessage());
+                                    Log.e("Uncaught Error", e.getMessage());
                                 }
 
                             }

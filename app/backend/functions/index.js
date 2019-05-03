@@ -161,7 +161,7 @@ exports.updateTeamScores = functions.database.ref('stations/{stationId}/Teams/{t
 //       res.send("successfull");
 //     }
 //   );
-const LEVEL_UP_LIMIT = () => 100;
+const LEVEL_UP_LIMIT = () => 4000;
 
 const levelUp = (level, exp) => {
   var changed = false;
