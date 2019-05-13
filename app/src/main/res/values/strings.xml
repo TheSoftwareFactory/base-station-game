@@ -1,4 +1,34 @@
 <resources>
     <string name="app_name">base-station-game</string>
     <string name="title_activity_service">ServiceActivity</string>
+    <string name="pw_wrong">Wrong credentials, try again</string>
+    <string name="enter">Please enter Email and Password</string>
+    <string name="corrupt">Userdata is corrupted, please contact an Admin</string>
+    <string name="user_missing">User does not exist</string>
+    <string name="all_fields">Please fill all fields!</string>
+    <string name="username_gone">The Username is already in use</string>
+    <string name="char_min">Min. 6 Characters</string>
+    <string name="acc_exists">Account already exists</string>
+    <string name="reg_fail">Registering failed</string>
+    <string name="level_up">Level Up!</string>
+    <string name="level_reach">You finally reached Level </string>
+    <string name="wait_gps">Waiting for location...</string>
+    <string name="station_tap">Nobody played the minigame of this station before you! Hurry up! Do you want to play the minigame of this station?</string>
+    <string name="station1">The winning team right now is YOUR TEAM (</string>
+    <string name="station2">)! Do you want to play the minigame of this station in order to increase the score of your team?</string>
+    <string name="station3">The winning team right now is another TEAM (</string>
+    <string name="station4">)! Do you want to play the minigame of this station in order to defeat opponents?</string>
+    <string name="cancel">CANCEL?</string>
+    <string name="too_far">You cant conquer this station, get closer!</string>
+    <string name="won">You won! You gain </string>
+    <string name="lost">You lost! :(</string>
+    <string name="conquered">Station Conquered!</string>
+    <string name="logout_question">Do you really want to log out?</string>
+    <string name="logged_out">Logged out successfully!</string>
+    <string name="signed_in"> signed in!</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="team_restriction">2-12 Characters</string>
+    <string name="pw_restriction">2-10 Characters</string>
+
 </resources>

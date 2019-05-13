@@ -25,11 +25,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -64,13 +66,13 @@ public class MapActivity extends AppCompatActivity {
     boolean mBound = false;
     private ProgressBar expBar;
     private TextView level;
-    private User user;
     private LocationManager locationManager;
     private LocationListener listener;
     private ChildEventListener childListener;
     private GeoPoint actualPosition = new GeoPoint(0, 0);
     private SimpleFastPointOverlay sfpo;
     private Polygon p = null;
+    private User user;
 
     //Meters
     static int MAX_DISTANCE = 200;
@@ -94,8 +96,6 @@ public class MapActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.user = (User) getIntent().getSerializableExtra("user");
-
         mDatabase = FirebaseDatabase.getInstance().getReference();
         childListener = new ChildEventListener() {
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -109,8 +109,8 @@ public class MapActivity extends AppCompatActivity {
                     long lvl = (long) ds.getValue();
                     level.setText(""+lvl);
                     AlertDialog levelDialog = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
-                    levelDialog.setTitle("Level Up!");
-                    levelDialog.setMessage("You finally reached Level "+lvl);
+                    levelDialog.setTitle(getString(R.string.level_up));
+                    levelDialog.setMessage(getString(R.string.level_reach)+lvl);
                 }
                 if(ds.getKey().equals("exp")){
                     long exp = (long) ds.getValue();
@@ -152,6 +152,10 @@ public class MapActivity extends AppCompatActivity {
 
         //inflate and create the map
         setContentView(R.layout.activity_map);
+        getSupportActionBar().hide();
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         level = findViewById(R.id.level);
         expBar = findViewById(R.id.expBar);
         mDatabase.child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addListenerForSingleValueEvent(
@@ -302,19 +306,16 @@ public class MapActivity extends AppCompatActivity {
                     case R.id.user_profile_ID:
                         //Toast.makeText(MapActivity.this, "cliccked on userprofile", Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(MapActivity.this, UserProfile.class);
-                        intent.putExtra("user", user);
                         startActivity(intent);
                         return true; // false will close it without animation
                     case settings_ID:
                         //Toast.makeText(MapActivity.this, "cliccked on settings", Toast.LENGTH_LONG).show();
                         Intent intent1 = new Intent(MapActivity.this, setting.class);
-                        intent1.putExtra("user", user);
                         startActivity(intent1);
                         return true; // false will close it without animation
                     case R.id.news_activity:
                         //Toast.makeText(MapActivity.this, "cliccked on settings", Toast.LENGTH_LONG).show();
                         Intent intent2 = new Intent(MapActivity.this, NewsActivity.class);
-                        intent2.putExtra("user", user);
                         startActivity(intent2);
                         return true; // false will close it without animation
                     default:
@@ -333,7 +334,7 @@ public class MapActivity extends AppCompatActivity {
             map.getController().animateTo(actualPosition, (double) 18, 1500L);
             map.invalidate();
         } else {
-            Toast.makeText(this, "Waiting for location...", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.wait_gps, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -374,25 +375,24 @@ public class MapActivity extends AppCompatActivity {
                     if (dist[0] < MAX_DISTANCE) {
                         String winningTeam = clicckedbasestation.getWinningTeam();
                         if (winningTeam == null) {
-                            alertDialog.setMessage("Nobody played the minigame of this station before you! Hurry up! Do you want to play the minigame of this station?");
+                            alertDialog.setMessage(R.string.station_tap+"");
                         } else {
                             if (winningTeam.equals(user.getTeam())) {
-                                alertDialog.setMessage("The winning team right now is YOUR TEAM (" + winningTeam + ")! Do you want to play the minigame of this station in order to increase the score of your team?");
+                                alertDialog.setMessage(R.string.station1 + winningTeam + R.string.station2);
                             } else {
-                                alertDialog.setMessage("The winning team right now is an other TEAM (" + winningTeam + ")! Do you want to play the minigame of this station in order to defeat opponents?");
+                                alertDialog.setMessage(R.string.station3 + winningTeam + R.string.station4);
                             }
                         }
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         Intent intent = new Intent(MapActivity.this, MinigameActivity.class);
-                                        intent.putExtra("user", user);
                                         intent.putExtra("station", clicckedbasestation);
                                         startActivityForResult(intent, 1);
                                         dialog.dismiss();
                                     }
                                 });
-                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
+                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel),
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
@@ -400,7 +400,7 @@ public class MapActivity extends AppCompatActivity {
                                 });
                         alertDialog.show();
                     } else {
-                        alertDialog.setMessage("You cant conquer this station, get closer!");
+                        alertDialog.setMessage(getString(R.string.too_far));
                         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
@@ -449,6 +449,21 @@ public class MapActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference ref = mDatabase.child("Users").child(firebaseUser.getUid()); //check at reference of user if it already exists
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                user = dataSnapshot.getValue(User.class);
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(MapActivity.this, R.string.corrupt,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
 
         Intent intent = new Intent(this, DatabaseService.class);
         startService(intent);
@@ -464,10 +479,10 @@ public class MapActivity extends AppCompatActivity {
         AlertDialog alertDialog = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
         alertDialog.setTitle("Result:");
         if (resultCode != Activity.RESULT_OK) {
-            alertDialog.setMessage("You lost! :(");
+            alertDialog.setMessage(getString(R.string.lost));
         } else {
             Long score = data.getLongExtra("score", 0);
-            alertDialog.setMessage("You won! You gain " + score.toString() + " exp! :)");
+            alertDialog.setMessage(getString(R.string.won)+score.toString() + " exp! :)");
             updateStationsOnMap();
         }
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
@@ -489,7 +504,7 @@ public class MapActivity extends AppCompatActivity {
         map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(DatabaseReceiver,
-                        new IntentFilter("my-integer"));
+                        new IntentFilter("new_station"));
 
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(ConquerReceiver,
@@ -557,7 +572,7 @@ public class MapActivity extends AppCompatActivity {
 
             String message = intent.getStringExtra("message");
             AlertDialog station_conquered_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
-            station_conquered_alert.setTitle("Station Conquered!");
+            station_conquered_alert.setTitle(getString(R.string.conquered));
             station_conquered_alert.setMessage(message);
             station_conquered_alert.show();
         }
@@ -566,16 +581,16 @@ public class MapActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         AlertDialog.Builder back_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme);
-        back_alert.setTitle("Do you really want to log out?");
+        back_alert.setTitle(getString(R.string.logout_question));
 
 
-        back_alert.setNegativeButton( "No",
+        back_alert.setNegativeButton( getString(R.string.no),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
-        back_alert.setPositiveButton("Yes",
+        back_alert.setPositiveButton(getString(R.string.yes),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         logout();
@@ -586,7 +601,7 @@ public class MapActivity extends AppCompatActivity {
 
     public void logout(){
         if (FirebaseAuth.getInstance().getCurrentUser()!=null) {
-            Toast.makeText(MapActivity.this, "Logged out successfully!",
+            Toast.makeText(MapActivity.this, getString(R.string.logged_out),
                     Toast.LENGTH_SHORT).show();
             FirebaseAuth.getInstance().signOut();
 

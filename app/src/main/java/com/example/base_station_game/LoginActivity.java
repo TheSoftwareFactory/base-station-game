@@ -55,7 +55,6 @@ public class LoginActivity extends AppCompatActivity {
 
     public void register(View v) {
         Intent intent = new Intent(this, RegisterActivity.class);
-        intent.putExtra("user", user);
         startActivity(intent);
     }
 
@@ -68,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if ( password.equals("") || email.equals(""))
         {
-            Toast.makeText(LoginActivity.this, "Please enter Email and Password",
+            Toast.makeText(LoginActivity.this, R.string.enter,
                     Toast.LENGTH_SHORT).show();
         }
         else {
@@ -96,15 +95,12 @@ public class LoginActivity extends AppCompatActivity {
                                                 }
                                                 else
                                                 {
-                                                    Log.d("token error refresh login","token couldnt get generated");
+                                                    Log.d("token error","token couldnt get generated");
                                                 }
                                             }
                                         });
-
-
-                                        user.beUpdated();
                                         ref.removeEventListener(this);
-                                        Toast.makeText(LoginActivity.this, user.getUsername() + " signed in.",
+                                        Toast.makeText(LoginActivity.this, user.getUsername() + R.string.signed_in,
                                                 Toast.LENGTH_SHORT).show();
                                         startMap();
 
@@ -112,6 +108,8 @@ public class LoginActivity extends AppCompatActivity {
 
                                     @Override
                                     public void onCancelled(DatabaseError databaseError) {
+                                        Toast.makeText(LoginActivity.this, R.string.corrupt,
+                                                Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
@@ -120,15 +118,15 @@ public class LoginActivity extends AppCompatActivity {
                                 try {
                                     throw task.getException();
                                 } catch(FirebaseAuthInvalidCredentialsException e) {
-                                    password_field.setError("Password invalid");
+                                    password_field.setError(getString(R.string.pw_wrong));
                                     password_field.requestFocus();
 
                                 }
                                 catch(FirebaseAuthInvalidUserException e) {
-                                    email_field.setError("User does not exist");
+                                    email_field.setError(getString(R.string.user_missing));
                                     email_field.requestFocus();
                                 } catch(Exception e) {
-                                    Log.e("whatever", e.getMessage());
+                                    Log.e("Uncaught Error", e.getMessage());
                                 }
 
                             }
@@ -140,7 +138,6 @@ public class LoginActivity extends AppCompatActivity {
 
     public void startMap(){
         Intent intent = new Intent(this, MapActivity.class);
-        intent.putExtra("user", user);
         startActivity(intent);
     }
 
