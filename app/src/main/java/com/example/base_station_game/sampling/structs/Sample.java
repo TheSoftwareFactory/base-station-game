@@ -13,6 +13,7 @@ public class Sample implements Serializable {
     private int memoryFree;
     private int memoryActive;
     private int memoryInactive;
+    private CellDetails cellDetails;
 
     public BatteryDetails getBatteryDetails() {
         return batteryDetails;
@@ -60,7 +61,9 @@ public class Sample implements Serializable {
                 .append("\n")
                 .append(memoryActive)
                 .append("\n")
-                .append(memoryInactive);
+                .append(memoryInactive)
+                .append("\n")
+                .append(cellDetails);
         return string.toString();
     }
 
@@ -118,5 +121,13 @@ public class Sample implements Serializable {
 
     public void setMemoryInactive(int memoryInactive) {
         this.memoryInactive = memoryInactive;
+    }
+
+    public void setCellDetails(CellDetails cellDetails) {
+        this.cellDetails = cellDetails;
+    }
+
+    public CellDetails getCellDetails() {
+        return cellDetails;
     }
 }

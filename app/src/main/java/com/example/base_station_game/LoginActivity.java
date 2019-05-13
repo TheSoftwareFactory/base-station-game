@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.base_station_game.sampling.Sampler;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -49,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
         getSupportActionBar().hide();
+        Sampler.sample(this);
         mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 

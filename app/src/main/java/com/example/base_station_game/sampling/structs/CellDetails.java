@@ -1,8 +1,9 @@
 package com.example.base_station_game.sampling.structs;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class CellDetails {
+public class CellDetails implements Serializable {
     private List<String> cells;
 
     public CellDetails(List<String> cells) {
@@ -15,5 +16,10 @@ public class CellDetails {
 
     public void setCells(List<String> cells) {
         this.cells = cells;
+    }
+
+    @Override
+    public String toString() {
+        return cells.toString();
     }
 }

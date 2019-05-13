@@ -133,6 +133,7 @@ public class Sampler {
         }
         TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         CellDetails ci = getCellDetails(tm);
+        sample.setCellDetails(ci);
         SystemLoadPoint load2 = SamplingLibrary.getSystemLoad();
         sample.setCpuStatus(constructCpuStatus(load1, load2));
         return sample;
@@ -147,7 +148,6 @@ public class Sampler {
             System.out.println("Insufficient permissions for CellInfo");
         }
         for (CellInfo cell: cellInfo) {
-            System.out.println(cell.toString());
             strings.add(cell.toString());
         }
         return new CellDetails(strings);
