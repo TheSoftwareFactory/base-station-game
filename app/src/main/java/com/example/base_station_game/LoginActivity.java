@@ -50,7 +50,6 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
         getSupportActionBar().hide();
-        Sampler.sample(this);
         mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
