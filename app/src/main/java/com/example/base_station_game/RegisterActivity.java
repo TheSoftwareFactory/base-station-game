@@ -64,11 +64,11 @@ public class RegisterActivity extends AppCompatActivity {
         }
         else {
             if(team.length()<2 || team.length()>12){
-                team_field.setError("Between 2 and 10 characters");
+                team_field.setError(getString(R.string.team_restriction));
             }
             else {
                 if(username.length()<2 || username.length()>10) {
-                    username_field.setError("Between 2 and 10 characters");
+                    username_field.setError(getString(R.string.pw_restriction));
                 }
                 else{
 
@@ -80,7 +80,7 @@ public class RegisterActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if (dataSnapshot.exists()) {
-                                username_field.setError(R.string.username_gone + "");
+                                username_field.setError(getString(R.string.username_gone));
                                 username_field.requestFocus();
                             } else {
                                 FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
@@ -95,7 +95,6 @@ public class RegisterActivity extends AppCompatActivity {
                                                         if (task.isSuccessful()) {
                                                             String token = task.getResult().getToken();
                                                             user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), username, team);
-                                                            user.beUpdated();
                                                             mDatabase.child("Users").child(user.getUID()).child("username").setValue(user.getUsername());
                                                             mDatabase.child("Users").child(user.getUID()).child("email").setValue(user.getEmail());
                                                             mDatabase.child("Users").child(user.getUID()).child("uid").setValue(user.getUID());
@@ -116,12 +115,12 @@ public class RegisterActivity extends AppCompatActivity {
                                                 try {
                                                     throw task.getException();
                                                 } catch (FirebaseAuthWeakPasswordException e) {
-                                                    password_field.setError(R.string.char_min + "");
+                                                    password_field.setError(getString(R.string.char_min));
                                                     password_field.requestFocus();
                                                 } catch (FirebaseAuthInvalidCredentialsException e) {
 
                                                 } catch (FirebaseAuthUserCollisionException e) {
-                                                    email_field.setError(R.string.acc_exists + "");
+                                                    email_field.setError(getString(R.string.acc_exists));
                                                     email_field.requestFocus();
                                                     // mTxtEmail.requestFocus();
                                                 } catch (Exception e) {
@@ -145,7 +144,6 @@ public class RegisterActivity extends AppCompatActivity {
     }
     public void startMap(){
         Intent intent = new Intent(this, MapActivity.class);
-        intent.putExtra("user", user);
         startActivity(intent);
     }
 

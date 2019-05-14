@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">base-station-game</string>
     <string name="title_activity_service">ServiceActivity</string>
-    <string name="pw_wrong">Password is not correct</string>
+    <string name="pw_wrong">Wrong credentials, try again</string>
     <string name="enter">Please enter Email and Password</string>
     <string name="corrupt">Userdata is corrupted, please contact an Admin</string>
     <string name="user_missing">User does not exist</string>
@@ -25,6 +25,12 @@
     <string name="conquered">Station Conquered!</string>
     <string name="logout_question">Do you really want to log out?</string>
     <string name="logged_out">Logged out successfully!</string>
+
     <string name="signed_in"> signed in!</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="team_restriction">2-12 Characters</string>
+    <string name="pw_restriction">2-10 Characters</string>
+
 
 </resources>
