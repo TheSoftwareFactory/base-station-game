@@ -24,23 +24,6 @@ exports.deleteAllStations = functions.https.onRequest((req, res) => {
   });
 });
 
-exports.addStation = functions.https.onRequest((req, res) => {
-  // Grab the text parameter.
-  var original = req.query.text;
-  var a = original.split(",");
-  // Push the new message into the Realtime Database using the Firebase Admin SDK.
-  //UTC Date
-  var dt = new Date();
-  dt.setHours(dt.getHours() + a[3]);
-  dt = new Date(dt)
-  return admin.database().ref('/stations').push({ "name": a[0], "latitude": parseFloat(a[1]), "longitude": parseFloat(a[2]), "timeToLive": dt.toISOString() })
-    .then(snapshot => {
-      return res.send("station added with the id: " + snapshot.key);
-    }).catch(error => {
-      res.status(500).send(error)
-    })
-});
-
 exports.addStationGeoFire = functions.https.onRequest((req, res) => {
   // Grab the text parameter.
   var original = req.query.text;
@@ -51,24 +34,16 @@ exports.addStationGeoFire = functions.https.onRequest((req, res) => {
   dt.setHours(dt.getHours() + a[3]);
   dt = new Date(dt);
 
-  var promises = [];
   return admin.database().ref('/stations').push({ "name": a[0], "latitude": parseFloat(a[1]), "longitude": parseFloat(a[2]), "timeToLive": dt.toISOString() })
     .then(snapshot => {
       var geoFire = new GeoFire(admin.database().ref("/GeoFireStations"));
       return geoFire.set(snapshot.key, [parseFloat(a[1]), parseFloat(a[2])])
-        .then(function () {
-          console.log("name " + a[0] + "key " + snapshot.key + " initially set to " + [parseFloat(a[1]), parseFloat(a[2])]);
-          return res.send("station added with the id: " + snapshot.key);
-        }).catch(error => {
-          res.status(500).send(error);
-        });
-      
+    }).then(function () {
+      console.log("name " + a[0] + "key " + snapshot.key + " initially set to " + [parseFloat(a[1]), parseFloat(a[2])]);
+      return res.send("station added with the id: " + snapshot.key);
     }).catch(error => {
       res.status(500).send(error);
     });
-    //promises.push(first)
-    //promises.push(second)
-   // return Promise.all(promises);
 });
 
 exports.winningteam = functions.database.ref('stations/{stationId}/Teams/{teamId}/teamScore')

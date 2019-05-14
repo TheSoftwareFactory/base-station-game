@@ -11,10 +11,17 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            buildConfigField 'String', "ApiKey", MyAwesomeApp_ApiKey
+            resValue 'string', "api_key", MyAwesomeApp_ApiKey
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', "ApiKey", MyAwesomeApp_ApiKey
+            resValue 'string', "api_key", MyAwesomeApp_ApiKey
         }
+
     }
     compileOptions {
         sourceCompatibility = '1.8'
@@ -54,5 +61,18 @@ dependencies {
     implementation 'org.jetbrains:annotations:15.0'
     implementation 'com.google.firebase:firebase-messaging:17.6.0'
     implementation 'com.github.HITGIF:TextFieldBoxes:1.4.4'
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation(name: 'wikitudesdk', ext: 'aar')
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.google.ar:core:1.1.0'
 }
+
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 apply plugin: 'com.google.gms.google-services'
