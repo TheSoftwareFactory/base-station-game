@@ -386,8 +386,11 @@ public class MapActivity extends AppCompatActivity {
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
-                                        Intent intent = new Intent(MapActivity.this, MinigameActivity.class);
+                                        //Intent intent = new Intent(MapActivity.this, MinigameActivity.class);
+                                        Intent intent = new Intent(MapActivity.this, AR_Activity.class);
                                         intent.putExtra("station", clicckedbasestation);
+                                        // TODO remove this
+                                        intent.putExtra("user", user);
                                         startActivityForResult(intent, 1);
                                         dialog.dismiss();
                                     }
