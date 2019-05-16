@@ -57,89 +57,76 @@ public class RegisterActivity extends AppCompatActivity {
 
 
 
-        if ( password.equals("") || email.equals("") || team.equals("") || username.equals(""))
-        {
-            Toast.makeText(RegisterActivity.this, R.string.all_fields,
-                    Toast.LENGTH_SHORT).show();
-        }
-        else {
-            if(team.length()<2 || team.length()>12){
-                team_field.setError(getString(R.string.team_restriction));
-            }
-            else {
-                if(username.length()<2 || username.length()>10) {
-                    username_field.setError(getString(R.string.pw_restriction));
-                }
-                else{
+        if ( password.equals("") || email.equals("") || team.equals("") || username.equals("")) {
+            Toast.makeText(RegisterActivity.this, R.string.all_fields, Toast.LENGTH_SHORT).show();
+        } else if (team.length()<2 || team.length()>12) {
+            team_field.setError(getString(R.string.team_restriction));
+        } else if (username.length()<2 || username.length()>10) {
+            username_field.setError(getString(R.string.pw_restriction));
+        } else {
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+            // If you use . - or other symbols this fail
+            DatabaseReference ref = mDatabase.child("usernames").child(username); //check at reference of user if it already exists
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        username_field.setError(getString(R.string.username_gone));
+                        username_field.requestFocus();
+                    } else {
+                        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(RegisterActivity.this, task -> {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(RegisterActivity.this, username + " registered!",
+                                                Toast.LENGTH_SHORT).show();
+                                        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                                        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                                if (task.isSuccessful()) {
+                                                    String token = task.getResult().getToken();
+                                                    user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), username, team);
+                                                    mDatabase.child("Users").child(user.getUID()).child("username").setValue(user.getUsername());
+                                                    mDatabase.child("Users").child(user.getUID()).child("email").setValue(user.getEmail());
+                                                    mDatabase.child("Users").child(user.getUID()).child("uid").setValue(user.getUID());
+                                                    mDatabase.child("Users").child(user.getUID()).child("team").setValue(user.getTeam());
+                                                    mDatabase.child("Users").child(user.getUID()).child("token").setValue(token);
 
-
-                    mDatabase = FirebaseDatabase.getInstance().getReference();
-                    // If you use . - or other symbols this fail
-                    DatabaseReference ref = mDatabase.child("usernames").child(username); //check at reference of user if it already exists
-                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.exists()) {
-                                username_field.setError(getString(R.string.username_gone));
-                                username_field.requestFocus();
-                            } else {
-                                FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
-                                        .addOnCompleteListener(RegisterActivity.this, task -> {
-                                            if (task.isSuccessful()) {
-                                                Toast.makeText(RegisterActivity.this, username + " registered!",
-                                                        Toast.LENGTH_SHORT).show();
-                                                FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                                                FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                                                        if (task.isSuccessful()) {
-                                                            String token = task.getResult().getToken();
-                                                            user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), username, team);
-                                                            mDatabase.child("Users").child(user.getUID()).child("username").setValue(user.getUsername());
-                                                            mDatabase.child("Users").child(user.getUID()).child("email").setValue(user.getEmail());
-                                                            mDatabase.child("Users").child(user.getUID()).child("uid").setValue(user.getUID());
-                                                            mDatabase.child("Users").child(user.getUID()).child("team").setValue(user.getTeam());
-                                                            mDatabase.child("Users").child(user.getUID()).child("token").setValue(token);
-
-                                                            mDatabase.child("usernames").child(username).setValue(user.getUID());
-                                                            mDatabase.child("Teams").child(team).child(firebaseUser.getUid()).setValue(username);
-                                                            startMap();
-                                                        } else {
-                                                            Log.d("token error", "token couldnt get generated");
-                                                        }
-                                                    }
-                                                });
-
-
-                                            } else {
-                                                try {
-                                                    throw task.getException();
-                                                } catch (FirebaseAuthWeakPasswordException e) {
-                                                    password_field.setError(getString(R.string.char_min));
-                                                    password_field.requestFocus();
-                                                } catch (FirebaseAuthInvalidCredentialsException e) {
-
-                                                } catch (FirebaseAuthUserCollisionException e) {
-                                                    email_field.setError(getString(R.string.acc_exists));
-                                                    email_field.requestFocus();
-                                                    // mTxtEmail.requestFocus();
-                                                } catch (Exception e) {
-                                                    Log.e("Uncaught Error", e.getMessage());
+                                                    mDatabase.child("usernames").child(username).setValue(user.getUID());
+                                                    mDatabase.child("Teams").child(team).child(firebaseUser.getUid()).setValue(username);
+                                                    startMap();
+                                                } else {
+                                                    Log.d("token error", "token couldnt get generated");
                                                 }
-                                                Toast.makeText(RegisterActivity.this, R.string.reg_fail,
-                                                        Toast.LENGTH_SHORT).show();
                                             }
                                         });
 
-                            }
-                        }
+                                    } else {
+                                        try {
+                                            throw task.getException();
+                                        } catch (FirebaseAuthWeakPasswordException e) {
+                                            password_field.setError(getString(R.string.char_min));
+                                            password_field.requestFocus();
+                                        } catch (FirebaseAuthInvalidCredentialsException e) {
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                        }
-                    });
+                                        } catch (FirebaseAuthUserCollisionException e) {
+                                            email_field.setError(getString(R.string.acc_exists));
+                                            email_field.requestFocus();
+                                            // mTxtEmail.requestFocus();
+                                        } catch (Exception e) {
+                                            Log.e("Uncaught Error", e.getMessage());
+                                        }
+                                        Toast.makeText(RegisterActivity.this, R.string.reg_fail,
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
                 }
-            }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
         }
     }
     public void startMap(){
