@@ -334,7 +334,7 @@ public class MapActivity extends AppCompatActivity {
             map.getController().animateTo(actualPosition, (double) 18, 1500L);
             map.invalidate();
         } else {
-            Toast.makeText(this, R.string.wait_gps, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.wait_gps), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -375,19 +375,22 @@ public class MapActivity extends AppCompatActivity {
                     if (dist[0] < MAX_DISTANCE) {
                         String winningTeam = clicckedbasestation.getWinningTeam();
                         if (winningTeam == null) {
-                            alertDialog.setMessage(R.string.station_tap+"");
+                            alertDialog.setMessage(getString(R.string.station_tap));
                         } else {
                             if (winningTeam.equals(user.getTeam())) {
-                                alertDialog.setMessage(R.string.station1 + winningTeam + R.string.station2);
+                                alertDialog.setMessage(getString(R.string.station1) + winningTeam + getString(R.string.station2));
                             } else {
-                                alertDialog.setMessage(R.string.station3 + winningTeam + R.string.station4);
+                                alertDialog.setMessage(getString(R.string.station3) + winningTeam + getString(R.string.station4));
                             }
                         }
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
-                                        Intent intent = new Intent(MapActivity.this, MinigameActivity.class);
+                                        //Intent intent = new Intent(MapActivity.this, MinigameActivity.class);
+                                        Intent intent = new Intent(MapActivity.this, AR_Activity.class);
                                         intent.putExtra("station", clicckedbasestation);
+                                        // TODO remove this
+                                        intent.putExtra("user", user);
                                         startActivityForResult(intent, 1);
                                         dialog.dismiss();
                                     }
@@ -482,7 +485,7 @@ public class MapActivity extends AppCompatActivity {
             alertDialog.setMessage(getString(R.string.lost));
         } else {
             Long score = data.getLongExtra("score", 0);
-            alertDialog.setMessage(getString(R.string.won)+score.toString() + " exp! :)");
+            alertDialog.setMessage(getString(R.string.won)+score.toString() + getString(R.string.exp));
             updateStationsOnMap();
         }
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",

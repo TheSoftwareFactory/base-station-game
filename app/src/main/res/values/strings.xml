@@ -25,10 +25,12 @@
     <string name="conquered">Station Conquered!</string>
     <string name="logout_question">Do you really want to log out?</string>
     <string name="logged_out">Logged out successfully!</string>
+    <string name="exp"> exp! :)</string>
     <string name="signed_in"> signed in!</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
     <string name="team_restriction">2-12 Characters</string>
     <string name="pw_restriction">2-10 Characters</string>
+
 
 </resources>
