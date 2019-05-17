@@ -44,6 +44,14 @@ public class RegisterActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
+    private boolean isAlphanumericString(String string) {
+        for(int i = 0; i < string.length(); i++) {
+            if (!Character.isLetterOrDigit(string.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public void register(View v) {
         email_field = findViewById(R.id.email_text);
@@ -63,6 +71,8 @@ public class RegisterActivity extends AppCompatActivity {
             team_field.setError(getString(R.string.team_restriction));
         } else if (username.length()<2 || username.length()>10) {
             username_field.setError(getString(R.string.pw_restriction));
+        } else if (!this.isAlphanumericString(username)) {
+            username_field.setError("Cannot contain special characters.");
         } else {
             mDatabase = FirebaseDatabase.getInstance().getReference();
             // If you use . - or other symbols this fail
