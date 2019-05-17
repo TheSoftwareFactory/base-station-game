@@ -68,7 +68,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if ( password.equals("") || email.equals(""))
         {
-            Toast.makeText(LoginActivity.this, R.string.enter,
+            Toast.makeText(LoginActivity.this, getString(R.string.enter),
                     Toast.LENGTH_SHORT).show();
         }
         else {
@@ -85,23 +85,19 @@ public class LoginActivity extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         user = dataSnapshot.getValue(User.class);
-
-                                        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                                                if(task.isSuccessful()){
-                                                    if (!dataSnapshot.child("token").getValue().toString().equals(task.getResult().getToken())){
-                                                        mDatabase.child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("token").setValue(task.getResult().getToken());
-                                                    }
+                                        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task1 -> {
+                                            if(task1.isSuccessful()){
+                                                if (!dataSnapshot.child("token").getValue().toString().equals(task1.getResult().getToken())){
+                                                    mDatabase.child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("token").setValue(task1.getResult().getToken());
                                                 }
-                                                else
-                                                {
-                                                    Log.d("token error","token couldnt get generated");
-                                                }
+                                            }
+                                            else
+                                            {
+                                                Log.d("token error","token couldnt get generated");
                                             }
                                         });
                                         ref.removeEventListener(this);
-                                        Toast.makeText(LoginActivity.this, user.getUsername() + R.string.signed_in,
+                                        Toast.makeText(LoginActivity.this, user.getUsername() + getString(R.string.signed_in),
                                                 Toast.LENGTH_SHORT).show();
                                         startMap();
 
@@ -109,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                     @Override
                                     public void onCancelled(DatabaseError databaseError) {
-                                        Toast.makeText(LoginActivity.this, R.string.corrupt,
+                                        Toast.makeText(LoginActivity.this, getString(R.string.corrupt),
                                                 Toast.LENGTH_SHORT).show();
                                     }
                                 });

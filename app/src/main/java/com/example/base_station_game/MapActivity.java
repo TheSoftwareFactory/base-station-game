@@ -1,21 +1,20 @@
 package com.example.base_station_game;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -30,6 +29,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -54,8 +64,10 @@ import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlayOptions;
 import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme;
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.base_station_game.R.id.settings_ID;
 
@@ -66,18 +78,16 @@ public class MapActivity extends AppCompatActivity {
     boolean mBound = false;
     private ProgressBar expBar;
     private TextView level;
-    private LocationManager locationManager;
-    private LocationListener listener;
+    ;
     private ChildEventListener childListener;
-    private GeoPoint actualPosition = new GeoPoint(0, 0);
+    private GeoPoint actualPosition = null;
     private SimpleFastPointOverlay sfpo;
     private Polygon p = null;
     private User user;
-
+    private static final String TAG = MapActivity.class.getSimpleName();
     //Meters
     static int MAX_DISTANCE = 200;
 
-    //creating fake station list
     double startKumpulaLatitude = 60.205637;
     double startKumpulaLongitude = 24.962433;
 
@@ -90,11 +100,17 @@ public class MapActivity extends AppCompatActivity {
     private Paint pointStyle = new Paint();
     private Paint selectedPointStyle = new Paint();
 
-    private static final String LOG_TAG =
-            MapActivity.class.getSimpleName();
+    final int REQUEST_CHECK_SETTINGS = 39;
+    final int MY_PERMISSIONS_REQUEST_POSITIONS = 41;
+
+    private LocationRequest locationRequest = null;
+    private LocationCallback locationCallBack = null;
+    private FusedLocationProviderClient fusedLocationClient;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         childListener = new ChildEventListener() {
@@ -105,14 +121,14 @@ public class MapActivity extends AppCompatActivity {
             @Override
             public void onChildChanged(DataSnapshot ds, String prevChildKey) {
                 Log.e("DS", ds.toString());
-                if(ds.getKey().equals("level")){
+                if (ds.getKey().equals("level")) {
                     long lvl = (long) ds.getValue();
-                    level.setText(""+lvl);
+                    level.setText("" + lvl);
                     AlertDialog levelDialog = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
                     levelDialog.setTitle(getString(R.string.level_up));
-                    levelDialog.setMessage(getString(R.string.level_reach)+lvl);
+                    levelDialog.setMessage(getString(R.string.level_reach) + lvl);
                 }
-                if(ds.getKey().equals("exp")){
+                if (ds.getKey().equals("exp")) {
                     long exp = (long) ds.getValue();
                     if (Build.VERSION.SDK_INT >= 24) {
                         expBar.setProgress((int) exp, true);
@@ -159,37 +175,37 @@ public class MapActivity extends AppCompatActivity {
         level = findViewById(R.id.level);
         expBar = findViewById(R.id.expBar);
         mDatabase.child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addListenerForSingleValueEvent(
-            new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    System.out.println("Initing level and exp");
-                    Object lvlobj = dataSnapshot.child("level").getValue();
-                    if (lvlobj == null) {
-                        System.out.println("level was null!");
-                        long i = 1;
-                        lvlobj = i;
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        System.out.println("Initing level and exp");
+                        Object lvlobj = dataSnapshot.child("level").getValue();
+                        if (lvlobj == null) {
+                            System.out.println("level was null!");
+                            long i = 1;
+                            lvlobj = i;
+                        }
+                        int lvl = ((Long) lvlobj).intValue();
+                        level.setText("" + lvl);
+                        Object expobj = dataSnapshot.child("exp").getValue();
+                        if (expobj == null) {
+                            System.out.println("exp was null!");
+                            long i = 0;
+                            expobj = i;
+                        }
+                        int exp = ((Long) expobj).intValue();
+                        if (Build.VERSION.SDK_INT >= 24) {
+                            expBar.setProgress(exp, true);
+                        } else {
+                            expBar.setProgress(exp);
+                        }
                     }
-                    int lvl = ((Long) lvlobj).intValue();
-                    level.setText(""+lvl);
-                    Object expobj = dataSnapshot.child("exp").getValue();
-                    if (expobj == null) {
-                        System.out.println("exp was null!");
-                        long i = 0;
-                        expobj = i;
-                    }
-                    int exp = ((Long) expobj).intValue();
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        expBar.setProgress(exp, true);
-                    } else {
-                        expBar.setProgress(exp);
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                     }
                 }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            }
         );
 
         map = (MapView) findViewById(R.id.map);
@@ -201,11 +217,6 @@ public class MapActivity extends AppCompatActivity {
         //Adding base stations with Simple Fast Point Overlay
 
         lbs = new ArrayList<>();
-        /*for (int i = 0; i < 0; i++) {
-            lbs.add(new BaseStation("Station " + i,
-                    startKumpulaLatitude + ((Math.random()*2-1) * 0.0054),
-                    startKumpulaLongitude + ((Math.random()*2-1) * 0.004),null));
-        }*/
 
         // create label style
 
@@ -225,53 +236,6 @@ public class MapActivity extends AppCompatActivity {
         selectedPointStyle.setStyle(Paint.Style.FILL);
         selectedPointStyle.setColor(Color.parseColor("#00ff00"));
         selectedPointStyle.setTextAlign(Paint.Align.CENTER);
-
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-        listener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                Log.d(LOG_TAG, "New location --> " + location.getLatitude() + " " + location.getLongitude());
-                actualPosition = new GeoPoint(location);
-                if (marker == null) {
-                    //Not dynamic
-                    List<GeoPoint> circle = Polygon.pointsAsCircle(actualPosition, MAX_DISTANCE);
-                    p.setPoints(circle);
-                    map.getOverlayManager().add(p);
-                    marker = new Marker(map);
-                    marker.setPosition(actualPosition);
-                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                    marker.setTitle("test");
-                    map.getOverlays().add(marker);
-                    updateStationsOnMap();
-                } else {
-                    p.setPoints(Polygon.pointsAsCircle(actualPosition, MAX_DISTANCE));
-                    marker.setPosition(actualPosition);
-
-                }
-                map.invalidate();
-            }
-
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            public void onProviderEnabled(String s) {
-
-            }
-
-            public void onProviderDisabled(String s) {
-                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(i);
-            }
-        };
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET}
-                        , 10);
-            }
-            return;
-        }
-        locationManager.requestLocationUpdates("gps", 3000, 0, listener);
 
         SpeedDialView speedDialView = findViewById(R.id.speedDial);
         speedDialView.addActionItem(
@@ -325,6 +289,17 @@ public class MapActivity extends AppCompatActivity {
                 return true; // To keep the Speed Dial open
             }
         });
+
+        locationCallBack = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                Log.d(TAG + "FUSEDLOCATION", locationResult.getLastLocation().toString());
+                onSuccessLastLocation(locationResult.getLastLocation());
+            }
+        };
     }
 
 
@@ -452,29 +427,52 @@ public class MapActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference ref = mDatabase.child("Users").child(firebaseUser.getUid()); //check at reference of user if it already exists
 
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                user = dataSnapshot.getValue(User.class);
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(MapActivity.this, R.string.corrupt,
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestLocationPermissions(MY_PERMISSIONS_REQUEST_POSITIONS);
+        } else {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                // Logic to handle location object
+                                onSuccessLastLocation(location);
+                            }
+                        }
+                    });
+            Intent intent = new Intent(this, DatabaseService.class);
+            startService(intent);
+            createLocationRequest();
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            DatabaseReference ref = mDatabase.child("Users").child(firebaseUser.getUid()); //check at reference of user if it already exists
 
-        Intent intent = new Intent(this, DatabaseService.class);
-        startService(intent);
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    user = dataSnapshot.getValue(User.class);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Toast.makeText(MapActivity.this, R.string.corrupt,
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        createLocationRequest();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    protected void onSuccessLastLocation(Location location) {
+        actualPosition = new GeoPoint(location);
     }
 
 
@@ -485,15 +483,11 @@ public class MapActivity extends AppCompatActivity {
             alertDialog.setMessage(getString(R.string.lost));
         } else {
             Long score = data.getLongExtra("score", 0);
-            alertDialog.setMessage(getString(R.string.won)+score.toString() + getString(R.string.exp));
+            alertDialog.setMessage(getString(R.string.won) + score.toString() +  getString(R.string.exp));
             updateStationsOnMap();
         }
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                (dialog, which) -> dialog.dismiss());
         alertDialog.show();
     }
 
@@ -512,6 +506,7 @@ public class MapActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(ConquerReceiver,
                         new IntentFilter("conquer"));
+        startLocationUpdates();
 
     }
 
@@ -525,13 +520,13 @@ public class MapActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        locationManager.removeUpdates(listener);
 
         // Unregister since the activity is not visible
         LocalBroadcastManager.getInstance(this)
                 .unregisterReceiver(DatabaseReceiver);
         LocalBroadcastManager.getInstance(this)
                 .unregisterReceiver(ConquerReceiver);
+        stopLocationUpdates();
 
     }
 
@@ -582,28 +577,20 @@ public class MapActivity extends AppCompatActivity {
     };
 
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         AlertDialog.Builder back_alert = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme);
         back_alert.setTitle(getString(R.string.logout_question));
 
 
-        back_alert.setNegativeButton( getString(R.string.no),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+        back_alert.setNegativeButton(getString(R.string.no),
+                (dialog, which) -> dialog.dismiss());
         back_alert.setPositiveButton(getString(R.string.yes),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        logout();
-                    }
-                });
+                (dialog, which) -> logout());
         back_alert.create().show();
     }
 
-    public void logout(){
-        if (FirebaseAuth.getInstance().getCurrentUser()!=null) {
+    public void logout() {
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             Toast.makeText(MapActivity.this, getString(R.string.logged_out),
                     Toast.LENGTH_SHORT).show();
             FirebaseAuth.getInstance().signOut();
@@ -611,12 +598,176 @@ public class MapActivity extends AppCompatActivity {
 
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
-        }
-        else
-        {
-            Log.d("User Error","No user logged in when logging out!");
+        } else {
+            Log.d("User Error", "No user logged in when logging out!");
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         }
     }
+
+    private void requestLocationPermissions(int reqcode) {
+        String[] PERMISSION = {
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        };
+        ActivityCompat.requestPermissions(MapActivity.this, PERMISSION, reqcode);
+    }
+
+    protected void createLocationRequest() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(2500);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+
+        SettingsClient client = LocationServices.getSettingsClient(this);
+
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+
+        task.addOnSuccessListener(this, locationSettingsResponse -> {
+            // All location settings are satisfied. The client can initialize
+            // location requests here.
+            if (ActivityCompat.checkSelfPermission(MapActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(MapActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // The app should have already permissions for location
+
+            } else {
+                Intent intent = new Intent(this, DatabaseService.class);
+                startService(intent);
+                fusedLocationClient.requestLocationUpdates(locationRequest,
+                        new LocationCallback() {
+                            @Override
+                            public void onLocationResult(LocationResult locationResult) {
+                                if (locationResult == null) {
+                                    return;
+                                }
+                                Log.d(TAG + "FUSEDLOCATION", locationResult.getLastLocation().toString());
+                                // TODO SEND This location to the architectView
+                                onSuccessLastLocation(locationResult.getLastLocation());
+                                if (marker == null) {
+                                    //Not dynamic
+                                    List<GeoPoint> circle = Polygon.pointsAsCircle(actualPosition, MAX_DISTANCE);
+                                    p.setPoints(circle);
+                                    map.getOverlayManager().add(p);
+                                    marker = new Marker(map);
+                                    marker.setPosition(actualPosition);
+                                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                                    marker.setTitle("test");
+                                    map.getOverlays().add(marker);
+                                    updateStationsOnMap();
+                                } else {
+                                    p.setPoints(Polygon.pointsAsCircle(actualPosition, MAX_DISTANCE));
+                                    marker.setPosition(actualPosition);
+
+                                }
+                                map.invalidate();
+                            }
+
+                            ;
+                        },
+                        null /* Looper */);
+            }
+        }).addOnFailureListener(this, e -> {
+            if (e instanceof ResolvableApiException) {
+                // Location settings are not satisfied, but this can be fixed
+                // by showing the user a dialog.
+                try {
+                    // Show the dialog by calling startResolutionForResult(),
+                    // and check the result in onActivityResult().
+                    ResolvableApiException resolvable = (ResolvableApiException) e;
+                    resolvable.startResolutionForResult(MapActivity.this, REQUEST_CHECK_SETTINGS);
+                } catch (IntentSender.SendIntentException sendEx) {
+                    // Ignore the error.
+                }
+            }
+        });
+
+    }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_POSITIONS: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    fusedLocationClient.getLastLocation()
+                            .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                                @Override
+                                public void onSuccess(Location location) {
+                                    // Got last known location. In some rare situations this can be null.
+                                    if (location != null) {
+                                        // Logic to handle location object
+                                        onSuccessLastLocation(location);
+                                    }
+                                }
+                            });
+                    fusedLocationClient.getLastLocation()
+                            .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                                @Override
+                                public void onSuccess(Location location) {
+                                    // Got last known location. In some rare situations this can be null.
+                                    if (location != null) {
+                                        // Logic to handle location object
+                                        onSuccessLastLocation(location);
+                                    }
+                                }
+                            });
+                    Intent intent = new Intent(this, DatabaseService.class);
+                    startService(intent);
+
+                    createLocationRequest();
+
+                    mDatabase = FirebaseDatabase.getInstance().getReference();
+                    FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                    DatabaseReference ref = mDatabase.child("Users").child(firebaseUser.getUid()); //check at reference of user if it already exists
+
+                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            user = dataSnapshot.getValue(User.class);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Toast.makeText(MapActivity.this, R.string.corrupt,
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                } else {
+                    // permission denied, boo!
+                    alertUserPermissionsNeeded();
+                    finish();
+                }
+                return;
+
+            }
+        }
+    }
+
+    private void alertUserPermissionsNeeded() {
+        AlertDialog alertDialog = new AlertDialog.Builder(MapActivity.this, R.style.AlertDialogTheme).create();
+        alertDialog.setTitle("THE APP NEEDS POSITIONS PERMISSIONS!");
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdates() {
+        fusedLocationClient.requestLocationUpdates(locationRequest,
+                locationCallBack,
+                null /* Looper */);
+    }
+
+    @SuppressLint("MissingPermission")
+    private void stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallBack);
+    }
+
+
 }
