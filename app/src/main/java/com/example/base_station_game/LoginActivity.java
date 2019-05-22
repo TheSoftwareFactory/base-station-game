@@ -1,6 +1,7 @@
 package com.example.base_station_game;
 
 import android.content.Intent;
+import android.location.Location;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

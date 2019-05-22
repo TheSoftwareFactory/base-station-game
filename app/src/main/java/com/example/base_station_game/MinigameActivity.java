@@ -101,8 +101,8 @@ public class MinigameActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    if (Sampler.sample(context))
-                        System.out.println("sample inserted into the database.");
+//                    if (Sampler.sample(context))
+//                        System.out.println("sample inserted into the database.");
                     while (progressStatus < 100) {
                         progressStatus += 1;
                         // Update the progress bar and display the

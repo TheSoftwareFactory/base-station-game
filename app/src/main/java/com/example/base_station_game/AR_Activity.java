@@ -190,8 +190,9 @@ public class AR_Activity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 int progressStatus = 0;
-                if (Sampler.sample(AR_Activity.this))
-                    System.out.println("sample inserted into the database.");
+                //TODO: figure out the best way to provide the location here.
+//                if (Sampler.sample(AR_Activity.this))
+//                    System.out.println("sample inserted into the database.");
                 while (progressStatus < 100) {
                     progressStatus += 1;
                     // Update the progress bar and display the

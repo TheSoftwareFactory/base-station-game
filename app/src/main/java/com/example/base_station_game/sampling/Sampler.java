@@ -2,6 +2,7 @@ package com.example.base_station_game.sampling;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.telephony.CellInfo;
@@ -12,6 +13,7 @@ import com.example.base_station_game.sampling.storage.SampleDB;
 import com.example.base_station_game.sampling.structs.BatteryDetails;
 import com.example.base_station_game.sampling.structs.CellDetails;
 import com.example.base_station_game.sampling.structs.CpuStatus;
+import com.example.base_station_game.sampling.structs.LocationDetails;
 import com.example.base_station_game.sampling.structs.Sample;
 import com.example.base_station_game.sampling.utils.BatteryUtils;
 import com.example.base_station_game.sampling.utils.FsUtils;
@@ -27,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class Sampler {
     private static String TAG = Sampler.class.getSimpleName();
 
-    public static boolean sample(Context context){
+    public static boolean sample(Context context, Location location){
         boolean success = false;
         SampleDB db = SampleDB.getInstance(context);
         long monthAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30);
@@ -41,7 +43,7 @@ public class Sampler {
 //            return false;
 //        }
 
-        Sample sample = createSample(context, batteryIntent);
+        Sample sample = createSample(context, batteryIntent, location);
         System.out.println("new" + sample);
         if(sample != null){
             long id = db.putSample(sample);
@@ -118,9 +120,10 @@ public class Sampler {
 //    }
 //
 
-    public static Sample createSample(Context context, Intent batteryIntent) {
+    public static Sample createSample(Context context, Intent batteryIntent, Location location) {
         SystemLoadPoint load1 = SamplingLibrary.getSystemLoad();
         Sample sample = new Sample();
+        sample.setLocationDetails(new LocationDetails(location));
         sample.setBatteryDetails(getBatteryDetails(context, batteryIntent));
         sample.setBatteryLevel(BatteryUtils.getBatteryLevel(batteryIntent));
         sample.setBatteryState(getBatteryStatusString(batteryIntent));
