@@ -203,8 +203,8 @@ public class AR_Activity extends AppCompatActivity implements ArchitectJavaScrip
     protected void startThreadMinigame() {
         new Thread(() -> {
             try {
-                if (Sampler.sample(AR_Activity.this))
-                    System.out.println("sample inserted into the database.");
+                /*if (Sampler.sample(AR_Activity.this))
+                    System.out.println("sample inserted into the database.");*/
                 while (progressStatus < 100) {
                     progressStatus += 1;
 

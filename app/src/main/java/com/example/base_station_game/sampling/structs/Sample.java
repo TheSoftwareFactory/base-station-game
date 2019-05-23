@@ -1,5 +1,7 @@
 package com.example.base_station_game.sampling.structs;
 
+import android.location.Location;
+
 import java.io.Serializable;
 
 public class Sample implements Serializable {
@@ -14,6 +16,7 @@ public class Sample implements Serializable {
     private int memoryActive;
     private int memoryInactive;
     private CellDetails cellDetails;
+    private LocationDetails locationDetails;
 
     public BatteryDetails getBatteryDetails() {
         return batteryDetails;
@@ -44,6 +47,8 @@ public class Sample implements Serializable {
         StringBuilder string = new StringBuilder();
         string
                 .append(timestamp)
+                .append("\n")
+                .append(locationDetails.toString())
                 .append("\n")
                 .append(timeZone)
                 .append("\n")
@@ -129,5 +134,13 @@ public class Sample implements Serializable {
 
     public CellDetails getCellDetails() {
         return cellDetails;
+    }
+
+    public void setLocationDetails(LocationDetails locationDetails) {
+        this.locationDetails = locationDetails;
+    }
+
+    public LocationDetails getLocationDetails() {
+        return locationDetails;
     }
 }
