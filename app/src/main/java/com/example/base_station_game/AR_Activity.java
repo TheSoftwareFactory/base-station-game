@@ -3,7 +3,6 @@ package com.example.base_station_game;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -16,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.base_station_game.sampling.Sampler;
@@ -35,14 +35,16 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.wikitude.architect.ArchitectJavaScriptInterfaceListener;
 import com.wikitude.architect.ArchitectStartupConfiguration;
 import com.wikitude.architect.ArchitectView;
 
-import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
-public class AR_Activity extends AppCompatActivity {
+public class AR_Activity extends AppCompatActivity implements ArchitectJavaScriptInterfaceListener {
 
     private ArchitectView architectView;
 
@@ -73,6 +75,9 @@ public class AR_Activity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private User user;
     private BaseStation station;
+    private ProgressBar progressBar;
+    private int progressStatus = 0;
+    private int clicked = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +91,7 @@ public class AR_Activity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         user = (User) getIntent().getSerializableExtra("user");
         station = (BaseStation) getIntent().getSerializableExtra("station");
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         this.architectView = (ArchitectView) this.findViewById(R.id.architectView);
         final ArchitectStartupConfiguration config = new ArchitectStartupConfiguration();
@@ -117,6 +123,14 @@ public class AR_Activity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA_CONTACTS);
             } else {
                 architectView.load(SAMPLES_ROOT + arExperience);
+                try {
+                    JSONObject jo = new JSONObject();
+                    jo.put("stationPositionLatitude", station.getLatitude());
+                    jo.put("stationPositionLongitude", station.getLongitude());
+                    architectView.callJavascript("setStationLocation(" + jo.toString() + ");");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (IOException e) {
             Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
@@ -189,20 +203,17 @@ public class AR_Activity extends AppCompatActivity {
     protected void startThreadMinigame() {
         new Thread(() -> {
             try {
-                int progressStatus = 0;
                 if (Sampler.sample(AR_Activity.this))
                     System.out.println("sample inserted into the database.");
                 while (progressStatus < 100) {
                     progressStatus += 1;
-                    // Update the progress bar and display the
-                    //current value in the text view
-                    handler.post(new Runnable() {
-                        public void run() {
 
-                        }
+                    // Update the progress bar
+                    handler.post(() -> {
+                        progressBar.setProgress(progressStatus);
                     });
 
-                    // Sleep for 100 milliseconds.
+                    // Sleep for 200 milliseconds.
 
                     // Check if the player is this in the Range
                     // In case throw an exception
@@ -217,7 +228,8 @@ public class AR_Activity extends AppCompatActivity {
                 finish();
             }
             // Everything went GOOD
-            Long score = new Long(500);
+            //Long score = new Long(500);
+            Long score = Long.valueOf((clicked * 50) + 10);
             data.putExtra("score", score);
             conquered(station, score);
             setResult(Activity.RESULT_OK, data);
@@ -304,6 +316,7 @@ public class AR_Activity extends AppCompatActivity {
                     // contacts-related task you need to do.
                     try {
                         architectView.load(SAMPLES_ROOT + arExperience);
+                        architectView.addArchitectJavaScriptInterfaceListener(this);
                     } catch (IOException e) {
                         Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
                         Log.e(TAG, " onRequestPermissionsResult -> Exception while loading arExperience " + arExperience + ".", e);
@@ -393,4 +406,9 @@ public class AR_Activity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onJSONObjectReceived(JSONObject jsonObject) {
+            Log.d(TAG, "object received" + jsonObject.toString());
+            clicked += 1;
+    }
 }

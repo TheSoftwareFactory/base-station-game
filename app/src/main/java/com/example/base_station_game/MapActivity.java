@@ -65,6 +65,7 @@ import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -440,6 +441,7 @@ public class MapActivity extends AppCompatActivity {
                             if (location != null) {
                                 // Logic to handle location object
                                 onSuccessLastLocation(location);
+                                onNewLocation(location);
                             }
                         }
                     });
@@ -463,7 +465,6 @@ public class MapActivity extends AppCompatActivity {
                 }
             });
         }
-        createLocationRequest();
     }
 
     @Override
@@ -483,7 +484,7 @@ public class MapActivity extends AppCompatActivity {
             alertDialog.setMessage(getString(R.string.lost));
         } else {
             Long score = data.getLongExtra("score", 0);
-            alertDialog.setMessage(getString(R.string.won) + score.toString() +  getString(R.string.exp));
+            alertDialog.setMessage(getString(R.string.won) + score.toString() + getString(R.string.exp));
             updateStationsOnMap();
         }
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
@@ -642,32 +643,8 @@ public class MapActivity extends AppCompatActivity {
                         new LocationCallback() {
                             @Override
                             public void onLocationResult(LocationResult locationResult) {
-                                if (locationResult == null) {
-                                    return;
-                                }
-                                Log.d(TAG + "FUSEDLOCATION", locationResult.getLastLocation().toString());
-                                // TODO SEND This location to the architectView
-                                onSuccessLastLocation(locationResult.getLastLocation());
-                                if (marker == null) {
-                                    //Not dynamic
-                                    List<GeoPoint> circle = Polygon.pointsAsCircle(actualPosition, MAX_DISTANCE);
-                                    p.setPoints(circle);
-                                    map.getOverlayManager().add(p);
-                                    marker = new Marker(map);
-                                    marker.setPosition(actualPosition);
-                                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                                    marker.setTitle("test");
-                                    map.getOverlays().add(marker);
-                                    updateStationsOnMap();
-                                } else {
-                                    p.setPoints(Polygon.pointsAsCircle(actualPosition, MAX_DISTANCE));
-                                    marker.setPosition(actualPosition);
-
-                                }
-                                map.invalidate();
+                                onNewLocation(locationResult.getLastLocation());
                             }
-
-                            ;
                         },
                         null /* Looper */);
             }
@@ -686,6 +663,35 @@ public class MapActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void onNewLocation(Location locationResult) {
+        if (locationResult == null) {
+            return;
+        }
+        float[] dist = new float[1];
+        Location.distanceBetween(actualPosition.getLatitude(), actualPosition.getLongitude(), locationResult.getLatitude(), locationResult.getLongitude(), dist);
+        onSuccessLastLocation(locationResult);
+        //if (dist[0] > 5) {
+        Log.d(TAG + "FUSEDLOCATION", locationResult.toString());
+        // TODO SEND This location to the architectView
+        if (marker == null) {
+            //Not dynamic
+            p.setPoints(Polygon.pointsAsCircle(actualPosition, MAX_DISTANCE));
+            map.getOverlayManager().add(p);
+            marker = new Marker(map);
+            marker.setPosition(actualPosition);
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setTitle("test");
+            map.getOverlays().add(marker);
+            updateStationsOnMap();
+        } else {
+            p.setPoints(Polygon.pointsAsCircle(actualPosition, MAX_DISTANCE));
+            marker.setPosition(actualPosition);
+
+        }
+        map.invalidate();
+        //}
     }
 
     @SuppressLint("MissingPermission")
@@ -717,6 +723,7 @@ public class MapActivity extends AppCompatActivity {
                                 }
                             });
                     Intent intent = new Intent(this, DatabaseService.class);
+                    intent.putExtra("position", (Serializable) actualPosition);
                     startService(intent);
 
                     createLocationRequest();

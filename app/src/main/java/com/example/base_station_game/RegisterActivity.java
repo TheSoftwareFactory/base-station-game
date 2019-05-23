@@ -47,21 +47,20 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void register(View v) {
         email_field = findViewById(R.id.email_text);
-        String email=email_field.getText().toString();
+        String email = email_field.getText().toString();
         team_field = findViewById(R.id.team_text);
-        String team=team_field.getText().toString();
+        String team = team_field.getText().toString();
         username_field = findViewById(R.id.username_text);
-        String username=username_field.getText().toString();
-        password_field =  findViewById(R.id.password_text);
-        String password=password_field.getText().toString();
+        String username = username_field.getText().toString();
+        password_field = findViewById(R.id.password_text);
+        String password = password_field.getText().toString();
 
 
-
-        if ( password.equals("") || email.equals("") || team.equals("") || username.equals("")) {
+        if (password.equals("") || email.equals("") || team.equals("") || username.equals("")) {
             Toast.makeText(RegisterActivity.this, R.string.all_fields, Toast.LENGTH_SHORT).show();
-        } else if (team.length()<2 || team.length()>12) {
+        } else if (team.length() < 2 || team.length() > 12) {
             team_field.setError(getString(R.string.team_restriction));
-        } else if (username.length()<2 || username.length()>10) {
+        } else if (username.length() < 2 || username.length() > 10) {
             username_field.setError(getString(R.string.pw_restriction));
         } else {
             mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -129,7 +128,8 @@ public class RegisterActivity extends AppCompatActivity {
             });
         }
     }
-    public void startMap(){
+
+    public void startMap() {
         Intent intent = new Intent(this, MapActivity.class);
         startActivity(intent);
     }

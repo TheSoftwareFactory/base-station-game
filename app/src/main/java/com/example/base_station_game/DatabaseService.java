@@ -20,7 +20,6 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,7 +41,7 @@ public class DatabaseService extends Service {
 
     private LocationManager locationManager;
     private LocationListener listener;
-    private GeoPoint actualPosition = new GeoPoint(0, 0);
+    private GeoPoint actualPosition = null;
     private GeoFire geoFire = null;
 
     public User user;
@@ -61,6 +60,7 @@ public class DatabaseService extends Service {
 
 
     }
+
 
     public void onCreate() {
         super.onCreate();
@@ -88,10 +88,22 @@ public class DatabaseService extends Service {
             }
         };
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         locationManager.requestLocationUpdates("gps", 3000, 0, listener);
 
 
     }
+
+
     public class LocalBinder extends Binder {
         DatabaseService getService() {
             // Return this instance of LocalService so clients can call public methods
@@ -100,6 +112,10 @@ public class DatabaseService extends Service {
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
+        actualPosition = (GeoPoint) intent.getSerializableExtra("position");
+        if(actualPosition != null) {
+            query_stations();
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
