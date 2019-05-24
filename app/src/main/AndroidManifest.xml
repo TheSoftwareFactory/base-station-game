@@ -37,7 +37,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".AR_Activity"></activity>
+        <activity android:name=".TeamCreationActivity"></activity>
+        <activity android:name=".AR_Activity" />
         <activity android:name=".NewsActivity" />
 
         <service

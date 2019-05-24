@@ -23,8 +23,6 @@ public class setting extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_setting);
-
-
     }
 
     @Override
@@ -49,5 +47,10 @@ public class setting extends AppCompatActivity {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         }
+    }
+
+    public void createTeam(View view) {
+        Intent intent = new Intent(this, TeamCreationActivity.class);
+        startActivity(intent);
     }
 }
