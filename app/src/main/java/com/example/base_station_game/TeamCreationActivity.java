@@ -4,6 +4,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import studio.carbonylgroup.textfieldboxes.ExtendedEditText;
 
 public class TeamCreationActivity extends AppCompatActivity {
@@ -17,6 +21,11 @@ public class TeamCreationActivity extends AppCompatActivity {
     public void createTeam(View view) {
         ExtendedEditText teamNameField = findViewById(R.id.team_name_text);
         String teamName = teamNameField.getText().toString();
-        System.out.println(teamName);
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        database
+                .child("Users")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("team")
+                .setValue(teamName);
     }
 }
