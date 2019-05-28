@@ -49,7 +49,7 @@ public class TeamCreationActivity extends AppCompatActivity {
 
     public void createTeam(View view) {
         if (!currentTeam.equals("Lone Wolfs")) {
-            Toast.makeText(this, "You are already in" + currentTeam, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You are already in " + currentTeam, Toast.LENGTH_SHORT).show();
             return;
         }
         ExtendedEditText teamNameField = findViewById(R.id.team_name_text);
@@ -60,8 +60,10 @@ public class TeamCreationActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.child(teamName).exists()) {
-                            mDatabase.child("Teams").child(teamName).child(uid).setValue(username);
                             mDatabase.child("Teams").child("Lone Wolfs").child(uid).removeValue();
+                            mDatabase.child("Users").child(uid).child("team").setValue(teamName);
+                            currentTeam = teamName;
+                            mDatabase.child("Teams").child(teamName).child(uid).setValue(username);
                         } else {
                             Toast.makeText(TeamCreationActivity.this, "Team already exists", Toast.LENGTH_SHORT).show();
                         }
