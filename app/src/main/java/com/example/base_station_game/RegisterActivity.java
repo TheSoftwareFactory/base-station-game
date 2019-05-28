@@ -136,7 +136,8 @@ public class RegisterActivity extends AppCompatActivity {
             });
         }
     }
-    public void startMap(){
+
+    public void startMap() {
         Intent intent = new Intent(this, MapActivity.class);
         startActivity(intent);
     }
