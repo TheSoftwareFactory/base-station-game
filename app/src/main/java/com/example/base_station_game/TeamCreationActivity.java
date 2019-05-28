@@ -33,6 +33,11 @@ public class TeamCreationActivity extends AppCompatActivity {
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        long lvl = (long) dataSnapshot.child("level").getValue();
+                        if (lvl < 5) {
+                            Toast.makeText(TeamCreationActivity.this, "You need to be level 5 or higher to do this", Toast.LENGTH_SHORT);
+                            finish();
+                        }
                         currentTeam = (String) dataSnapshot.child("team").getValue();
                         username = (String) dataSnapshot.child("username").getValue();
                     }
