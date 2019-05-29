@@ -37,8 +37,6 @@ public class TeamCreationActivity extends AppCompatActivity {
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-<<<<<<< Updated upstream
-=======
                         long lvl = (long) dataSnapshot.child("level").getValue();
                         if (lvl < 5) {
                             Intent data = new Intent();
@@ -46,7 +44,6 @@ public class TeamCreationActivity extends AppCompatActivity {
                             setResult(Activity.RESULT_CANCELED, data);
                             finish();
                         }
->>>>>>> Stashed changes
                         currentTeam = (String) dataSnapshot.child("team").getValue();
                         username = (String) dataSnapshot.child("username").getValue();
                     }
