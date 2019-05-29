@@ -51,6 +51,17 @@ public class setting extends AppCompatActivity {
 
     public void createTeam(View view) {
         Intent intent = new Intent(this, TeamCreationActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, 0);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(this, "Team created successfully", Toast.LENGTH_SHORT).show();
+            } else if (resultCode == RESULT_CANCELED) {
+                String message = data.getStringExtra("Error");
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

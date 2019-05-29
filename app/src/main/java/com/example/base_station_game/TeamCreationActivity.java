@@ -1,5 +1,7 @@
 package com.example.base_station_game;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +14,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.sql.SQLOutput;
 
 import studio.carbonylgroup.textfieldboxes.ExtendedEditText;
 
@@ -33,6 +37,16 @@ public class TeamCreationActivity extends AppCompatActivity {
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+<<<<<<< Updated upstream
+=======
+                        long lvl = (long) dataSnapshot.child("level").getValue();
+                        if (lvl < 5) {
+                            Intent data = new Intent();
+                            data.putExtra("Error", "You need to be level 5 or higher to do this");
+                            setResult(Activity.RESULT_CANCELED, data);
+                            finish();
+                        }
+>>>>>>> Stashed changes
                         currentTeam = (String) dataSnapshot.child("team").getValue();
                         username = (String) dataSnapshot.child("username").getValue();
                     }
@@ -64,8 +78,13 @@ public class TeamCreationActivity extends AppCompatActivity {
                             mDatabase.child("Users").child(uid).child("team").setValue(teamName);
                             currentTeam = teamName;
                             mDatabase.child("Teams").child(teamName).child(uid).setValue(username);
+                            setResult(RESULT_OK);
+                            finish();
                         } else {
-                            Toast.makeText(TeamCreationActivity.this, "Team already exists", Toast.LENGTH_SHORT).show();
+                            Intent data = new Intent();
+                            data.putExtra("Error", "Team already exists");
+                            setResult(Activity.RESULT_CANCELED, data);
+                            finish();
                         }
                     }
 
