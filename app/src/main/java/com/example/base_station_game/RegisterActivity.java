@@ -100,7 +100,9 @@ public class RegisterActivity extends AppCompatActivity {
                                                     mDatabase.child("Users").child(user.getUID()).child("token").setValue(token);
 
                                                     mDatabase.child("usernames").child(username).setValue(user.getUID());
-                                                    mDatabase.child("Teams").child(team).child("Users").child(firebaseUser.getUid()).setValue(username);
+                                                    System.out.println("Lone Wolfs should have a new team member");
+                                                    mDatabase.child("Teams").child(user.getTeam()).child("Users").child(user.getUID()).setValue(user.getUsername());
+                                                    System.out.println(user.getTeam() + " " + user.getUID() + " " + user.getUsername());
                                                     startMap();
                                                 } else {
                                                     Log.d("token error", "token couldnt get generated");

@@ -1,0 +1,76 @@
+{
+  "rules": {
+
+    "usernames":{
+      ".write":true,
+      ".read":true,
+    },
+    "GeoFireStations":{
+      ".read":true,
+      ".write":true
+    },
+    "Teams":{    
+      "$teamid": {
+        "$userid": {
+          ".write": "root.child('Users').child(auth.uid).child('team').val() == $teamid",
+          ".validate": "auth.uid == $userid",
+        },       
+      },
+      ".read":true,
+    }, 
+    "stations": {
+      ".read": "true",
+      "$stationid": {
+        "Teams": {          
+          "$teamid": {           
+              "Players": {
+                ".write": "root.child('Users').child(auth.uid).child('team').val() == $teamid",            
+              	"$userid": {
+                	".validate": "auth.uid == $userid",
+              }
+            }
+          }
+        },     
+      }, 
+    },
+    "Users": {
+      "$uid": {
+        ".read": "auth.uid == $uid",
+        ".indexOn": [
+          "username"
+        ],
+        "email": {
+          ".write": "auth.uid == $uid && newData.exists()",
+          ".validate": "newData.isString()",
+        },
+          "token": {
+          ".write": "auth.uid == $uid && newData.exists()",
+        },
+        "username": {
+          ".write": "auth.uid == $uid && newData.exists()",
+          ".validate": "newData.isString() && newData.val().length<11"
+        },
+        "uid": {
+          ".validate": "newData.val() == $uid",
+          ".write": "auth.uid == $uid",
+        },
+        "team": {
+          ".write": "auth.uid == $uid && newData.exists()",
+          ".validate": "newData.isString() && newData.val().length<11"
+        },
+        "PlayedStations": {
+          
+          "$stationId":{
+            ".write": "auth.uid == $uid && newData.exists()",
+          	".validate": 
+            "root.child('stations').child($stationId).exists() && newData.exists() && newData.isNumber() && newData.val() >0 ",
+        }
+           
+        },
+        "ConqueredStations": {
+          ".write": false,
+        }
+      }
+    }
+  }
+}
